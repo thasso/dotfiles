@@ -61,13 +61,13 @@ map <c-h> <c-w>h
 " add arrow key navigation between windows
 map <c-DOWN> <c-w>j
 map <c-UP> <c-w>k
-map <c-LEFT> <c-w>l
-map <c-RIGHT> <c-w>h
+map <c-RIGHT> <c-w>l
+map <c-LEFT> <c-w>h
 
 imap <c-DOWN> <ESC><c-w>j
 imap <c-UP> <ESC><c-w>k
-imap <c-LEFT> <ESC><c-w>l
-imap <c-RIGHT> <ESC><c-w>h
+imap <c-RIGHT> <ESC><c-w>l
+imap <c-LEFT> <ESC><c-w>h
 
 
 " easier moving between tabs
