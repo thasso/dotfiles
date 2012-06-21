@@ -58,11 +58,26 @@ map <c-k> <c-w>k
 map <c-l> <c-w>l
 map <c-h> <c-w>h
 
+" add arrow key navigation between windows
+map <c-DOWN> <c-w>j
+map <c-UP> <c-w>k
+map <c-LEFT> <c-w>l
+map <c-RIGHT> <c-w>h
+
+imap <c-DOWN> <ESC><c-w>j
+imap <c-UP> <ESC><c-w>k
+imap <c-LEFT> <ESC><c-w>l
+imap <c-RIGHT> <ESC><c-w>h
+
 
 " easier moving between tabs
 map <Leader>n <esc>:tabprevious<CR>
 map <Leader>m <esc>:tabnext<CR>
 
+map <C-S-LEFT> <esc>:tabprevious<CR>
+map <C-S-RIGHT> <esc>:tabnext<CR>
+imap <C-S-LEFT> <esc>:tabprevious<CR>i
+imap <C-S-RIGHT> <esc>:tabnext<CR>i
 
 " map sort function to a key
 vnoremap <Leader>s :sort<CR>
