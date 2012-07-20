@@ -3,16 +3,11 @@
 
 ;;; color scheme
 (add-to-list 'load-path "~/.emacs.d/colors")
-(require 'color-theme)
-;;;(require 'color-theme-subdued)
-;;;(require 'color-theme-tango)
-;;;(color-theme-initialize)
-;;;(color-theme-robin-hood)
-;;;(color-theme-subdued)
-;;;(color-theme-tango)
 
 ;;; load commons
 (add-to-list 'load-path "~/.emacs.d/commons")
+(add-to-list 'custom-theme-load-path "~/.emacs.d/emacs-color-theme-solarized")
+(load-theme 'solarized-dark t)
 
 ;;; auto follow symkinks
 (setq vc-follow-symlinks t)
