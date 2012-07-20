@@ -26,7 +26,6 @@
 ;;; CUA cut/copy/paste and other defaults
 (require 'autopair)
 (autopair-global-mode 1)
-
 (cua-mode t)
 ;;; workaround to get shif up selection working
 (if (equal "xterm" (tty-type))
@@ -39,14 +38,13 @@
 ;;;(setq cua-keep-region-after-copy t) ;; Standard Windows behaviour
 ;;;(setq autopair-autowrap t)
 
-
 ;;; load magit
 (add-to-list 'load-path "~/.emacs.d/magit")
 (require 'magit)
 (global-set-key (kbd "C-c g") 'magit-status)
 
 ;;; load python magic
-;;;(load-file "~/.emacs.d/emacs-python/epy-init.el")
+(load-file "~/.emacs.d/emacs-python/epy-init.el")
 
 ;;; bind RET to py-newline-and-indent
 ;;;(add-hook 'python-mode-hook '(lambda () 

@@ -3,16 +3,16 @@
 ;; Pairing parentheses
 
 ;; All languages:
-(setq skeleton-pair t)
-(global-set-key "(" 'skeleton-pair-insert-maybe)
-(global-set-key "[" 'skeleton-pair-insert-maybe)
-(global-set-key "{" 'skeleton-pair-insert-maybe)
-(global-set-key "\"" 'skeleton-pair-insert-maybe)
+;;(setq skeleton-pair t)
+;;(global-set-key "(" 'skeleton-pair-insert-maybe)
+;;(global-set-key "[" 'skeleton-pair-insert-maybe)
+;;(global-set-key "{" 'skeleton-pair-insert-maybe)
+;;(global-set-key "\"" 'skeleton-pair-insert-maybe)
 
 ;; Just python
-(add-hook 'python-mode-hook 
-	  (lambda () 
-	    (define-key python-mode-map "'" 'skeleton-pair-insert-maybe)))
+;;(add-hook 'python-mode-hook 
+;;	  (lambda () 
+;;	    (define-key python-mode-map "'" 'skeleton-pair-insert-maybe)))
 
 ;; Live completion with auto-complete
 ;; (see http://cx4a.org/software/auto-complete/)
