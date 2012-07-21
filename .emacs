@@ -20,18 +20,34 @@
 (defun track-mouse (e)) 
 (setq mouse-sel-mode t)
 
-;;; CUA cut/copy/paste and other defaults
+;;; autopairing
 (require 'autopair)
 (autopair-global-mode 1)
+
+;;; CUA cut/copy/paste and other defaults
 (cua-mode t)
-;;; workaround to get shif up selection working
+; workaround to get shif up selection working
 (if (equal "xterm" (tty-type))
       (define-key input-decode-map "\e[1;2A" [S-up]))
 (defadvice terminal-init-xterm (after select-shift-up activate)
     (define-key input-decode-map "\e[1;2A" [S-up]))
 (global-set-key (kbd "C-c r") 'cua-set-rectangle-mark)
 
-;;; load magit
+;;; fix Iterm2 issue with meta arrow keys
+;;; to enable window navigation
+(add-hook 'term-setup-hook
+  '(lambda ()
+     (define-key function-key-map "\e[1;9A" [M-up])
+     (define-key function-key-map "\e[1;9B" [M-down])
+     (define-key function-key-map "\e[1;9C" [M-right])
+     (define-key function-key-map "\e[1;9D" [M-left])))
+
+;;; window navigation
+(require 'windmove)
+(windmove-default-keybindings 'meta)
+
+
+;;; magit git support
 (add-to-list 'load-path "~/.emacs.d/magit")
 (require 'magit)
 (global-set-key (kbd "C-c g") 'magit-status)
@@ -43,3 +59,4 @@
 (add-hook 'c-mode-common-hook
   (lambda() 
     (local-set-key  (kbd "C-c o") 'ff-find-other-file)))
+
