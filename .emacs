@@ -32,6 +32,10 @@
 (defadvice terminal-init-xterm (after select-shift-up activate)
     (define-key input-decode-map "\e[1;2A" [S-up]))
 (global-set-key (kbd "C-c r") 'cua-set-rectangle-mark)
+;;; add mac os x terminal clipboard support
+(require 'pbcopy)
+(turn-on-pbcopy)
+
 
 ;;; magit git support
 (add-to-list 'load-path "~/.emacs.d/magit")
