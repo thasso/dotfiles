@@ -132,14 +132,14 @@ original" (interactive)
   (setq deactivate-mark nil)
 )
 
-(global-set-key (kbd "M-<up>") 'move-text-up)
-(global-set-key (kbd "M-<down>") 'move-text-down)
+(global-set-key (kbd "S-M-<up>") 'move-text-up)
+(global-set-key (kbd "S-M-<down>") 'move-text-down)
 
 (add-hook 'python-mode-hook
 	  (lambda ()
-	    (define-key python-mode-map (kbd "M-<right>")
+	    (define-key python-mode-map (kbd "S-M-<right>")
 	      'balle-python-shift-right)
-	    (define-key python-mode-map (kbd "M-<left>")
+	    (define-key python-mode-map (kbd "S-M-<left>")
 	      'balle-python-shift-left))
 	  )
 
