@@ -1,6 +1,6 @@
 ;;; enable ido mode by default
 (ido-mode t)
-
+(setq ido-enable-flex-matching t)
 ;;; color scheme
 (add-to-list 'load-path "~/.emacs.d/colors")
 
@@ -33,20 +33,6 @@
     (define-key input-decode-map "\e[1;2A" [S-up]))
 (global-set-key (kbd "C-c r") 'cua-set-rectangle-mark)
 
-;;; fix Iterm2 issue with meta arrow keys
-;;; to enable window navigation
-(add-hook 'term-setup-hook
-  '(lambda ()
-     (define-key function-key-map "\e[1;9A" [M-up])
-     (define-key function-key-map "\e[1;9B" [M-down])
-     (define-key function-key-map "\e[1;9C" [M-right])
-     (define-key function-key-map "\e[1;9D" [M-left])))
-
-;;; window navigation
-(require 'windmove)
-(windmove-default-keybindings 'meta)
-
-
 ;;; magit git support
 (add-to-list 'load-path "~/.emacs.d/magit")
 (require 'magit)
@@ -59,4 +45,17 @@
 (add-hook 'c-mode-common-hook
   (lambda() 
     (local-set-key  (kbd "C-c o") 'ff-find-other-file)))
+
+;;; fix Iterm2 issue with meta arrow keys
+;;; to enable window navigation
+(add-hook 'term-setup-hook
+  '(lambda ()
+     (define-key function-key-map "\e[1;9A" [M-up])
+     (define-key function-key-map "\e[1;9B" [M-down])
+     (define-key function-key-map "\e[1;9C" [M-right])
+     (define-key function-key-map "\e[1;9D" [M-left])))
+
+;;; window navigation
+(require 'windmove)
+(windmove-default-keybindings 'meta)
 
