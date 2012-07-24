@@ -7,3 +7,6 @@
 [submodule ".vim/bundle/vim-powerline"]
 	path = .vim/bundle/vim-powerline
 	url = git://github.com/Lokaltog/vim-powerline.git
+[submodule ".emacs.d/yasnippet"]
+	path = .emacs.d/yasnippet
+	url = http://github.com/capitaomorte/yasnippet.git

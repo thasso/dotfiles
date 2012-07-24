@@ -7,8 +7,7 @@
   "Installation directory of emacs-for-python terminating with a slash"
   )
 
-
-;; Adding paths to the variable load-path
+;; Adding pathsto the variable load-path
 (dolist (relpath '(""
                    "extensions/"
                    "extensions/yasnippet"

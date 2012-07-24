@@ -38,9 +38,13 @@ __git_ps1 () {
     fi
 }
 
-
 export PS1='\u@\h:\w \[\033[31m\]$(__git_ps1 "(%s)") \[\033[01;34m\]$\[\033[00m\] '
 
+## default aliases on the mac
+if [ `uname` == 'Darwin' ]; then
+    alias ls="ls -G"
+    alias ll="ls -laG"
+fi
 ## default paths
 export PATH=$HOME/usr/bin:$PATH
 export LD_LIBRARY_PATH=$HOME/usr/lib:$LD_LIBRARY_PATH
