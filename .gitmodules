@@ -10,3 +10,24 @@
 [submodule ".emacs.d/yasnippet"]
 	path = .emacs.d/yasnippet
 	url = http://github.com/capitaomorte/yasnippet.git
+[submodule ".emacs.d/anything"]
+	path = .emacs.d/anything
+	url = git://repo.or.cz/anything-config.git
+[submodule ".emacs.d/expand-region"]
+	path = .emacs.d/expand-region
+	url = https://github.com/magnars/expand-region.el.git
+[submodule "emacs.d/vendor/magit"]
+	path = emacs.d/vendor/magit
+	url = http://github.com/magit/magit.git
+[submodule "emacs.d/vendor/auto-complete"]
+	path = emacs.d/vendor/auto-complete
+	url = https://github.com/m2ym/auto-complete.git
+[submodule "emacs.d/vendor/expand-region"]
+	path = emacs.d/vendor/expand-region
+	url = http://github.com/magnars/expand-region.el.git
+[submodule "emacs.d/vendor/helm"]
+	path = emacs.d/vendor/helm
+	url = http://github.com/emacs-helm/helm.git
+[submodule "emacs.d/vendor/pymacs"]
+	path = emacs.d/vendor/pymacs
+	url = http://github.com/pinard/Pymacs.git
