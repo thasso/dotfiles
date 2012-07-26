@@ -59,3 +59,11 @@ export EDITOR='emacsclient'
 export VISUAL=$EDITOR
 export GIT_EDITOR=$EDITOR
 alias emacs='emacsclient -t'
+
+
+## load customizations
+if [ -d "$HOME/.bashrc.d" ]; then
+    for file in $HOME/.bashrc.d/*; do
+        . $file
+    done
+fi
