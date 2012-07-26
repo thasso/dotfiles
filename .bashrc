@@ -50,3 +50,6 @@ fi
 export PATH=$HOME/usr/bin:$PATH
 export LD_LIBRARY_PATH=$HOME/usr/lib:$LD_LIBRARY_PATH
 
+export EDITOR=emacs
+export VISUAL=$EDITOR
+export GIT_EDITOR=$EDITOR
