@@ -40,11 +40,13 @@ __git_ps1 () {
 
 export PS1='\u@\h:\w \[\033[31m\]$(__git_ps1 "(%s)") \[\033[01;34m\]$\[\033[00m\] '
 
-## default aliases on the mac
+## default mac stuff
 if [ `uname` == 'Darwin' ]; then
     alias ls="ls -G"
     alias ll="ls -laG"
+    export PATH=$PATH:~/Library/Python/2.7/bin
 fi
 ## default paths
 export PATH=$HOME/usr/bin:$PATH
 export LD_LIBRARY_PATH=$HOME/usr/lib:$LD_LIBRARY_PATH
+
