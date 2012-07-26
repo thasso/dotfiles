@@ -20,7 +20,7 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
-# Set git autocompletion and PS1 integration
+# Set autocompletion and PS1 integration
 if [ `uname` = 'Darwin' ]; then
     if [ -f `brew --prefix`/etc/bash_completion ]; then
         . `brew --prefix`/etc/bash_completion
@@ -31,25 +31,31 @@ else
     fi
 fi
 
+## function to get the current branch if we are in a git repo
 __git_ps1 () {
     local b="$(git symbolic-ref HEAD 2>/dev/null)";
     if [ -n "$b" ]; then
         printf " (%s)" "${b##refs/heads/}";
     fi
 }
-
+## The prompt
 export PS1='\u@\h:\w \[\033[31m\]$(__git_ps1 "(%s)") \[\033[01;34m\]$\[\033[00m\] '
 
-## default mac stuff
+
+## default tweaks for mac os x
 if [ `uname` == 'Darwin' ]; then
     alias ls="ls -G"
     alias ll="ls -laG"
     export PATH=$PATH:~/Library/Python/2.7/bin
 fi
-## default paths
+
+## default path and library path
 export PATH=$HOME/usr/bin:$PATH
 export LD_LIBRARY_PATH=$HOME/usr/lib:$LD_LIBRARY_PATH
 
-export EDITOR=emacs
+## configure editor
+export ALTERNATE_EDITOR=emacs
+export EDITOR='emacsclient'
 export VISUAL=$EDITOR
 export GIT_EDITOR=$EDITOR
+alias emacs='emacsclient -t'
