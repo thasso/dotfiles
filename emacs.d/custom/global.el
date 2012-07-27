@@ -30,6 +30,10 @@
 ;; Prevent the annoying beep on errors
 (setq visible-bell t)
 
+;; Emacs gurus don't need no stinking scroll bars
+(when (fboundp 'toggle-scroll-bar)
+  (toggle-scroll-bar -1))
+
 ;; Make sure all backup files only live in one place
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 

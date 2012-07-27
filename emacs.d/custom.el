@@ -8,6 +8,8 @@
 
 ;;; load custom things
 (load "custom/theme")
+(load "custom/fonts")
+(load "custom/env")
 (load "custom/global")
 (load "custom/defuns")
 (load "custom/ido")
@@ -18,7 +20,8 @@
 (load "custom/windows")
 (load "custom/flymake")
 (load "custom/utf8")
-
+(load "custom/mac")
+(load "custom/python-mode")
 
 ;;; vendor loads
 (vendor 'magit 'magit-status)
@@ -27,6 +30,6 @@
 (vendor 'expand-region)
 (vendor 'helm)
 (vendor 'pymacs)
-(vendor 'python-mode)
+(vendor 'python-mode 'python-mode)
 (vendor 'nose)
 (vendor 'ac-python)

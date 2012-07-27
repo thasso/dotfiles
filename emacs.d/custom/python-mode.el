@@ -47,16 +47,6 @@
 
 )
 
-(pm-init-rope)
-(pm-init-rope-loading)
-(require 'flymake)
-(pm-init-flymake)
-;; load rope and autocomplete support
-(add-to-list 'ac-sources 'ac-source-ropemacs)
-(require 'ac-python)
-(ac-ropemacs-initialize)
-(pm-init-keyboard)
-
 (add-hook 'python-mode-hook
           (lambda ()
             (pm-init-rope)
