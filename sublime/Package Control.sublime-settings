@@ -1,0 +1,10 @@
+{
+	"installed_packages":
+	[
+		"DocBlockr",
+		"Git",
+		"Package Control",
+		"SublimeLinter",
+		"SublimeRope"
+	]
+}

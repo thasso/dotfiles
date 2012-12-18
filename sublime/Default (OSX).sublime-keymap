@@ -1,0 +1,14 @@
+[
+    //Rope key bindings
+    { "keys": ["super+j"], "command": "python_get_documentation", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "source.python" }
+        ]
+    },
+    { "keys": ["super+b"], "command": "goto_python_definition", "context":
+        [
+            { "key": "selector", "operator": "equal", "operand": "source.python" }
+        ]
+    },
+    { "keys": ["shif+f10"], "command": "build" }
+]
