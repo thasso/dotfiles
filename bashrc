@@ -55,7 +55,7 @@ export LD_LIBRARY_PATH=$HOME/usr/lib:$LD_LIBRARY_PATH
 
 ## configure editor
 export ALTERNATE_EDITOR=emacs
-export EDITOR='emacsclient'
+export EDITOR='vim'
 export VISUAL=$EDITOR
 export GIT_EDITOR=$EDITOR
 alias emacs='emacsclient -t'
@@ -67,3 +67,7 @@ if [ -d "$HOME/.bashrc.d" ]; then
         . $file
     done
 fi
+
+## locale
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8

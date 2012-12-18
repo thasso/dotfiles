@@ -49,6 +49,7 @@
 
 (add-hook 'python-mode-hook
           (lambda ()
+            (set (make-local-variable 'eldoc-mode-hook) nil)
             (pm-init-rope)
             (pm-init-rope-loading)
             (require 'flymake)

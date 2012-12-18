@@ -31,5 +31,5 @@
 (vendor 'helm)
 (vendor 'pymacs)
 (vendor 'python-mode 'python-mode)
-(vendor 'nose)
+(vendor 'nose 'nosetests-all 'nosetests-one 'nosetests-module)
 (vendor 'ac-python)
