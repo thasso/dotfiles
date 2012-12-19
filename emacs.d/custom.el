@@ -29,7 +29,7 @@
 (vendor 'pbcopy)
 (vendor 'expand-region)
 (vendor 'helm)
-(vendor 'pymacs)
+;;(vendor 'pymacs)
 (vendor 'python-mode 'python-mode)
 (vendor 'nose 'nosetests-all 'nosetests-one 'nosetests-module)
 (vendor 'ac-python)
