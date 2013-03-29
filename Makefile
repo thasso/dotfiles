@@ -4,6 +4,9 @@ POWERLINE_PATH = vim/bundle/powerline
 all: vim bash
 	@echo "Configuration installed"
 
+init:
+	git submodule init
+
 vim-clean:
 	rm -f ~/.vimrc
 	rm -Rf ~/.vim
@@ -12,7 +15,7 @@ vim-init:
 	ln -sf $(CURDIR)/vim ~/.vim
 	ln -sf ~/.vim/vimrc ~/.vimrc
 
-vim: vim-clean vim-init command-t powerline
+vim: init vim-clean vim-init command-t powerline
 	echo "Vim plugins initialized"
 
 command-t: vim-init
@@ -32,7 +35,7 @@ bash-clean:
 bash-init:
 	@mkdir -p ~/.bashrc.d
 
-bash: bash-clean bash-init
+bash: init bash-clean bash-init
 	ln -s $(CURDIR)/bashrc ~/.bashrc
 	ln -s $(CURDIR)/profile ~/.profile
 	
