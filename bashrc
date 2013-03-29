@@ -41,6 +41,8 @@ __git_ps1 () {
 ## The prompt
 export PS1='\u@\h:\w \[\033[31m\]$(__git_ps1 "(%s)") \[\033[01;34m\]$\[\033[00m\] '
 
+#powerline
+. ~/.vim/bundle/powerline/powerline/bindings/bash/powerline.sh
 
 ## default tweaks for mac os x
 if [ `uname` == 'Darwin' ]; then
@@ -54,7 +56,7 @@ export PATH=$HOME/usr/bin:$PATH
 export LD_LIBRARY_PATH=$HOME/usr/lib:$LD_LIBRARY_PATH
 
 ## configure editor
-export ALTERNATE_EDITOR=emacs
+export ALTERNATE_EDITOR=vim
 export EDITOR='vim'
 export VISUAL=$EDITOR
 export GIT_EDITOR=$EDITOR
@@ -71,7 +73,3 @@ if [ -d "$HOME/.bashrc.d" ]; then
         . $file
     done
 fi
-
-## locale
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8

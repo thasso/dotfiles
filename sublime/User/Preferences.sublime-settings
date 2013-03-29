@@ -1,24 +1,15 @@
 {
+	"auto_complete_commit_on_tab": true,
+	"font_size": 12.0,
+	"highlight_line": true,
+	"highlight_modified_tabs": false,
+	"hot_exit": false,
 	"ignored_packages":
 	[
+		"Vintage"
 	],
+	"remember_open_files": false,
+	"spell_check": true,
 	"translate_tabs_to_spaces": true,
-	"trim_trailing_white_space_on_save": true,
-    "spell_check": false,
-    "highlight_line": true,
-    "auto_complete_commit_on_tab": true,
-    "highlight_modified_tabs": false,
-        // Exiting the application with hot_exit enabled will cause it to close
-    // immediately without prompting. Unsaved modifications and open files will
-    // be preserved and restored when next starting.
-    //
-    // Closing a window with an associated project will also close the window
-    // without prompting, preserving unsaved changes in the workspace file
-    // alongside the project.
-    "hot_exit": false,
-
-    // remember_open_files makes the application start up with the last set of
-    // open files. Changing this to false will have no effect if hot_exit is
-    // true
-    "remember_open_files": false
+	"trim_trailing_white_space_on_save": true
 }

@@ -1,24 +1,9 @@
-[submodule ".vim/bundle/ctrlp.vim"]
-    path = .vim/bundle/ctrlp.vim
-    url = http://github.com/kien/ctrlp.vim.git
-[submodule ".vim/bundle/python-mode"]
-    path = .vim/bundle/python-mode
-    url = http://github.com/klen/python-mode
-[submodule ".vim/bundle/vim-powerline"]
-    path = .vim/bundle/vim-powerline
-    url = git://github.com/Lokaltog/vim-powerline.git
-[submodule "emacs.d/vendor/magit"]
-    path = emacs.d/vendor/magit
-    url = http://github.com/magit/magit.git
-[submodule "emacs.d/vendor/auto-complete"]
-    path = emacs.d/vendor/auto-complete
-    url = http://github.com/m2ym/auto-complete.git
-[submodule "emacs.d/vendor/expand-region"]
-    path = emacs.d/vendor/expand-region
-    url = http://github.com/magnars/expand-region.el.git
-[submodule "emacs.d/vendor/helm"]
-    path = emacs.d/vendor/helm
-    url = http://github.com/emacs-helm/helm.git
-[submodule "emacs.d/vendor/pymacs"]
-    path = emacs.d/vendor/pymacs
-    url = http://github.com/pinard/Pymacs.git
+[submodule "vim/bundle/command-t"]
+	path = vim/bundle/command-t
+	url = git://git.wincent.com/command-t.git
+[submodule "vim/bundle/powerline"]
+	path = vim/bundle/powerline
+	url = git://github.com/Lokaltog/powerline.git
+[submodule "vim/bundle/vim-surround"]
+	path = vim/bundle/vim-surround
+	url = git://github.com/tpope/vim-surround.git
