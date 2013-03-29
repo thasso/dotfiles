@@ -1,0 +1,56 @@
+" Load pathogen
+execute pathogen#infect()
+
+" load .vimrc automatically on changes
+if has("autocmd")
+  autocmd! bufwritepost .vimrc source %
+endif
+
+" general syntax highlighting
+syntax on
+
+" avoid hitting escape
+imap jj <esc>
+
+" renap leader to ,
+let mapleader = ","
+
+" bind Ctrl+<movement> keys to move around the windows, instead of using Ctrl+w + <movement>
+" Every unnecessary keystroke that can be saved is good for your health :)
+map <c-j> <c-w>j
+map <c-k> <c-w>k
+map <c-l> <c-w>l
+map <c-h> <c-w>h
+
+" Line numbers and line width
+set number
+set tw=79
+
+" color column at 80
+set colorcolumn=80
+highlight ColorColumn ctermbg=24
+
+" history and undo length
+set history=700
+set undolevels=700
+
+" disable backup and swap files
+set nobackup
+set nowritebackup
+set noswapfile
+
+" set default tab sizes
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set shiftround
+
+" enable exapnd tabs based on file type 
+if has("autocmd")
+  autocmd Filetype python setlocal expandtab
+endif
+
+" enable powerbar
+set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
+set laststatus=2
+set noshowmode
