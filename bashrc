@@ -62,7 +62,6 @@ export VISUAL=$EDITOR
 export GIT_EDITOR=$EDITOR
 alias emacs='emacsclient -t'
 
-
 ## language
 export LC_CTYPE="en_US.UTF-8"
 export LANG="en_US.UTF-8"
