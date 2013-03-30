@@ -31,6 +31,8 @@ map <Leader>m :bp<CR>
 set spelllang=en_US
 map <Leader>s :set spell!<CR>
 
+" exclude files from listings
+set wildignore+=*.pyc,*.o,*.obj,.git
 " Line numbers and line wrapping
 set number
 set tw=0
@@ -40,7 +42,15 @@ map <leader>p gqip
 
 " color column at 80
 set colorcolumn=80
-highlight ColorColumn ctermbg=24
+highlight ColorColumn ctermbg=235
+
+" color scheme
+if has('gui_running')
+	set background=dark
+	colorscheme solarized
+	set guioptions-=T " disable toolbar
+	set guifont=Source\ Code\ Pro\ for\ Powerline:h12
+endif
 
 " history and undo length
 set history=700
