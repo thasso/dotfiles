@@ -76,3 +76,7 @@ endif
 set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
 set laststatus=2
 set noshowmode
+
+" configure search
+set hlsearch
+map <leader>h :nohlsearch<CR>
