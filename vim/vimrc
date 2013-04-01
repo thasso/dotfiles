@@ -69,9 +69,13 @@ set softtabstop=4
 set shiftwidth=4
 set shiftround
 
+" folding key bindings
+map <space> za
+
 " enable exapnd tabs based on file type 
 if has("autocmd")
   autocmd Filetype python setlocal expandtab
+  autocmd Filetype python set foldmethod=indent foldlevel=99
 endif
 
 " enable powerbar
