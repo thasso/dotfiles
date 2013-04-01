@@ -1,13 +1,15 @@
-" Load pathogen
+set nocompatible
 execute pathogen#infect()
+syntax on
+filetype plugin indent on
 
 " load .vimrc automatically on changes
 if has("autocmd")
   autocmd! bufwritepost .vimrc source %
 endif
 
-" general syntax highlighting
-syntax on
+" hidden mode
+set hidden
 
 " avoid hitting escape
 imap jj <esc>
@@ -78,5 +80,13 @@ set laststatus=2
 set noshowmode
 
 " configure search
-set hlsearch
-map <leader>h :nohlsearch<CR>
+set hlsearch " hightlight search
+" turn off search highlighting with leader h
+map <leader>h :nohlsearch<CR> 
+set incsearch " incremental search
+set ignorecase
+set smartcase
+
+
+" open lusty file explorer
+map <leader>f :LustyFilesystemExplorer<CR>
