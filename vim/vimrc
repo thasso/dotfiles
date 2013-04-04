@@ -34,7 +34,11 @@ set spelllang=en_US
 map <Leader>s :set spell!<CR>
 
 " exclude files from listings
-set wildignore+=*.pyc,*.o,*.obj,.git
+set wildignore+=*.pyc,*.o,*.obj,.git,*.egg/**
+
+" fix issues with backspace key in some systems
+set backspace=2
+
 " Line numbers and line wrapping
 set number
 set tw=0
@@ -53,6 +57,9 @@ if has('gui_running')
 	set guioptions-=T " disable toolbar
 	set guifont=Source\ Code\ Pro\ for\ Powerline:h12
 endif
+
+"set term
+set term=xterm-256color
 
 " history and undo length
 set history=700

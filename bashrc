@@ -32,14 +32,17 @@ else
 fi
 
 ## function to get the current branch if we are in a git repo
-__git_ps1 () {
-    local b="$(git symbolic-ref HEAD 2>/dev/null)";
-    if [ -n "$b" ]; then
-        printf " (%s)" "${b##refs/heads/}";
-    fi
-}
+#__git_ps1 () {
+#    local b="$(git symbolic-ref HEAD 2>/dev/null)";
+#    if [ -n "$b" ]; then
+#        printf " (%s)" "${b##refs/heads/}";
+#    fi
+#}
 ## The prompt
-export PS1='\u@\h:\w \[\033[31m\]$(__git_ps1 "(%s)") \[\033[01;34m\]$\[\033[00m\] '
+#export PS1='\u@\h:\w \[\033[31m\]$(__git_ps1 "(%s)") \[\033[01;34m\]$\[\033[00m\] '
+
+## terminal 
+export TERM=xterm-256color
 
 #powerline
 . ~/.vim/bundle/powerline/powerline/bindings/bash/powerline.sh
@@ -65,6 +68,7 @@ alias emacs='emacsclient -t'
 ## language
 export LC_CTYPE="en_US.UTF-8"
 export LANG="en_US.UTF-8"
+
 
 ## load customizations
 if [ -d "$HOME/.bashrc.d" ]; then

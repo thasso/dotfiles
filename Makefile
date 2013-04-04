@@ -1,7 +1,7 @@
 COMMAND_T_PATH = vim/bundle/command-t
 POWERLINE_PATH = vim/bundle/powerline
 
-all: vim bash
+all: vim bash tmux
 	@echo "Configuration installed"
 
 init:
@@ -39,3 +39,8 @@ bash: init bash-clean bash-init
 	ln -s $(CURDIR)/bashrc ~/.bashrc
 	ln -s $(CURDIR)/profile ~/.profile
 	
+tmux-clean:
+	rm -f ~/.tmux.conf
+
+tmux: tmux-clean
+	ln -s $(CURDIR)/tmux.conf ~/.tmux.conf
