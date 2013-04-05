@@ -29,6 +29,10 @@ map <c-h> <c-w>h
 map <Leader>n :bn<CR>
 map <Leader>m :bp<CR>
 
+" navigate between errors
+map <Leader>e :cnext<CR>
+map <Leader>E :cprevious<CR>
+
 " Spell checker
 set spelllang=en_US
 map <Leader>s :set spell!<CR>
