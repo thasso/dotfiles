@@ -44,7 +44,7 @@ set number
 set tw=0
 set wrap
 set linebreak
-map <leader>p gqip
+map <leader>p gqip " wrap paragraph
 
 " color column at 80
 set colorcolumn=80
@@ -56,10 +56,10 @@ if has('gui_running')
 	colorscheme solarized
 	set guioptions-=T " disable toolbar
 	set guifont=Source\ Code\ Pro\ for\ Powerline:h12
+else
+	"set term
+	set term=xterm-256color
 endif
-
-"set term
-set term=xterm-256color
 
 " history and undo length
 set history=700
@@ -84,6 +84,9 @@ if has("autocmd")
   autocmd Filetype python setlocal expandtab
   autocmd Filetype python set foldmethod=indent foldlevel=99
 endif
+
+" completion
+
 
 " enable powerbar
 set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
