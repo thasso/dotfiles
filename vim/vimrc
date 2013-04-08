@@ -1,110 +1,102 @@
+" vim:fdm=marker
+" General setting {{{
 set nocompatible
 execute pathogen#infect()
 syntax on
 filetype plugin indent on
-
-" load .vimrc automatically on changes
-if has("autocmd")
-  autocmd! bufwritepost .vimrc source %
-endif
-
-" hidden mode
+set term=xterm-256color
 set hidden
-
-" avoid hitting escape
-imap jj <esc>
-
-" renap leader to ,
-let mapleader = ","
-
-" navigation options
-"
-" bind Ctrl+<movement> keys to move around the windows, instead of using Ctrl+w + <movement>
-" Every unnecessary keystroke that can be saved is good for your health :)
-map <c-j> <c-w>j
-map <c-k> <c-w>k
-map <c-l> <c-w>l
-map <c-h> <c-w>h
-" navigate between buffers
-map <Leader>n :bn<CR>
-map <Leader>m :bp<CR>
-
-" navigate between errors
-map <Leader>e :cnext<CR>
-map <Leader>E :cprevious<CR>
-
-" Spell checker
 set spelllang=en_US
-map <Leader>s :set spell!<CR>
-
-" exclude files from listings
-set wildignore+=*.pyc,*.o,*.obj,.git,*.egg/**
-
-" fix issues with backspace key in some systems
 set backspace=2
-
-" Line numbers and line wrapping
 set number
 set tw=0
 set wrap
 set linebreak
-map <leader>p gqip " wrap paragraph
-
-" color column at 80
-set colorcolumn=80
-highlight ColorColumn ctermbg=235
-
-" color scheme
-if has('gui_running')
-	set background=dark
-	colorscheme solarized
-	set guioptions-=T " disable toolbar
-	set guifont=Source\ Code\ Pro\ for\ Powerline:h12
-else
-	"set term
-	set term=xterm-256color
-endif
-
-" history and undo length
 set history=700
 set undolevels=700
-
-" disable backup and swap files
 set nobackup
 set nowritebackup
 set noswapfile
-
-" set default tab sizes
+set nohlsearch
+set incsearch " incremental search
+set ignorecase
+set smartcase
+set list
+set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮
+set cursorline
+if has("autocmd") " load .vimrc automatically on changes
+  autocmd! bufwritepost .vimrc source %
+endif
+" }}}
+" Leader bindings {{{
+let mapleader = ","
+imap jj <esc>
+nmap <Leader>e :cnext<CR>
+nmap <Leader>E :cprevious<CR>
+nmap <Leader>ev :vsplit $MYVIMRC<CR>
+nmap <Leader>n :bn<CR>
+nmap <Leader>m :bp<CR>
+nmap <Leader>s :set spell!<CR>
+nmap <leader>p gqip " wrap paragraph
+nmap <leader>f :LustyFilesystemExplorer<CR>
+nmap <leader>w :w<CR>
+nmap <leader>q :q<CR>
+" }}}
+" Keybindings {{{
+imap <C-h> <left>
+imap <C-l> <right>
+imap <C-j> <down>
+imap <C-k> <up>
+imap <C-e> <esc>$a
+imap <C-a> <esc>^i
+nmap <C-a> ^
+nmap <C-e> $
+nmap <space> za
+"
+" }}}
+" Window navigation {{{
+nmap <c-j> <c-w>j
+nmap <c-k> <c-w>k
+nmap <c-l> <c-w>l
+nmap <c-h> <c-w>h
+" }}}
+" File wildcards {{{
+set wildignore+=*.pyc,*.o,*.obj,.git,*.egg/**
+" }}}
+" Color scheme {{{
+set background=dark
+let g:solarized_termcolors=256
+let g:solarized_visibility="high"
+let g:solarized_contrast="high"
+colorscheme solarized
+set colorcolumn=80
+highlight ColorColumn ctermbg=235
+" }}}
+" GUI Mode {{{
+if has('gui_running')
+	colorscheme solarized
+	set guioptions-=T " disable toolbar
+	set guifont=Source\ Code\ Pro\ for\ Powerline:h12
+endif
+" }}}
+" Tabs and Spaces {{{
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set shiftround
-
-" folding key bindings
-map <space> za
-
-" enable exapnd tabs based on file type 
+" }}}
+" File types and settings {{{
+" Python {{{
 if has("autocmd")
   autocmd Filetype python setlocal expandtab
   autocmd Filetype python set foldmethod=indent foldlevel=99
 endif
-
-" completion
-
-
-" enable powerbar
+" }}}
+" }}}
+" Plugin Settings {{{
+" Powerline {{{
 set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
 set laststatus=2
 set noshowmode
-
-" configure search
-set hlsearch " hightlight search
-" turn off search highlighting with leader h
-map <leader>h :nohlsearch<CR> 
-set incsearch " incremental search
-set ignorecase
-set smartcase
-
-
-" open lusty file explorer
-map <leader>f :LustyFilesystemExplorer<CR>
+" }}}
+" }}}
