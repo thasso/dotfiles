@@ -52,6 +52,18 @@ imap <C-a> <esc>^i
 nmap <C-a> ^
 nmap <C-e> $
 nmap <space> za
+imap <S-down> <esc>vj
+nmap <S-down> <esc>vj
+vmap <S-down> j
+imap <S-up> <esc>vk
+nmap <S-up> <esc>vk
+vmap <S-up> k
+nmap <S-right> <esc>vl
+imap <S-right> <esc>vl
+vmap <S-up> l
+nmap <S-left> <esc>vh
+imap <S-left> <esc>vh
+vmap <S-up> h
 "
 " }}}
 " Window navigation {{{
