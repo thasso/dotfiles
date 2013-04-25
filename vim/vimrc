@@ -39,6 +39,7 @@ nmap <Leader>m :bp<CR>
 nmap <Leader>s :set spell!<CR>
 nmap <leader>p gqip " wrap paragraph
 nmap <leader>f :LustyFilesystemExplorer<CR>
+nmap <leader>T :LustyBufferExplorer<CR>
 nmap <leader>w :w<CR>
 nmap <leader>q :q<CR>
 " }}}
