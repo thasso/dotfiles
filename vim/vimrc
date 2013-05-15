@@ -41,6 +41,7 @@ nmap <leader>p gqip " wrap paragraph
 nmap <leader>f :LustyFilesystemExplorer<CR>
 nmap <leader>w :w<CR>
 nmap <leader>q :q<CR>
+nmap <leader>T :LustyBufferExplorer<CR>
 " }}}
 " Keybindings {{{
 imap <C-h> <left>
@@ -77,6 +78,8 @@ if has('gui_running')
 	colorscheme solarized
 	set guioptions-=T " disable toolbar
 	set guifont=Source\ Code\ Pro\ for\ Powerline:h12
+	set guioptions+=LlRrb
+	set guioptions-=LlRrb
 endif
 " }}}
 " Tabs and Spaces {{{
@@ -85,12 +88,35 @@ set softtabstop=4
 set shiftwidth=4
 set shiftround
 " }}}
+" Folding and custom fold line {{{
+function! NeatFoldText()
+  let line = ' ' . substitute(getline(v:foldstart), '^\s*"\?\s*\|\s*"\?\s*{{' . '{\d*\s*', '', 'g') . ' '
+  let lines_count = v:foldend - v:foldstart + 1
+  let lines_count_text = '| ' . printf("%10s", lines_count . ' lines') . ' |'
+  let foldchar = matchstr(&fillchars, 'fold:\zs.')
+  let foldtextstart = strpart('+' . repeat(foldchar, v:foldlevel*2) . line, 0, (winwidth(0)*2)/3)
+  let foldtextend = lines_count_text . repeat(foldchar, 8)
+  let foldtextlength = strlen(substitute(foldtextstart . foldtextend, '.', 'x', 'g')) + &foldcolumn
+  return foldtextstart . repeat(foldchar, winwidth(0)-foldtextlength) . foldtextend
+endfunction
+set foldtext=NeatFoldText()
+" }}}
 " File types and settings {{{
 " Python {{{
 if has("autocmd")
   autocmd Filetype python setlocal expandtab
   autocmd Filetype python set foldmethod=indent foldlevel=99
 endif
+" }}}
+" C {{{
+if has("autocmd")
+  autocmd Filetype c setlocal expandtab
+  autocmd Filetype c setlocal shiftwidth=2
+  autocmd Filetype c setlocal softtabstop=2
+  autocmd Filetype c setlocal tabstop=2
+  autocmd Filetype c set foldmethod=syntax foldlevel=99 foldlevel=99
+endif
+
 " }}}
 " }}}
 " Plugin Settings {{{
