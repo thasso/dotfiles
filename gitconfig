@@ -1,0 +1,6 @@
+[user]
+	name = Thasso Griebel
+	email = thasso.griebel@googlemail.com
+[alias]
+	ci = commit
+	st = status
