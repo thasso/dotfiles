@@ -1,12 +1,18 @@
 COMMAND_T_PATH = vim/bundle/command-t
 POWERLINE_PATH = vim/bundle/powerline
 
-all: vim bash tmux
+all: vim bash tmux gitconfig
 	@echo "Configuration installed"
 
 init:
 	git submodule init
 
+gitconfig-clean:
+	rm -f ~/.gitconfig
+
+gitconfig: gitconfig-clean
+	ln -sf $(CURDIR)/gitconfig ~/.gitconfig
+	
 vim-clean:
 	rm -f ~/.vimrc
 	rm -Rf ~/.vim
