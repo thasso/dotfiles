@@ -50,6 +50,8 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 # set default user name
 export DEFAULT_USER=thasso
+#editor settings
+export EDITOR=vim
 
 # load extensions
 for config_file ($ZSH/ext/*.zsh); do
