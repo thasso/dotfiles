@@ -15,3 +15,13 @@ function take() {
   cd $1
 }
 
+function fname(){
+	name=$(basename $1)
+	split=(${(s:.:)name});
+	if [[ $#split > 0 ]]; 
+	then
+		print $split[1]
+	else
+		print $name
+	fi
+}
