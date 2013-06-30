@@ -33,13 +33,16 @@ ZSH_THEME="agnoster"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git)
+plugins=(git virtualenv)
 
 source $ZSH/zsh.sh
 
 # Customize to your needs...
-export PATH=$PATH:/usr/local/mysql/bin:/Users/thasso/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/X11/bin:/usr/local/git/bin:/usr/texbin:/Users/thasso/Library/Python/2.7/bin:/Users/thasso/usr/grails/bin:/Users/thasso/usr/gradle/bin
+export PATH=$HOME/bin:$HOME/usr/bin:$PATH
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/usr/lib
 
+# disable ssh askpass
+unset SSH_ASKPASS
 # terminal configuration
 export TERM="xterm-256color"
 # language setup
@@ -47,3 +50,8 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 # set default user name
 export DEFAULT_USER=thasso
+
+# load extensions
+for config_file ($ZSH/ext/*.zsh); do
+  source $config_file
+done
