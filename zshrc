@@ -54,6 +54,7 @@ export DEFAULT_USER=thasso
 export EDITOR=vim
 
 # load extensions
-for config_file ($ZSH/ext/*.zsh); do
+ext_files=($ZSH/ext/*.zsh) 2>/dev/null
+for config_file $ext_files; do
   source $config_file
 done
