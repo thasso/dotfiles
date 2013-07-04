@@ -44,7 +44,16 @@ bash-init:
 bash: init bash-clean bash-init
 	ln -s $(CURDIR)/bashrc ~/.bashrc
 	ln -s $(CURDIR)/profile ~/.profile
-	
+
+zsh-clean:
+	rm -f ~/.zshrc
+	rm -f ~/.zsh.d
+
+zsh: init zsh-clean
+	ln -s $(CURDIR)/zshrc ~/.zshrc
+	ln -s $(CURDIR)/zsh.d ~/.zsh.d
+
+
 tmux-clean:
 	rm -f ~/.tmux.conf
 
