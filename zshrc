@@ -33,7 +33,7 @@ ZSH_THEME="agnoster"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git virtualenv)
+plugins=(git git-flow virtualenv)
 
 source $ZSH/zsh.sh
 
@@ -54,6 +54,7 @@ export DEFAULT_USER=thasso
 export EDITOR=vim
 
 # load extensions
-for config_file ($ZSH/ext/*.zsh); do
+ext_files=($ZSH/ext/*.zsh) 2>/dev/null
+for config_file $ext_files; do
   source $config_file
 done

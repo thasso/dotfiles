@@ -24,6 +24,8 @@ set smartcase
 set list
 set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮
 set cursorline
+" always expand tab
+set expandtab
 if has("autocmd") " load .vimrc automatically on changes
   autocmd! bufwritepost .vimrc source %
 endif
