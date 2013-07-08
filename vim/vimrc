@@ -66,6 +66,8 @@ vmap <S-up> l
 nmap <S-left> <esc>vh
 imap <S-left> <esc>vh
 vmap <S-up> h
+" go to end of selection after yank
+vmap y y`]
 "
 " }}}
 " Window navigation {{{

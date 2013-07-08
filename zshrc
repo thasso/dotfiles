@@ -55,6 +55,6 @@ export EDITOR=vim
 
 # load extensions
 ext_files=($ZSH/ext/*.zsh) 2>/dev/null
-for config_file $ext_files; do
+for config_file ($ext_files); do
   source $config_file
 done
