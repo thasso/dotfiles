@@ -146,5 +146,12 @@ endif
 set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
 set laststatus=2
 set noshowmode
+"  }}}
+" Mark Multiple {{{
+let g:mark_multiple_trigger = "<C-d>"
+nmap <C-d> :call MarkMultiple()<CR>
+xmap <C-d> :call MarkMultiple()<CR>
+nmap <C-N> :call MarkMultipleClean()<CR>
+xmap <C-N> :call MarkMultipleClean()<CR>
 " }}}
 " }}}

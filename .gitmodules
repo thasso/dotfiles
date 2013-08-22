@@ -34,3 +34,6 @@
 [submodule "vim/bundle/nerdcommenter"]
 	path = vim/bundle/nerdcommenter
 	url = git://github.com/scrooloose/nerdcommenter.git
+[submodule "vim/bundle/vim-makrmultiple"]
+	path = vim/bundle/vim-makrmultiple
+	url = git@github.com:adinapoli/vim-markmultiple.git
