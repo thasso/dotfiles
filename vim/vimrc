@@ -44,6 +44,7 @@ nmap <leader>f :LustyFilesystemExplorer<CR>
 nmap <leader>T :LustyBufferExplorer<CR>
 nmap <leader>w :w<CR>
 nmap <leader>q :q<CR>
+nmap <leader>P :PyLintToggle<CR>
 nmap <leader>T :LustyBufferExplorer<CR>
 " }}}
 " Keybindings {{{
@@ -55,6 +56,8 @@ imap <C-e> <esc>$a
 imap <C-a> <esc>^i
 nmap <C-a> ^
 nmap <C-e> $
+imap <C-s> <esc>:wi<CR>
+nmap <C-s> :w<CR>
 nmap <space> za
 imap <S-down> <esc>vj
 nmap <S-down> <esc>vj
@@ -68,6 +71,8 @@ vmap <S-up> l
 nmap <S-left> <esc>vh
 imap <S-left> <esc>vh
 vmap <S-up> h
+" select paste text
+nnoremap gp `[v`] 
 "
 " }}}
 " Window navigation {{{
