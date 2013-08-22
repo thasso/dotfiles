@@ -73,6 +73,8 @@ imap <S-left> <esc>vh
 vmap <S-up> h
 " select paste text
 nnoremap gp `[v`] 
+" go to end of selection after yank
+vmap y y`]
 "
 " }}}
 " Window navigation {{{
