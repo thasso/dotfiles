@@ -52,6 +52,11 @@ export LANG=en_US.UTF-8
 export DEFAULT_USER=thasso
 #editor settings
 export EDITOR=vim
+# enable zmv by default
+autoload zmv
+# disable autocorrect
+unsetopt correct
+unsetopt correct_all
 
 # load extensions
 ext_files=($ZSH/ext/*.zsh) 2>/dev/null
