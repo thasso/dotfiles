@@ -7,6 +7,7 @@ filetype plugin indent on
 set term=xterm-256color
 set hidden
 set spelllang=en_US
+set modelines=1
 set backspace=2
 set number
 set tw=0
@@ -40,12 +41,13 @@ nmap <Leader>n :bn<CR>
 nmap <Leader>m :bp<CR>
 nmap <Leader>s :set spell!<CR>
 nmap <leader>p gqip " wrap paragraph
-nmap <leader>f :LustyFilesystemExplorer<CR>
 nmap <leader>T :LustyBufferExplorer<CR>
 nmap <leader>w :w<CR>
 nmap <leader>q :q<CR>
 nmap <leader>P :PyLintToggle<CR>
 nmap <leader>T :LustyBufferExplorer<CR>
+nmap <leader>fa zM
+nmap <leader>fu zR
 " }}}
 " Keybindings {{{
 imap <C-h> <left>
@@ -84,7 +86,7 @@ nmap <c-l> <c-w>l
 nmap <c-h> <c-w>h
 " }}}
 " File wildcards {{{
-set wildignore+=*.pyc,*.o,*.obj,.git,*.egg/**
+set wildignore+=*.pyc,*.o,*.obj,.git,*.egg/**,*.min.js,*.so,*egg-info*/**,*.jpg,*.png,*.gif,*.ico
 " }}}
 " Color scheme {{{
 set background=dark
@@ -146,6 +148,10 @@ endif
 set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
 set laststatus=2
 set noshowmode
+"  }}}
+"  Command T {{{
+let g:CommandTMatchWindowAtTop=1
+let g:CommandTMaxHeight=20
 "  }}}
 " Mark Multiple {{{
 let g:mark_multiple_trigger = "<C-d>"
