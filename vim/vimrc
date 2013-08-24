@@ -160,4 +160,9 @@ xmap <C-d> :call MarkMultiple()<CR>
 nmap <C-N> :call MarkMultipleClean()<CR>
 xmap <C-N> :call MarkMultipleClean()<CR>
 " }}}
+" Expand Regions {{{
+nmap <C-w> viw<Plug>(expand_region_expand)
+imap <C-w> <esc>viw<Plug>(expand_region_expand)
+vmap <C-W> <Plug>(expand_region_expand)
+" }}}
 " }}}
