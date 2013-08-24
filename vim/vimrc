@@ -25,6 +25,9 @@ set smartcase
 set list
 set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮
 set cursorline
+" enable "+ as default register
+" note that we need the yank remaps below
+set clipboard=unnamedplus
 " always expand tab
 set expandtab
 if has("autocmd") " load .vimrc automatically on changes
@@ -41,13 +44,17 @@ nmap <Leader>n :bn<CR>
 nmap <Leader>m :bp<CR>
 nmap <Leader>s :set spell!<CR>
 nmap <leader>p gqip " wrap paragraph
-nmap <leader>T :LustyBufferExplorer<CR>
+"nmap <leader>T :LustyBufferExplorer<CR>
 nmap <leader>w :w<CR>
 nmap <leader>q :q<CR>
 nmap <leader>P :PyLintToggle<CR>
 nmap <leader>T :LustyBufferExplorer<CR>
 nmap <leader>fa zM
 nmap <leader>fu zR
+
+nnoremap <silent> <Leader>xt :CommandT<CR>
+nnoremap <leader>t :CtrlP<CR>
+nnoremap <leader>T :CtrlPBuffer<CR>
 " }}}
 " Keybindings {{{
 imap <C-h> <left>
@@ -74,9 +81,12 @@ nmap <S-left> <esc>vh
 imap <S-left> <esc>vh
 vmap <S-up> h
 " select paste text
-nnoremap gp `[v`] 
+nnoremap gp `[v`]
 " go to end of selection after yank
-vmap y y`]
+" and always do a normal yank and a yank to system clipboard
+" vmap y y`]
+nnoremap yy yy"+yy
+vnoremap y ygv"+y`]
 "
 " }}}
 " Window navigation {{{
@@ -161,7 +171,7 @@ nmap <C-N> :call MarkMultipleClean()<CR>
 xmap <C-N> :call MarkMultipleClean()<CR>
 " }}}
 " Expand Regions {{{
-nmap <C-w> viw<Plug>(expand_region_expand)
+"nmap <C-w> viw<Plug>(expand_region_expand)
 imap <C-w> <esc>viw<Plug>(expand_region_expand)
 vmap <C-W> <Plug>(expand_region_expand)
 " }}}
