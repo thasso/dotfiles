@@ -28,6 +28,7 @@ set cursorline
 " enable "+ as default register
 " note that we need the yank remaps below
 set clipboard=unnamedplus
+"set clipboard=autoselectplus
 " always expand tab
 set expandtab
 if has("autocmd") " load .vimrc automatically on changes
