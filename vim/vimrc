@@ -104,17 +104,20 @@ set background=dark
 let g:solarized_termcolors=256
 let g:solarized_visibility="high"
 let g:solarized_contrast="high"
+let base16colorspace=256 
+"colorscheme base16-default
 colorscheme solarized
 set colorcolumn=80
 highlight ColorColumn ctermbg=235
 " }}}
 " GUI Mode {{{
 if has('gui_running')
-	colorscheme solarized
-	set guioptions-=T " disable toolbar
-	set guifont=Source\ Code\ Pro\ for\ Powerline:h12
-	set guioptions+=LlRrb
-	set guioptions-=LlRrb
+    "colorscheme solarized
+    colorscheme base16-default
+    set guioptions-=T " disable toolbar
+    set guifont=Source\ Code\ Pro\ for\ Powerline:h12
+    set guioptions+=LlRrb
+    set guioptions-=LlRrb
 endif
 " }}}
 " Tabs and Spaces {{{
