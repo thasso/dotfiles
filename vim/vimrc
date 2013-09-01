@@ -156,10 +156,13 @@ endif
 " }}}
 " Plugin Settings {{{
 " Powerline {{{
-set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
+"set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
 set laststatus=2
-set noshowmode
+"set noshowmode
 "  }}}
+" Airline {{{
+let g:airline_powerline_fonts = 1
+" }}}
 "  Command T {{{
 let g:CommandTMatchWindowAtTop=1
 let g:CommandTMaxHeight=20
