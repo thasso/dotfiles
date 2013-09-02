@@ -36,7 +36,7 @@ endif
 " }}}
 " Leader bindings {{{
 let mapleader = ","
-imap jj <esc>
+imap jj <esc>l
 nmap <Leader>e :cnext<CR>
 nmap <Leader>E :cprevious<CR>
 nmap <Leader>ev :vsplit $MYVIMRC<CR>
