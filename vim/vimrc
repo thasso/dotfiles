@@ -183,4 +183,7 @@ xmap <C-N> :call MarkMultipleClean()<CR>
 imap <C-w> <esc>viw<Plug>(expand_region_expand)
 vmap <C-W> <Plug>(expand_region_expand)
 " }}}
+" Tagbar {{{
+let g:tagbar_ctags_bin='~/usr/bin/ctags'
+" }}}
 " }}}
