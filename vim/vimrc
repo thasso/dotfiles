@@ -4,7 +4,9 @@ set nocompatible
 execute pathogen#infect()
 syntax on
 filetype plugin indent on
-set term=xterm-256color
+if !has('gui_running')
+    set term=xterm-256color
+endif
 set hidden
 set spelllang=en_US
 set modelines=1
@@ -116,7 +118,7 @@ if has('gui_running')
     "colorscheme solarized
     colorscheme base16-default
     set guioptions-=T " disable toolbar
-    set guifont=Source\ Code\ Pro\ for\ Powerline:h12
+    "set guifont=Source\ Code\ Pro\ for\ Powerline
     set guioptions+=LlRrb
     set guioptions-=LlRrb
 endif
