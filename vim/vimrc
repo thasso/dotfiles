@@ -52,7 +52,7 @@ nmap <leader>P :PyLintToggle<CR>
 nmap <leader>T :LustyBufferExplorer<CR>
 nmap <leader>fa zM
 nmap <leader>fu zR
-
+nmap <leader>l :TagbarToggle<CR>
 nnoremap <silent> <Leader>xt :CommandT<CR>
 nnoremap <leader>t :CtrlP<CR>
 nnoremap <leader>T :CtrlPBuffer<CR>
@@ -81,6 +81,7 @@ vmap <S-up> l
 nmap <S-left> <esc>vh
 imap <S-left> <esc>vh
 vmap <S-up> h
+inoremap <C-space> <C-X><C-O>
 " select paste text
 nnoremap gp `[v`]
 " go to end of selection after yank
