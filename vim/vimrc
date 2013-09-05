@@ -1,6 +1,7 @@
 " vim:fdm=marker
 " General setting {{{
 set nocompatible
+set completeopt=longest,menuone
 execute pathogen#infect()
 syntax on
 filetype plugin indent on
@@ -58,6 +59,7 @@ nmap <leader>l :TagbarToggle<CR>
 nnoremap <silent> <Leader>xt :CommandT<CR>
 nnoremap <leader>t :CtrlP<CR>
 nnoremap <leader>T :CtrlPBuffer<CR>
+nmap <leader>h :set hlsearch! hlsearch? <CR>
 " }}}
 " Keybindings {{{
 imap <C-h> <left>
@@ -83,7 +85,7 @@ vmap <S-up> l
 nmap <S-left> <esc>vh
 imap <S-left> <esc>vh
 vmap <S-up> h
-inoremap <C-space> <C-X><C-O>
+imap <C-space> <C-X><C-O>
 " select paste text
 nnoremap gp `[v`]
 " go to end of selection after yank
@@ -91,6 +93,8 @@ nnoremap gp `[v`]
 " vmap y y`]
 nnoremap yy yy"+yy
 vnoremap y ygv"+y`]
+" aliases
+:command W w
 "
 " }}}
 " Window navigation {{{
@@ -118,6 +122,7 @@ if has('gui_running')
     "colorscheme solarized
     colorscheme base16-default
     set guioptions-=T " disable toolbar
+    set guioptions-=m " disable menu
     "set guifont=Source\ Code\ Pro\ for\ Powerline
     set guioptions+=LlRrb
     set guioptions-=LlRrb
@@ -186,6 +191,16 @@ imap <C-w> <esc>viw<Plug>(expand_region_expand)
 vmap <C-W> <Plug>(expand_region_expand)
 " }}}
 " Tagbar {{{
-let g:tagbar_ctags_bin='~/usr/bin/ctags'
+"let g:tagbar_ctags_bin='~/usr/bin/ctags'
 " }}}
+" Python Mode {{{
+let g:pymode_rope_guess_project=0
+let g:pymode_rope=0
+
+" }}}
+"{{{ JEDI
+let g:jedi#use_tabs_not_buffers = 0
+let g:jedi#popup_on_dot = 0
+let g:jedi#popup_select_first = 1
+"}}}
 " }}}

@@ -43,3 +43,6 @@
 [submodule "vim/bundle/tagbar"]
 	path = vim/bundle/tagbar
 	url = git@github.com:majutsushi/tagbar.git
+[submodule "vim/bundle/jedi-vim"]
+	path = vim/bundle/jedi-vim
+	url = git@github.com:davidhalter/jedi-vim.git

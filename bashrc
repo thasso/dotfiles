@@ -45,7 +45,7 @@ fi
 export TERM=xterm-256color
 
 #powerline
-. ~/.vim/bundle/powerline/powerline/bindings/bash/powerline.sh
+#. ~/.vim/bundle/powerline/powerline/bindings/bash/powerline.sh
 
 ## default tweaks for mac os x
 if [ `uname` == 'Darwin' ]; then
