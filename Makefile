@@ -21,7 +21,7 @@ vim-init:
 	ln -sf $(CURDIR)/vim ~/.vim
 	ln -sf ~/.vim/vimrc ~/.vimrc
 
-vim: init vim-clean vim-init command-t powerline
+vim: init vim-clean vim-init
 	echo "Vim plugins initialized"
 
 command-t: vim-init
