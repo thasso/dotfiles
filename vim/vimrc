@@ -86,6 +86,10 @@ nmap <S-left> <esc>vh
 imap <S-left> <esc>vh
 vmap <S-up> h
 imap <C-space> <C-X><C-O>
+nmap <F3> :cnext<CR>
+nmap <S-F3> :cprevious<CR>
+imap <F3> <esc>:cnext<CR>
+imap <S-F3> <esc>:cprevious<CR>
 " select paste text
 nnoremap gp `[v`]
 " go to end of selection after yank
@@ -179,11 +183,11 @@ let g:CommandTMatchWindowAtTop=1
 let g:CommandTMaxHeight=20
 "  }}}
 " Mark Multiple {{{
-let g:mark_multiple_trigger = "<C-d>"
-nmap <C-d> :call MarkMultiple()<CR>
-xmap <C-d> :call MarkMultiple()<CR>
-nmap <C-N> :call MarkMultipleClean()<CR>
-xmap <C-N> :call MarkMultipleClean()<CR>
+"let g:mark_multiple_trigger = "<C-d>"
+"nmap <C-d> :call MarkMultiple()<CR>
+"xmap <C-d> :call MarkMultiple()<CR>
+"nmap <C-N> :call MarkMultipleClean()<CR>
+"xmap <C-N> :call MarkMultipleClean()<CR>
 " }}}
 " Expand Regions {{{
 "nmap <C-w> viw<Plug>(expand_region_expand)
