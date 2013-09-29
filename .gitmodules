@@ -1,48 +1,48 @@
 [submodule "vim/bundle/vim-surround"]
 	path = vim/bundle/vim-surround
-	url = git://github.com/tpope/vim-surround.git
+	url = https://github.com/tpope/vim-surround.git
 [submodule "powerline-fonts"]
 	path = powerline-fonts
-	url = git://github.com/Lokaltog/powerline-fonts.git
+	url = https://github.com/Lokaltog/powerline-fonts.git
 [submodule "vim/bundle/fugative"]
 	path = vim/bundle/fugative
-	url = git://github.com/tpope/vim-fugitive.git
+	url = https://github.com/tpope/vim-fugitive.git
 [submodule "vim/bundle/vim-colors-solarized"]
 	path = vim/bundle/vim-colors-solarized
-	url = git://github.com/altercation/vim-colors-solarized.git
+	url = https://github.com/altercation/vim-colors-solarized.git
 [submodule "vim/bundle/pydoc"]
 	path = vim/bundle/pydoc
-	url = git://github.com/fs111/pydoc.vim.git
+	url = https://github.com/fs111/pydoc.vim.git
 [submodule "vim/bundle/snipmate"]
 	path = vim/bundle/snipmate
-	url = git://github.com/msanders/snipmate.vim.git
+	url = https://github.com/msanders/snipmate.vim.git
 [submodule "vim/bundle/python-mode"]
 	path = vim/bundle/python-mode
-	url = git@github.com:klen/python-mode.git
+	url = https://github.com/klen/python-mode.git
 [submodule "vim/bundle/nerdcommenter"]
 	path = vim/bundle/nerdcommenter
-	url = git://github.com/scrooloose/nerdcommenter.git
+	url = https://github.com/scrooloose/nerdcommenter.git
 [submodule "vim/bundle/vim-makrmultiple"]
 	path = vim/bundle/vim-makrmultiple
-	url = git@github.com:adinapoli/vim-markmultiple.git
+	url = https://github.com/adinapoli/vim-markmultiple.git
 [submodule "vim/bundle/vim-expand-region"]
 	path = vim/bundle/vim-expand-region
-	url = git@github.com:terryma/vim-expand-region.git
+	url = https://github.com/terryma/vim-expand-region.git
 [submodule "vim/bundle/vim-indent-object"]
 	path = vim/bundle/vim-indent-object
 	url = https://github.com/michaeljsmith/vim-indent-object
 [submodule "vim/bundle/ctrlp.vim"]
 	path = vim/bundle/ctrlp.vim
-	url = git@github.com:kien/ctrlp.vim.git
+	url = https://github.com/kien/ctrlp.vim.git
 [submodule "vim/bundle/vim-airline"]
 	path = vim/bundle/vim-airline
 	url = https://github.com/bling/vim-airline
 [submodule "vim/bundle/supertab"]
 	path = vim/bundle/supertab
-	url = git@github.com:ervandew/supertab.git
+	url = https://github.com/ervandew/supertab.git
 [submodule "vim/bundle/tagbar"]
 	path = vim/bundle/tagbar
-	url = git@github.com:majutsushi/tagbar.git
+	url = https://github.com/majutsushi/tagbar.git
 [submodule "vim/bundle/jedi-vim"]
 	path = vim/bundle/jedi-vim
-	url = git@github.com:davidhalter/jedi-vim.git
+	url = https://github.com/davidhalter/jedi-vim.git
