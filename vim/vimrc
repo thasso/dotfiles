@@ -68,8 +68,6 @@ imap <C-j> <down>
 imap <C-k> <up>
 imap <C-e> <esc>$a
 imap <C-a> <esc>^i
-nmap <C-a> ^
-nmap <C-e> $
 imap <C-s> <esc>:wi<CR>
 nmap <C-s> :w<CR>
 nmap <space> za
