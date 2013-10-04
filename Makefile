@@ -34,6 +34,11 @@ powerline: vim-init
 	@rm -f ~/.config/powerline/config.json
 	ln -s $(CURDIR)/powerline_config.json ~/.config/powerline/config.json	
 
+matplotlib:
+	@mkdir -p ~/.config/matplotlib
+	@rm -f ~/.config/matplotlib/matplotlibrc
+	ln -s $(CURDIR)/matplotlibrc ~/.config/matplotlib/matplotlibrc
+
 bash-clean:
 	rm -f ~/.bashrc
 	rm -f ~/.profile
