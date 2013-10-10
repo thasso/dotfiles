@@ -1,7 +1,6 @@
 " vim:fdm=marker
 " General setting {{{
 set nocompatible
-set completeopt=longest,menuone
 execute pathogen#infect()
 syntax on
 filetype plugin indent on
@@ -28,6 +27,10 @@ set smartcase
 set list
 set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮
 set cursorline
+"set completeopt=longest,menuone
+set completeopt=menu,preview,longest
+set wildmenu
+set wildmode=list:longest:full
 " enable "+ as default register
 " note that we need the yank remaps below
 set clipboard=unnamedplus
