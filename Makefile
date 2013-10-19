@@ -1,7 +1,7 @@
 COMMAND_T_PATH = vim/bundle/command-t
 POWERLINE_PATH = vim/bundle/powerline
 
-all: vim bash tmux gitconfig
+all: vim bash zsh tmux gitconfig
 	@echo "Configuration installed"
 
 init:
