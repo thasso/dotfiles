@@ -125,7 +125,7 @@ if has('gui_running')
     colorscheme base16-default
     set guioptions-=T " disable toolbar
     set guioptions-=m " disable menu
-    "set guifont=Source\ Code\ Pro\ for\ Powerline
+    set guifont=Source\ Code\ Pro\ for\ Powerline
     set guioptions+=LlRrb
     set guioptions-=LlRrb
 endif
