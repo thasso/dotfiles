@@ -57,6 +57,10 @@ autoload zmv
 # disable autocorrect
 unsetopt correct
 unsetopt correct_all
+# load colors
+BASE16_SCHEME="chalk"
+BASE16_SHELL="$HOME/.config/base16-shell/base16-$BASE16_SCHEME.dark.sh"
+[[ -s $BASE16_SHELL ]] && . $BASE16_SHELL
 
 # load extensions
 ext_files=($ZSH/ext/*.zsh) 2>/dev/null
