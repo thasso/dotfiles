@@ -4,8 +4,7 @@ all: vim bash zsh tmux gitconfig
 init:
 	git submodule init
 	# install colors, they are used by the shells
-	@rm -rf ~/.config/bash16-shell
-	@mkdir -p ~/.config/bash16-shell
+	@rm -rf ~/.config/base16-shell
 	ln -sf $(CURDIR)/base16-colors ~/.config/base16-shell
 
 gitconfig-clean:
