@@ -1,43 +1,111 @@
 " vim:fdm=marker
-" General setting {{{
+" Base setting {{{
 set nocompatible
-execute pathogen#infect()
+filetype off
+" Vundle setup {{{
+let install_bundles=0
+let vundle_readme=expand('~/.vim/bundle/vundle/README.md')
+if !filereadable(vundle_readme)
+    echo "Installing Vundle..."
+    echo ""
+    silent !mkdir -p ~/.vim/bundle
+    silent !git clone https://github.com/gmarik/vundle ~/.vim/bundle/vundle
+    let install_bundles=1
+endif
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+" }}}
+" }}}
+" Bundles {{{
+
+Bundle 'gmarik/vundle'
+
+Bundle 'bling/vim-airline'
+Bundle 'kien/ctrlp.vim'
+Bundle 'tpope/vim-fugitive'
+"Bundle 'ervandew/supertab'
+Bundle 'scrooloose/nerdcommenter'
+Bundle 'Valloric/YouCompleteMe'
+Bundle 'scrooloose/syntastic'
+Bundle 'majutsushi/tagbar'
+Bundle 'klen/python-mode'
+Bundle 'nono/vim-handlebars'
+Bundle 'junegunn/goyo.vim'
+Bundle 'amix/vim-zenroom2'
+Bundle 'chriskempson/base16-vim'
+" }}}
+" General setting {{{
+"execute pathogen#infect()
+filetype plugin on
+filetype indent on
 syntax on
-filetype plugin indent on
 if !has('gui_running')
     set term=screen-256color
 endif
 set hidden
 set spelllang=en_US
 set modelines=1
-set backspace=2
+" set backspace=2
+" Configure backspace so it acts as it should act
+set backspace=eol,start,indent
+set whichwrap+=<,>,h,l
+
+" Set 7 lines to the cursor - when moving vertically using j/k
+set so=7
+
+" auto read file when changed on disk
+set autoread
 set number
-set tw=0
-set wrap
-set linebreak
 set history=700
 set undolevels=700
+
+" no backup and swap files
 set nobackup
 set nowritebackup
 set noswapfile
+
+" search
 set nohlsearch
-set incsearch " incremental search
+set incsearch
 set ignorecase
 set smartcase
+" For regular expressions turn magic on
+set magic
+
+" display tabs and end of lines
 set list
 set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮
+" highlight current line
 set cursorline
-"set completeopt=longest,menuone
 set completeopt=menu,preview,longest
 set wildmenu
 set wildmode=list:longest:full
+set mouse=a
+" Don't redraw while executing macros (good performance config)
+set lazyredraw
+
+"Always show current position
+set ruler
+
+" Show matching brackets when text indicator is over them
+set showmatch
+" How many tenths of a second to blink when matching brackets
+set mat=2
+
 " enable "+ as default register
 " note that we need the yank remaps below
-"set clipboard=unnamedplus
-"set clipboard=autoselectplus
-" always expand tab
-set expandtab
-if has("autocmd") " load .vimrc automatically on changes
+set clipboard=unnamedplus
+
+" Return to last edit position when opening files (You want this!)
+autocmd BufReadPost *
+     \ if line("'\"") > 0 && line("'\"") <= line("$") |
+     \   exe "normal! g`\"" |
+     \ endif
+" Remember info about open buffers on close
+set viminfo^=%
+
+" load .vimrc automatically on changes
+if has("autocmd")
   autocmd! bufwritepost .vimrc source %
 endif
 " }}}
@@ -65,6 +133,9 @@ nnoremap <leader>T :CtrlPBuffer<CR>
 nmap <leader>h :set hlsearch! hlsearch? <CR>
 " }}}
 " Keybindings {{{
+" Treat long lines as break lines (useful when moving around in them)
+map j gj
+map k gk
 imap <C-h> <left>
 imap <C-l> <right>
 imap <C-j> <down>
@@ -99,7 +170,7 @@ nnoremap gp `[v`]
 nnoremap yy yy"+yy
 vnoremap y ygv"+y`]
 " aliases
-:command W w
+:command! W w
 "
 " }}}
 " Window navigation {{{
@@ -113,19 +184,13 @@ set wildignore+=*.pyc,*.o,*.obj,.git,*.egg/**,*.min.js,*.so,*egg-info*/**,*.jpg,
 " }}}
 " Color scheme {{{
 set background=dark
-let g:solarized_termcolors=256
-let g:solarized_visibility="high"
-let g:solarized_contrast="high"
-let base16colorspace=256 
-"colorscheme base16-default
-colorscheme solarized
+let base16colorspace=256
+colorscheme base16-chalk
 set colorcolumn=80
 highlight ColorColumn ctermbg=235
 " }}}
 " GUI Mode {{{
 if has('gui_running')
-    "colorscheme solarized
-    colorscheme base16-default
     set guioptions-=T " disable toolbar
     set guioptions-=m " disable menu
     set guifont=Source\ Code\ Pro\ for\ Powerline
@@ -133,11 +198,14 @@ if has('gui_running')
     set guioptions-=LlRrb
 endif
 " }}}
-" Tabs and Spaces {{{
+" Tabs, Spaces, and Wrap {{{
+set expandtab
+set linebreak
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set shiftround
+set wrap
 " }}}
 " Folding and custom fold line {{{
 function! NeatFoldText()
@@ -183,6 +251,13 @@ let g:airline_powerline_fonts = 1
 let g:CommandTMatchWindowAtTop=1
 let g:CommandTMaxHeight=20
 "  }}}
+" CtrlP {{{
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/]\.(git|hg|svn)|node_modules$',
+  \ 'file': '\v\.(exe|so|dll)$',
+  \ 'link': 'some_bad_symbolic_links',
+  \ }
+" }}}
 " Mark Multiple {{{
 "let g:mark_multiple_trigger = "<C-d>"
 "nmap <C-d> :call MarkMultiple()<CR>
@@ -211,4 +286,11 @@ let g:jedi#popup_select_first = 1
 "{{{ Go Lang
 set runtimepath+=$GOROOT/misc/vim
 "}}}
+" }}}
+" Vundle install {{{ 
+if install_bundles == 1
+    echo "Installing Bundles, please ignore key map error messages"
+    echo ""
+    :BundleInstall
+endif
 " }}}
