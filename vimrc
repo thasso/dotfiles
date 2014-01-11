@@ -36,8 +36,7 @@ Bundle 'chriskempson/base16-vim'
 " }}}
 " General setting {{{
 "execute pathogen#infect()
-filetype plugin on
-filetype indent on
+filetype plugin indent on
 syntax on
 if !has('gui_running')
     set term=screen-256color
@@ -94,7 +93,9 @@ set mat=2
 
 " enable "+ as default register
 " note that we need the yank remaps below
-set clipboard=unnamedplus
+if $TMUX == ''
+    set clipboard=unnamedplus
+endif
 
 " Return to last edit position when opening files (You want this!)
 autocmd BufReadPost *
@@ -234,6 +235,20 @@ if has("autocmd")
   autocmd Filetype c setlocal softtabstop=2
   autocmd Filetype c setlocal tabstop=2
   autocmd Filetype c set foldmethod=syntax foldlevel=99 foldlevel=99
+endif
+
+" }}}
+" HTML {{{
+if has("autocmd")
+  autocmd Filetype html setlocal expandtab
+  autocmd Filetype html setlocal shiftwidth=2
+  autocmd Filetype html setlocal softtabstop=2
+  autocmd Filetype html setlocal tabstop=2
+  autocmd Filetype html setlocal cindent
+  "let g:html_indent_inctags = "html,body,head,tbody"
+  let g:html_indent_inctags = "body,head,tbody"
+
+  autocmd Filetype html set foldmethod=syntax foldlevel=99 foldlevel=99
 endif
 
 " }}}
