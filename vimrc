@@ -33,6 +33,13 @@ Bundle 'nono/vim-handlebars'
 Bundle 'junegunn/goyo.vim'
 Bundle 'amix/vim-zenroom2'
 Bundle 'chriskempson/base16-vim'
+Bundle 'haya14busa/vim-easymotion'
+Bundle 'tomtom/tlib_vim.git'
+Bundle 'MarcWeber/vim-addon-mw-utils.git'
+Bundle 'garbas/vim-snipmate'
+Bundle 'honza/vim-snippets.git'
+
+Bundle 'thasso/vim-jip'
 " }}}
 " General setting {{{
 "execute pathogen#infect()
@@ -247,10 +254,10 @@ if has("autocmd")
   autocmd Filetype html setlocal cindent
   "let g:html_indent_inctags = "html,body,head,tbody"
   let g:html_indent_inctags = "body,head,tbody"
+  let g:syntastic_html_tidy_ignore_errors=[" proprietary attribute \"ng-"]
 
   autocmd Filetype html set foldmethod=syntax foldlevel=99 foldlevel=99
 endif
-
 " }}}
 " }}}
 " Plugin Settings {{{
@@ -268,7 +275,7 @@ let g:CommandTMaxHeight=20
 "  }}}
 " CtrlP {{{
 let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/]\.(git|hg|svn)|node_modules$',
+  \ 'dir':  '\v[\/]\.(git|hg|svn)|node_modules$|bower_components',
   \ 'file': '\v\.(exe|so|dll)$',
   \ 'link': 'some_bad_symbolic_links',
   \ }
@@ -300,7 +307,11 @@ let g:jedi#popup_select_first = 1
 "}}}
 "{{{ Go Lang
 set runtimepath+=$GOROOT/misc/vim
-"}}}
+" }}}
+" {{{ Snipmate
+imap <C-J> <esc>a<Plug>snipMateNextOrTrigger
+smap <C-J> <Plug>snipMateNextOrTrigger
+" }}}
 " }}}
 " Vundle install {{{ 
 if install_bundles == 1
