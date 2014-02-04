@@ -1,8 +1,22 @@
 [user]
-	name = Thasso Griebel
-	email = thasso.griebel@googlemail.com
+    name = Thasso Griebel
+    email = thasso.griebel@googlemail.com
+
 [alias]
-	ci = commit
-	st = status
+    ci = commit
+    st = status
+
+[color]
+    ui = auto
+
 [push]
-	default = simple
+    default = simple
+
+[branch]
+	autosetuprebase = always
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
