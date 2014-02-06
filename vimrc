@@ -29,8 +29,6 @@ Bundle 'scrooloose/syntastic'
 Bundle 'majutsushi/tagbar'
 Bundle 'klen/python-mode'
 Bundle 'nono/vim-handlebars'
-Bundle 'junegunn/goyo.vim'
-Bundle 'amix/vim-zenroom2'
 Bundle 'chriskempson/base16-vim'
 Bundle 'haya14busa/vim-easymotion'
 Bundle 'tomtom/tlib_vim.git'
@@ -38,6 +36,12 @@ Bundle 'MarcWeber/vim-addon-mw-utils.git'
 Bundle 'garbas/vim-snipmate'
 Bundle 'honza/vim-snippets.git'
 Bundle 'tfnico/vim-gradle'
+Bundle 'Shougo/neocomplcache.vim'
+Bundle 'davidhalter/jedi-vim'
+Bundle 'tpope/vim-surround'
+
+" tmux pane navigation
+Bundle 'christoomey/vim-tmux-navigator'
 
 Bundle 'thasso/vim-jip'
 " }}}
@@ -64,7 +68,6 @@ set autoread
 set number
 set history=700
 set undolevels=700
-
 " no backup and swap files
 set nobackup
 set nowritebackup
@@ -304,6 +307,10 @@ let g:pymode_rope=0
 let g:jedi#use_tabs_not_buffers = 0
 let g:jedi#popup_on_dot = 0
 let g:jedi#popup_select_first = 1
+let g:jedi#auto_initialization = 1
+
+" hide docstring while completing
+autocmd FileType python setlocal completeopt-=preview
 "}}}
 "{{{ Go Lang
 set runtimepath+=$GOROOT/misc/vim
@@ -312,7 +319,34 @@ set runtimepath+=$GOROOT/misc/vim
 imap <C-J> <esc>a<Plug>snipMateNextOrTrigger
 smap <C-J> <Plug>snipMateNextOrTrigger
 " }}}
-" }}}
+" {{{ NeoComplCache
+let g:neocomplcache_enable_at_startup = 1
+" TAB completion
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" Use smartcase.
+let g:neocomplcache_enable_smart_case = 1
+
+" Enable omni completion.
+autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+" Enable heavy omni completion.
+if !exists('g:neocomplcache_omni_patterns')
+      let g:neocomplcache_omni_patterns = {}
+endif
+let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+let g:neocomplcache_omni_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
+let g:neocomplcache_omni_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+
+
+"  }}}
+"  tmux navigator {{{
+"let g:tmux_navigator_no_mappings = 1
+"  }}}
+ " }}}
 " Vundle install {{{ 
 if install_bundles == 1
     echo "Installing Bundles, please ignore key map error messages"
