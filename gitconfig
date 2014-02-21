@@ -6,6 +6,8 @@
     ci = commit
     st = status
 	dt = difftool
+    release = !sh -c \"git checkout production && git pull --rebase origin production && git flow release start $1 && git flow release finish $1\"
+    
 
 [color]
     ui = auto
