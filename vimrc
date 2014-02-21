@@ -39,6 +39,7 @@ Bundle 'tfnico/vim-gradle'
 Bundle 'Shougo/neocomplcache.vim'
 Bundle 'davidhalter/jedi-vim'
 Bundle 'tpope/vim-surround'
+Bundle 'tpope/vim-repeat'
 
 " tmux pane navigation
 Bundle 'christoomey/vim-tmux-navigator'
