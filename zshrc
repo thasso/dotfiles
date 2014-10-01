@@ -35,6 +35,11 @@ ZSH_THEME="agnoster"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 plugins=(git git-flow virtualenv)
 
+# Emacs support
+if [ -n "${INSIDE_EMACS}" ]; then
+  export ZSH_THEME="rawsyntax"
+fi
+
 source $ZSH/zsh.sh
 
 # Customize to your needs...
@@ -67,3 +72,4 @@ ext_files=($ZSH/ext/*.zsh) 2>/dev/null
 for config_file ($ext_files); do
   source $config_file
 done
+

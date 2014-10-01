@@ -40,11 +40,16 @@ Bundle 'Shougo/neocomplcache.vim'
 Bundle 'davidhalter/jedi-vim'
 Bundle 'tpope/vim-surround'
 Bundle 'tpope/vim-repeat'
+Bundle 'gcmt/wildfire.vim'
 
 " tmux pane navigation
 Bundle 'christoomey/vim-tmux-navigator'
 
 Bundle 'thasso/vim-jip'
+
+Bundle 'tommcdo/vim-exchange'
+" Extrade vim+git hitory browsing
+Bundle 'int3/vim-extradite'
 " }}}
 " General setting {{{
 "execute pathogen#infect()
@@ -239,13 +244,18 @@ if has("autocmd")
   autocmd Filetype python set foldmethod=indent foldlevel=99
 endif
 " }}}
-" C {{{
+" C and c++ {{{
 if has("autocmd")
-  autocmd Filetype c setlocal expandtab
-  autocmd Filetype c setlocal shiftwidth=2
-  autocmd Filetype c setlocal softtabstop=2
-  autocmd Filetype c setlocal tabstop=2
+  autocmd Filetype c setlocal noexpandtab
+  autocmd Filetype c setlocal shiftwidth=4
+  autocmd Filetype c setlocal softtabstop=4
+  autocmd Filetype c setlocal tabstop=4
   autocmd Filetype c set foldmethod=syntax foldlevel=99 foldlevel=99
+  autocmd Filetype cpp setlocal noexpandtab
+  autocmd Filetype cpp setlocal shiftwidth=4
+  autocmd Filetype cpp setlocal softtabstop=4
+  autocmd Filetype cpp setlocal tabstop=4
+  autocmd Filetype cpp set foldmethod=syntax foldlevel=99 foldlevel=99
 endif
 
 " }}}
