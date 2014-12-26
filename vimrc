@@ -41,7 +41,8 @@ Bundle 'davidhalter/jedi-vim'
 Bundle 'tpope/vim-surround'
 Bundle 'tpope/vim-repeat'
 Bundle 'gcmt/wildfire.vim'
-
+Bundle 'rhysd/vim-clang-format'
+Bundle 'Valloric/YouCompleteMe'
 " tmux pane navigation
 Bundle 'christoomey/vim-tmux-navigator'
 
@@ -50,6 +51,8 @@ Bundle 'thasso/vim-jip'
 Bundle 'tommcdo/vim-exchange'
 " Extrade vim+git hitory browsing
 Bundle 'int3/vim-extradite'
+Bundle 'editorconfig/editorconfig-vim'
+Bundle 'haya14busa/incsearch.vim'
 " }}}
 " General setting {{{
 "execute pathogen#infect()
@@ -179,6 +182,8 @@ nmap <F3> :cnext<CR>
 nmap <S-F3> :cprevious<CR>
 imap <F3> <esc>:cnext<CR>
 imap <S-F3> <esc>:cprevious<CR>
+inoremap <c-w> <c-g>u<c-w>
+
 " select paste text
 nnoremap gp `[v`]
 " go to end of selection after yank
@@ -303,8 +308,8 @@ let g:ctrlp_custom_ignore = {
 " }}}
 " Expand Regions {{{
 "nmap <C-w> viw<Plug>(expand_region_expand)
-imap <C-w> <esc>viw<Plug>(expand_region_expand)
-vmap <C-W> <Plug>(expand_region_expand)
+"imap <C-w> <esc>viw<Plug>(expand_region_expand)
+"vmap <C-W> <Plug>(expand_region_expand)
 " }}}
 " Tagbar {{{
 "let g:tagbar_ctags_bin='~/usr/bin/ctags'
@@ -356,6 +361,14 @@ let g:neocomplcache_omni_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
 "  }}}
 "  tmux navigator {{{
 "let g:tmux_navigator_no_mappings = 1
+"  }}}
+" Incsearch {{{
+map /  <Plug>(incsearch-forward)
+map ?  <Plug>(incsearch-backward)
+map g/ <Plug>(incsearch-stay)
+"  }}}
+"  Clang Format {{{
+let g:clang_format#auto_formatexpr=1
 "  }}}
  " }}}
 " Vundle install {{{ 

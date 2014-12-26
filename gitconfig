@@ -28,3 +28,5 @@
 	tool = vimdiff
 [difftool]
 	prompt = false
+[core]
+	autocrlf = input
