@@ -53,6 +53,9 @@ Bundle 'tommcdo/vim-exchange'
 Bundle 'int3/vim-extradite'
 Bundle 'editorconfig/editorconfig-vim'
 Bundle 'haya14busa/incsearch.vim'
+
+" Golang
+Bundle 'fatih/vim-go.git'
 " }}}
 " General setting {{{
 "execute pathogen#infect()
