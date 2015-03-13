@@ -6,10 +6,9 @@
     ci = commit
     st = status
 	dt = difftool
-    release = !sh -c \"git checkout production && git pull --rebase origin production && git flow release start $1 && git flow release finish $1\"
+    ;release = !sh -c \"git checkout production && git pull --rebase origin production && git flow release start $1 && git flow release finish $1\"
     subup = submodule update --init --recursive
-    
-
+    tags = !sh -c \"git for-each-ref --format='%(color:green)%(refname:short)|%(color:white)[%(taggerdate:relative)]|%(color:blue)%(objectname:short)|%(color:yellow)%(contents:subject)|%(color:white)Tagged by %(taggername)' --sort='-taggerdate' --count=10 refs/tags | awk -F'|' '{printf \\\"%-12s %-20s %s %-35s %s\\n\\\", \\$1, \\$2, \\$3, \\$5, \\$4}'\"
 [color]
     ui = auto
 

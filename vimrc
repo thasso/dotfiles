@@ -36,7 +36,7 @@ Bundle 'MarcWeber/vim-addon-mw-utils.git'
 Bundle 'garbas/vim-snipmate'
 Bundle 'honza/vim-snippets.git'
 Bundle 'tfnico/vim-gradle'
-Bundle 'Shougo/neocomplcache.vim'
+"Bundle 'Shougo/neocomplcache.vim'
 Bundle 'davidhalter/jedi-vim'
 Bundle 'tpope/vim-surround'
 Bundle 'tpope/vim-repeat'
@@ -53,9 +53,9 @@ Bundle 'tommcdo/vim-exchange'
 Bundle 'int3/vim-extradite'
 Bundle 'editorconfig/editorconfig-vim'
 Bundle 'haya14busa/incsearch.vim'
-
 " Golang
 Bundle 'fatih/vim-go.git'
+Bundle 'mustache/vim-mustache-handlebars'
 " }}}
 " General setting {{{
 "execute pathogen#infect()
@@ -181,10 +181,10 @@ nmap <S-left> <esc>vh
 imap <S-left> <esc>vh
 vmap <S-up> h
 imap <C-space> <C-X><C-O>
-nmap <F3> :cnext<CR>
-nmap <S-F3> :cprevious<CR>
-imap <F3> <esc>:cnext<CR>
-imap <S-F3> <esc>:cprevious<CR>
+nmap <F3> :lnext<CR>
+nmap <F2> :lprevious<CR>
+imap <F3> <esc>:lnext<CR>
+imap <F2> <esc>:lprevious<CR>
 inoremap <c-w> <c-g>u<c-w>
 
 " select paste text
@@ -203,6 +203,10 @@ nmap <c-j> <c-w>j
 nmap <c-k> <c-w>k
 nmap <c-l> <c-w>l
 nmap <c-h> <c-w>h
+
+" html tag closing 
+imap <C-Space> <C-x><C-o>
+iabbrev <// </<C-x><C-o>
 " }}}
 " File wildcards {{{
 set wildignore+=*.pyc,*.o,*.obj,.git,*.egg/**,*.min.js,*.so,*egg-info*/**,*.jpg,*.png,*.gif,*.ico
@@ -277,6 +281,7 @@ if has("autocmd")
   "let g:html_indent_inctags = "html,body,head,tbody"
   let g:html_indent_inctags = "body,head,tbody"
   let g:syntastic_html_tidy_ignore_errors=[" proprietary attribute \"ng-"]
+  let g:syntastic_check_on_open=1
 
   autocmd Filetype html set foldmethod=syntax foldlevel=99 foldlevel=99
 endif
@@ -372,6 +377,11 @@ map g/ <Plug>(incsearch-stay)
 "  }}}
 "  Clang Format {{{
 let g:clang_format#auto_formatexpr=1
+"  }}}
+" YMC you compelte me configuration {{{
+let g:ycm_confirm_extra_conf = 0
+let g:ycm_server_use_vim_stdout = 0
+let g:ycm_server_keep_logfiles = 0
 "  }}}
  " }}}
 " Vundle install {{{ 
