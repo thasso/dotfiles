@@ -13,49 +13,39 @@ if !filereadable(vundle_readme)
     let install_bundles=1
 endif
 set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
 " }}}
 " }}}
 " Bundles {{{
+call vundle#begin()
 
-Bundle 'gmarik/vundle'
+" General and utilities
+Plugin 'bling/vim-airline'
+Plugin 'chriskempson/base16-vim'
+Plugin 'editorconfig/editorconfig-vim'
+Plugin 'kien/ctrlp.vim'
+Plugin 'haya14busa/incsearch.vim'
+Plugin 'scrooloose/nerdcommenter'
+Plugin 'tpope/vim-surround'
+Plugin 'tpope/vim-repeat'
+Plugin 'terryma/vim-expand-region'
 
-Bundle 'bling/vim-airline'
-Bundle 'kien/ctrlp.vim'
-Bundle 'tpope/vim-fugitive'
-"Bundle 'ervandew/supertab'
-Bundle 'scrooloose/nerdcommenter'
-Bundle 'scrooloose/syntastic'
-Bundle 'majutsushi/tagbar'
-Bundle 'klen/python-mode'
-Bundle 'nono/vim-handlebars'
-Bundle 'chriskempson/base16-vim'
-Bundle 'haya14busa/vim-easymotion'
-Bundle 'tomtom/tlib_vim.git'
-Bundle 'MarcWeber/vim-addon-mw-utils.git'
-Bundle 'garbas/vim-snipmate'
-Bundle 'honza/vim-snippets.git'
-Bundle 'tfnico/vim-gradle'
-"Bundle 'Shougo/neocomplcache.vim'
-Bundle 'davidhalter/jedi-vim'
-Bundle 'tpope/vim-surround'
-Bundle 'tpope/vim-repeat'
-Bundle 'gcmt/wildfire.vim'
-Bundle 'rhysd/vim-clang-format'
-Bundle 'Valloric/YouCompleteMe'
+" GIT and SCM
+Plugin 'tpope/vim-fugitive'
+Plugin 'int3/vim-extradite' " Extrade vim+git hitory browsing
+
+" Formatting and completion
+Plugin 'rhysd/vim-clang-format'
+Plugin 'Valloric/YouCompleteMe'
+
 " tmux pane navigation
-Bundle 'christoomey/vim-tmux-navigator'
+Plugin 'christoomey/vim-tmux-navigator'
 
-Bundle 'thasso/vim-jip'
-
-Bundle 'tommcdo/vim-exchange'
-" Extrade vim+git hitory browsing
-Bundle 'int3/vim-extradite'
-Bundle 'editorconfig/editorconfig-vim'
-Bundle 'haya14busa/incsearch.vim'
-" Golang
-Bundle 'fatih/vim-go.git'
-Bundle 'mustache/vim-mustache-handlebars'
+" Languages
+Plugin 'thasso/vim-jip'
+Plugin 'tfnico/vim-gradle'
+Plugin 'fatih/vim-go.git'
+Plugin 'mustache/vim-mustache-handlebars'
+call vundle#end()
 " }}}
 " General setting {{{
 "execute pathogen#infect()
@@ -113,12 +103,6 @@ set showmatch
 " How many tenths of a second to blink when matching brackets
 set mat=2
 
-" enable "+ as default register
-" note that we need the yank remaps below
-if $TMUX == ''
-    set clipboard=unnamedplus
-endif
-
 " Return to last edit position when opening files (You want this!)
 autocmd BufReadPost *
      \ if line("'\"") > 0 && line("'\"") <= line("$") |
@@ -133,7 +117,7 @@ if has("autocmd")
 endif
 " }}}
 " Leader bindings {{{
-let mapleader = ","
+let mapleader = " "
 imap jj <esc>l
 nmap <Leader>e :cnext<CR>
 nmap <Leader>E :cprevious<CR>
@@ -142,15 +126,12 @@ nmap <Leader>n :bn<CR>
 nmap <Leader>m :bp<CR>
 nmap <Leader>s :set spell!<CR>
 nmap <leader>p gqip " wrap paragraph
-"nmap <leader>T :LustyBufferExplorer<CR>
 nmap <leader>w :w<CR>
 nmap <leader>q :q<CR>
 nmap <leader>P :PyLintToggle<CR>
-nmap <leader>T :LustyBufferExplorer<CR>
 nmap <leader>fa zM
 nmap <leader>fu zR
-nmap <leader>l :TagbarToggle<CR>
-nnoremap <silent> <Leader>xt :CommandT<CR>
+nmap <leader>ff za
 nnoremap <leader>t :CtrlP<CR>
 nnoremap <leader>T :CtrlPBuffer<CR>
 nmap <leader>h :set hlsearch! hlsearch? <CR>
@@ -167,7 +148,7 @@ imap <C-e> <esc>$a
 imap <C-a> <esc>^i
 imap <C-s> <esc>:wi<CR>
 nmap <C-s> :w<CR>
-nmap <space> za
+"nmap <space> za
 imap <S-down> <esc>vj
 nmap <S-down> <esc>vj
 vmap <S-down> j
@@ -186,14 +167,8 @@ nmap <F2> :lprevious<CR>
 imap <F3> <esc>:lnext<CR>
 imap <F2> <esc>:lprevious<CR>
 inoremap <c-w> <c-g>u<c-w>
-
 " select paste text
 nnoremap gp `[v`]
-" go to end of selection after yank
-" and always do a normal yank and a yank to system clipboard
-" vmap y y`]
-nnoremap yy yy"+yy
-vnoremap y ygv"+y`]
 " aliases
 :command! W w
 "
@@ -296,10 +271,6 @@ set laststatus=2
 " Airline {{{
 let g:airline_powerline_fonts = 1
 " }}}
-"  Command T {{{
-let g:CommandTMatchWindowAtTop=1
-let g:CommandTMaxHeight=20
-"  }}}
 " CtrlP {{{
 let g:ctrlp_custom_ignore = {
   \ 'dir':  '\v[\/]\.(git|hg|svn)|node_modules$|bower_components',
@@ -315,12 +286,13 @@ let g:ctrlp_custom_ignore = {
 "xmap <C-N> :call MarkMultipleClean()<CR>
 " }}}
 " Expand Regions {{{
-"nmap <C-w> viw<Plug>(expand_region_expand)
+nmap <C-w> <Plug>(expand_region_expand)
+vmap <C-w> <Plug>(expand_region_expand)
+nmap <S-w> <Plug>(expand_region_shrink)
+vmap <S-w> <Plug>(expand_region_shrink)
+"nmap <C-S-w> viw<Plug>(expand_region_shrink)
 "imap <C-w> <esc>viw<Plug>(expand_region_expand)
 "vmap <C-W> <Plug>(expand_region_expand)
-" }}}
-" Tagbar {{{
-"let g:tagbar_ctags_bin='~/usr/bin/ctags'
 " }}}
 " Python Mode {{{
 let g:pymode_rope_guess_project=0
@@ -383,11 +355,14 @@ let g:ycm_confirm_extra_conf = 0
 let g:ycm_server_use_vim_stdout = 0
 let g:ycm_server_keep_logfiles = 0
 "  }}}
+"  Extradite {{{
+command Tig Extradite
+"  }}}
  " }}}
 " Vundle install {{{ 
 if install_bundles == 1
     echo "Installing Bundles, please ignore key map error messages"
     echo ""
-    :BundleInstall
+    :PluginInstall
 endif
 " }}}
