@@ -29,6 +29,8 @@ Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-repeat'
 Plugin 'terryma/vim-expand-region'
 Plugin 'terryma/vim-multiple-cursors'
+Plugin 'SirVer/ultisnips' " This is the snippets plugin, below are the snippets
+Plugin 'honza/vim-snippets' " These are some default snipets
 
 " GIT and SCM
 Plugin 'tpope/vim-fugitive'
@@ -37,6 +39,7 @@ Plugin 'int3/vim-extradite' " Extrade vim+git hitory browsing
 " Formatting and completion
 Plugin 'rhysd/vim-clang-format'
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'scrooloose/syntastic'
 
 " tmux pane navigation
 Plugin 'christoomey/vim-tmux-navigator'
@@ -46,6 +49,9 @@ Plugin 'thasso/vim-jip'
 Plugin 'tfnico/vim-gradle'
 Plugin 'fatih/vim-go.git'
 Plugin 'mustache/vim-mustache-handlebars'
+Plugin 'jmcantrell/vim-virtualenv'
+Plugin 'marijnh/tern_for_vim' " Javascript
+Plugin 'zah/nimrod.vim'
 call vundle#end()
 " }}}
 " General setting {{{
@@ -117,8 +123,13 @@ if has("autocmd")
   autocmd! bufwritepost .vimrc source %
 endif
 " }}}
+" {{{ Search and replace
+vnoremap <silent> s //e<C-r>=&selection=='exclusive'?'+1':''<CR><CR>
+    \:<C-u>call histdel('search',-1)<Bar>let @/=histget('search',-1)<CR>gv
+omap s :normal vs<CR>
+" }}}
 " Leader bindings {{{
-let mapleader = " "
+let mapleader = ","
 imap jj <esc>l
 nmap <Leader>e :cnext<CR>
 nmap <Leader>E :cprevious<CR>
@@ -127,7 +138,7 @@ nmap <Leader>n :bn<CR>
 nmap <Leader>m :bp<CR>
 nmap <Leader>s :set spell!<CR>
 nmap <leader>p gqip " wrap paragraph
-nmap <leader>w :w<CR>
+"nmap <leader>w :w<CR>
 nmap <leader>q :q<CR>
 nmap <leader>P :PyLintToggle<CR>
 nmap <leader>fa zM
@@ -162,7 +173,6 @@ vmap <S-up> l
 nmap <S-left> <esc>vh
 imap <S-left> <esc>vh
 vmap <S-up> h
-imap <C-space> <C-X><C-O>
 nmap <F3> :lnext<CR>
 nmap <F2> :lprevious<CR>
 imap <F3> <esc>:lnext<CR>
@@ -172,16 +182,41 @@ inoremap <c-w> <c-g>u<c-w>
 nnoremap gp `[v`]
 " aliases
 :command! W w
+if &term =~ "screen"
+  set  <F13>=[1;2P
+  set  <F14>=[1;2Q
+  set  <F15>=[1;2R
+  set  <F16>=[1;2S
+  set  <F17>=[1;5P
+  set  <F18>=[1;5Q
+  set  <F19>=[1;5R
+  set  <F20>=[1;5A
+  set  <F21>=[1;5B
+elseif &term =~ "xterm"
+  set  <F13>=O2P
+  set  <F14>=O2Q
+  set  <F15>=O2R
+  set  <F16>=O2S
+  set  <F17>=O5P
+  set  <F18>=O5Q
+  set  <F19>=O5R
+  set  <F20>=[1;5A
+  set  <F21>=[1;5B
+endif
+
+" use some unused function key codes to
+" make special key combos work in terminal
+map  <F13> <M-Up>
+map  <F14> <M-Down>
 "
 " }}}
 " Window navigation {{{
-nmap <c-j> <c-w>j
-nmap <c-k> <c-w>k
-nmap <c-l> <c-w>l
-nmap <c-h> <c-w>h
-
-" html tag closing 
-imap <C-Space> <C-x><C-o>
+nmap <c-j> wincmd j
+nmap <c-k> wincmd k
+nmap <c-l> wincmd l
+nmap <c-h> wincmd h
+"
+" html tag closing
 iabbrev <// </<C-x><C-o>
 " }}}
 " File wildcards {{{
@@ -211,6 +246,8 @@ set softtabstop=4
 set shiftwidth=4
 set shiftround
 set wrap
+" Delete trailing whitespace
+autocmd BufWritePre * :%s/\s\+$//e
 " }}}
 " Folding and custom fold line {{{
 function! NeatFoldText()
@@ -271,29 +308,21 @@ set laststatus=2
 "  }}}
 " Airline {{{
 let g:airline_powerline_fonts = 1
+"let g:airline_theme='powerlineish'
 " }}}
 " CtrlP {{{
 let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/]\.(git|hg|svn)|node_modules$|bower_components',
+  \ 'dir':  '\v[\/]\.(git|hg|svn)|node_modules$|bower_components$|build$|tmp$',
   \ 'file': '\v\.(exe|so|dll)$',
   \ 'link': 'some_bad_symbolic_links',
   \ }
 " }}}
-" Mark Multiple {{{
-"let g:mark_multiple_trigger = "<C-d>"
-"nmap <C-d> :call MarkMultiple()<CR>
-"xmap <C-d> :call MarkMultiple()<CR>
-"nmap <C-N> :call MarkMultipleClean()<CR>
-"xmap <C-N> :call MarkMultipleClean()<CR>
-" }}}
 " Expand Regions {{{
-nmap <C-w> <Plug>(expand_region_expand)
-vmap <C-w> <Plug>(expand_region_expand)
-nmap <S-w> <Plug>(expand_region_shrink)
-vmap <S-w> <Plug>(expand_region_shrink)
-"nmap <C-S-w> viw<Plug>(expand_region_shrink)
-"imap <C-w> <esc>viw<Plug>(expand_region_expand)
-"vmap <C-W> <Plug>(expand_region_expand)
+"nmap <M-Up> <Plug>(expand_region_expand)
+"vmap <Esc><Up> <Plug>(expand_region_expand)
+"imap <Esc><Up> <Esc><Plug>(expand_region_expand)
+"nmap <Esc><Down> <Plug>(expand_region_shrink)
+"vmap <Esc><Down> <Plug>(expand_region_shrink)
 " }}}
 " Python Mode {{{
 let g:pymode_rope_guess_project=0
@@ -355,12 +384,24 @@ let g:clang_format#auto_formatexpr=1
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_server_use_vim_stdout = 0
 let g:ycm_server_keep_logfiles = 0
+let g:ycm_always_populate_location_list = 1
+nmap <leader>b :YcmCompleter GoTo<CR>
+vmap <leader>b :YcmCompleter GoTo<CR>
 "  }}}
 "  Extradite {{{
-command Tig Extradite
+command! Tig Extradite
 "  }}}
- " }}}
-" Vundle install {{{ 
+" UltiSnips {{{
+let g:UltiSnipsExpandTrigger       = "<C-j>"
+let g:UltiSnipsJumpForwardTrigger  = "<C-n>"
+let g:UltiSnipsJumpBackwardTrigger = "<C-p>"
+" }}}
+" Syntastic {{{
+"let g:syntastic_disabled_filetypes=['go']
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+" }}}
+" Vundle install {{{
 if install_bundles == 1
     echo "Installing Bundles, please ignore key map error messages"
     echo ""
