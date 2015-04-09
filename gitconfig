@@ -13,7 +13,7 @@
     ui = auto
 
 [push]
-    default = simple
+	default = simple
 
 [branch]
 	autosetuprebase = always
