@@ -31,6 +31,7 @@ Plugin 'terryma/vim-expand-region'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'SirVer/ultisnips' " This is the snippets plugin, below are the snippets
 Plugin 'honza/vim-snippets' " These are some default snipets
+Plugin 'Valloric/ListToggle' " helper plugin to toggle error and quicklists
 
 " GIT and SCM
 Plugin 'tpope/vim-fugitive'
@@ -138,8 +139,6 @@ nmap <Leader>n :bn<CR>
 nmap <Leader>m :bp<CR>
 nmap <Leader>s :set spell!<CR>
 nmap <leader>p gqip " wrap paragraph
-"nmap <leader>w :w<CR>
-nmap <leader>q :q<CR>
 nmap <leader>P :PyLintToggle<CR>
 nmap <leader>fa zM
 nmap <leader>fu zR
@@ -312,7 +311,7 @@ let g:airline_powerline_fonts = 1
 " }}}
 " CtrlP {{{
 let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/]\.(git|hg|svn)|node_modules$|bower_components$|build$|tmp$',
+  \ 'dir':  '\v[\/]\.(git|hg|svn)|node_modules$|bower_components$|build$|tmp$|packages$|node_modules$',
   \ 'file': '\v\.(exe|so|dll)$',
   \ 'link': 'some_bad_symbolic_links',
   \ }
@@ -339,7 +338,15 @@ let g:jedi#auto_initialization = 1
 autocmd FileType python setlocal completeopt-=preview
 "}}}
 "{{{ Go Lang
+let g:go_fmt_fail_silently = 1
+let g:go_fmt_command = "goimports"
 set runtimepath+=$GOROOT/misc/vim
+au FileType go nmap <Leader>i <Plug>(go-info)
+au FileType go nmap <Leader>b <Plug>(go-def)
+au FileType go nmap <Leader>r <Plug>(go-referrers)
+au FileType go nmap <F6> <Plug>(go-rename)
+au FileType go vmap <F6> <Plug>(go-rename)
+au FileType go imap <F6> <Plug>(go-rename)
 " }}}
 " {{{ Snipmate
 imap <C-J> <esc>a<Plug>snipMateNextOrTrigger
@@ -393,13 +400,13 @@ command! Tig Extradite
 "  }}}
 " UltiSnips {{{
 let g:UltiSnipsExpandTrigger       = "<C-j>"
-let g:UltiSnipsJumpForwardTrigger  = "<C-n>"
-let g:UltiSnipsJumpBackwardTrigger = "<C-p>"
+let g:UltiSnipsJumpForwardTrigger  = "<C-f>"
+let g:UltiSnipsJumpBackwardTrigger = "<C-b>"
 " }}}
 " Syntastic {{{
 "let g:syntastic_disabled_filetypes=['go']
 let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
+let g:syntastic_auto_loc_list = 0
 " }}}
 " Vundle install {{{
 if install_bundles == 1
