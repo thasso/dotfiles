@@ -19,168 +19,218 @@ set rtp+=~/.vim/bundle/vundle/
 call vundle#begin()
 
 " General and utilities
+Plugin 'tpope/vim-sensible'
 Plugin 'bling/vim-airline'
+" Color themes
 Plugin 'chriskempson/base16-vim'
+Plugin 'morhetz/gruvbox'
+Plugin 'NLKNguyen/papercolor-theme'
+Plugin 'therubymug/vim-pyte'
+Plugin 'vim-scripts/summerfruit256.vim'
+
 Plugin 'editorconfig/editorconfig-vim'
 Plugin 'kien/ctrlp.vim'
 Plugin 'haya14busa/incsearch.vim'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-repeat'
-Plugin 'terryma/vim-expand-region'
+Plugin 'tpope/vim-unimpaired'
+Plugin 'tpope/vim-eunuch'
 Plugin 'terryma/vim-multiple-cursors'
-Plugin 'SirVer/ultisnips' " This is the snippets plugin, below are the snippets
 Plugin 'honza/vim-snippets' " These are some default snipets
-Plugin 'Valloric/ListToggle' " helper plugin to toggle error and quicklists
+Plugin 'SirVer/ultisnips' " This is the snippets plugin, below are the snippets
+Plugin 'Lokaltog/vim-easymotion'
+Plugin 'terryma/vim-expand-region'
 
-" GIT and SCM
+Plugin 'rking/ag.vim'
+Plugin 'rbgrouleff/bclose.vim' " Use Bclose to close a buffer but keep the window
+Plugin 'airblade/vim-gitgutter'
+Plugin 'jiangmiao/auto-pairs'
+
+Plugin 'tpope/vim-dispatch'
+Plugin 'tpope/vim-projectionist'
+
+"" GIT and SCM
 Plugin 'tpope/vim-fugitive'
-Plugin 'int3/vim-extradite' " Extrade vim+git hitory browsing
 
-" Formatting and completion
+"" Formatting and completion
 Plugin 'rhysd/vim-clang-format'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'scrooloose/syntastic'
 
-" tmux pane navigation
+"" tmux pane navigation
 Plugin 'christoomey/vim-tmux-navigator'
 
-" Languages
+"" Languages
 Plugin 'thasso/vim-jip'
 Plugin 'tfnico/vim-gradle'
 Plugin 'fatih/vim-go.git'
-Plugin 'mustache/vim-mustache-handlebars'
-Plugin 'jmcantrell/vim-virtualenv'
-Plugin 'marijnh/tern_for_vim' " Javascript
-Plugin 'zah/nimrod.vim'
+
+" Javascript
+Plugin 'marijnh/tern_for_vim'
+Plugin 'pangloss/vim-javascript'
+Plugin 'nathanaelkane/vim-indent-guides'
+
+" Markdown preview
+Plugin 'greyblake/vim-preview'
+" Fix python indentation to be pep8 compatible
+Plugin 'hynek/vim-python-pep8-indent'
+
+" Text and prose writing (and dependencies)
+Plugin 'kana/vim-textobj-user'
+Plugin 'kana/vim-textobj-line'
+Plugin 'reedes/vim-pencil'
+Plugin 'reedes/vim-lexical'
+Plugin 'reedes/vim-litecorrect'
+Plugin 'reedes/vim-textobj-quote'
+Plugin 'reedes/vim-textobj-sentence'
+
+" One vim instance
+Plugin 'reedes/vim-one'
+" TExt objects
+Plugin 'michaeljsmith/vim-indent-object'
+Plugin 'tpope/vim-vinegar'
+
 call vundle#end()
 " }}}
 " General setting {{{
-"execute pathogen#infect()
-filetype plugin indent on
-syntax on
+" Note that the sensible plugin already sets lots of defaults
+set encoding=utf-8
+" Color settings
+set t_Co=256
 if !has('gui_running')
     set term=screen-256color
 endif
-set hidden
-set spelllang=en_US
-set modelines=1
-" set backspace=2
-" Configure backspace so it acts as it should act
-set backspace=eol,start,indent
+" Default spell check language
+set spelllang=en_us
+" whichrap here ensures that navigation left/right goes to next/previous line
 set whichwrap+=<,>,h,l
-
 " Set 7 lines to the cursor - when moving vertically using j/k
 set so=7
-
-" auto read file when changed on disk
-set autoread
+" Show line numbers by default
 set number
-set history=700
-set undolevels=700
+" Increase undo levels
+set undolevels=1000
 " no backup and swap files
 set nobackup
 set nowritebackup
 set noswapfile
-
-" search
+" Hide search result hightlighting by default
 set nohlsearch
-set incsearch
+" Ignore case and use smart case for searches
 set ignorecase
 set smartcase
 " For regular expressions turn magic on
 set magic
-
 " display tabs and end of lines
 set list
 set listchars=tab:▸\ ,eol:¬,extends:❯,precedes:❮
 " highlight current line
 set cursorline
-set completeopt=menu,preview,longest
+" Command line mode completion enables and iterate with tab
 set wildmenu
-set wildmode=list:longest:full
+set wildmode=longest:full,full
+" Mouse mode enabled
 set mouse=a
-" Don't redraw while executing macros (good performance config)
-set lazyredraw
-
-"Always show current position
-set ruler
-
-" Show matching brackets when text indicator is over them
+" " Show matching brackets when text indicator is over them
 set showmatch
-" How many tenths of a second to blink when matching brackets
+" " How many tenths of a second to blink when matching brackets
 set mat=2
 
 " Return to last edit position when opening files (You want this!)
 autocmd BufReadPost *
      \ if line("'\"") > 0 && line("'\"") <= line("$") |
-     \   exe "normal! g`\"" |
+     \   exec "normal! g`\"" |
      \ endif
 " Remember info about open buffers on close
 set viminfo^=%
+" Render color column at 80
+set colorcolumn=80
+" Ignore patterns
+set wildignore+=*.pyc,*.o,*.obj,.git,*.egg/**,*.min.js,*.so,*egg-info*/**,*.jpg,*.png,*.gif,*.ico
+" dected *.md files as markdown
+autocmd BufNewFile,BufRead *.md set filetype=markdown
 
-" load .vimrc automatically on changes
-if has("autocmd")
-  autocmd! bufwritepost .vimrc source %
+" Make sure that pasting over a selected region does not overwrite the
+" default past buffer
+function! RestoreRegister()
+  let @" = s:restore_reg
+  return ''
+endfunction
+function! s:Repl()
+  let s:restore_reg = @"
+  return "p@=RestoreRegister()\<cr>"
+endfunction
+vmap <silent> <expr> p <sid>Repl()
+
+" " }}}
+" Color scheme {{{
+set background=dark
+let base16colorspace=256
+" colorscheme base16-chalk
+" colorscheme base16-ashes
+colorscheme base16-tomorrow
+" colorscheme gruvbox
+highlight ColorColumn ctermbg=235
+" }}}
+" GUI Mode {{{
+if has('gui_running')
+    set guioptions-=T " disable toolbar
+    set guioptions-=m " disable menu
+    set guioptions-=rL " disable scrollbar
+    set guifont=Source\ Code\ Pro\ for\ Powerline
 endif
 " }}}
-" {{{ Search and replace
-vnoremap <silent> s //e<C-r>=&selection=='exclusive'?'+1':''<CR><CR>
-    \:<C-u>call histdel('search',-1)<Bar>let @/=histget('search',-1)<CR>gv
-omap s :normal vs<CR>
+" Tabs, Spaces, and Wrap {{{
+set expandtab
+set linebreak
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set shiftround
+set wrap
+" Delete trailing whitespace
+autocmd BufWritePre * :%s/\s\+$//e
 " }}}
 " Leader bindings {{{
-let mapleader = ","
-imap jj <esc>l
-nmap <Leader>e :cnext<CR>
-nmap <Leader>E :cprevious<CR>
-nmap <Leader>ev :vsplit $MYVIMRC<CR>
-nmap <Leader>n :bn<CR>
-nmap <Leader>m :bp<CR>
-nmap <Leader>s :set spell!<CR>
-nmap <leader>p gqip " wrap paragraph
-nmap <leader>P :PyLintToggle<CR>
+let mapleader = "\<space>"
+nmap <leader>w :w<CR>
+nmap <leader>q :q<CR>
+" Show - XXX toggles
+nmap <leader>ss :set spell!<CR>
+nmap <leader>sh :set hlsearch! hlsearch? <CR>
+" Folding
 nmap <leader>fa zM
 nmap <leader>fu zR
 nmap <leader>ff za
-nnoremap <leader>t :CtrlP<CR>
+" Buffer and file mappings
 nnoremap <leader>T :CtrlPBuffer<CR>
-nmap <leader>h :set hlsearch! hlsearch? <CR>
-" }}}
+nnoremap <leader>t :CtrlP<CR>
+" Copy paste to system clipboard
+vmap <Leader>y "+y
+vmap <Leader>d "+d
+nmap <Leader>p "+p
+nmap <Leader>P "+P
+vmap <Leader>p "+p
+vmap <Leader>P "+P
+
+" " }}}
 " Keybindings {{{
-" Treat long lines as break lines (useful when moving around in them)
 map j gj
 map k gk
-imap <C-h> <left>
-imap <C-l> <right>
-imap <C-j> <down>
-imap <C-k> <up>
+imap jj <esc>l
+" Emacs style beginnig and end of line in insert mode
 imap <C-e> <esc>$a
 imap <C-a> <esc>^i
-imap <C-s> <esc>:wi<CR>
-nmap <C-s> :w<CR>
-"nmap <space> za
-imap <S-down> <esc>vj
-nmap <S-down> <esc>vj
-vmap <S-down> j
-imap <S-up> <esc>vk
-nmap <S-up> <esc>vk
-vmap <S-up> k
-nmap <S-right> <esc>vl
-imap <S-right> <esc>vl
-vmap <S-up> l
-nmap <S-left> <esc>vh
-imap <S-left> <esc>vh
-vmap <S-up> h
-nmap <F3> :lnext<CR>
-nmap <F2> :lprevious<CR>
-imap <F3> <esc>:lnext<CR>
-imap <F2> <esc>:lprevious<CR>
-inoremap <c-w> <c-g>u<c-w>
 " select paste text
 nnoremap gp `[v`]
+" go to end of selection after yank
+vmap y ygv<Esc>
+" Git commands
+nnoremap <leader>gs :Gstatus<CR>
 " aliases
 :command! W w
+" bind unused kes to map to them from outside
 if &term =~ "screen"
   set  <F13>=[1;2P
   set  <F14>=[1;2Q
@@ -203,51 +253,17 @@ elseif &term =~ "xterm"
   set  <F21>=[1;5B
 endif
 
-" use some unused function key codes to
-" make special key combos work in terminal
+" " use some unused function key codes to
+" " make special key combos work in terminal
 map  <F13> <M-Up>
 map  <F14> <M-Down>
-"
-" }}}
-" Window navigation {{{
-nmap <c-j> wincmd j
-nmap <c-k> wincmd k
-nmap <c-l> wincmd l
-nmap <c-h> wincmd h
-"
+
+" " }}}
+" Abbreviations {{{
 " html tag closing
 iabbrev <// </<C-x><C-o>
-" }}}
-" File wildcards {{{
-set wildignore+=*.pyc,*.o,*.obj,.git,*.egg/**,*.min.js,*.so,*egg-info*/**,*.jpg,*.png,*.gif,*.ico
-" }}}
-" Color scheme {{{
-set background=dark
-let base16colorspace=256
-colorscheme base16-chalk
-set colorcolumn=80
-highlight ColorColumn ctermbg=235
-" }}}
-" GUI Mode {{{
-if has('gui_running')
-    set guioptions-=T " disable toolbar
-    set guioptions-=m " disable menu
-    set guifont=Source\ Code\ Pro\ for\ Powerline
-    set guioptions+=LlRrb
-    set guioptions-=LlRrb
-endif
-" }}}
-" Tabs, Spaces, and Wrap {{{
-set expandtab
-set linebreak
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
-set shiftround
-set wrap
-" Delete trailing whitespace
-autocmd BufWritePre * :%s/\s\+$//e
-" }}}
+iabbrev teh the
+"}}}
 " Folding and custom fold line {{{
 function! NeatFoldText()
   let line = ' ' . substitute(getline(v:foldstart), '^\s*"\?\s*\|\s*"\?\s*{{' . '{\d*\s*', '', 'g') . ' '
@@ -260,28 +276,24 @@ function! NeatFoldText()
   return foldtextstart . repeat(foldchar, winwidth(0)-foldtextlength) . foldtextend
 endfunction
 set foldtext=NeatFoldText()
-" }}}
-" File types and settings {{{
-" Python {{{
-if has("autocmd")
-  autocmd Filetype python setlocal expandtab
-  autocmd Filetype python set foldmethod=indent foldlevel=99
-endif
-" }}}
-" C and c++ {{{
-if has("autocmd")
-  autocmd Filetype c setlocal noexpandtab
-  autocmd Filetype c setlocal shiftwidth=4
-  autocmd Filetype c setlocal softtabstop=4
-  autocmd Filetype c setlocal tabstop=4
-  autocmd Filetype c set foldmethod=syntax foldlevel=99 foldlevel=99
-  autocmd Filetype cpp setlocal noexpandtab
-  autocmd Filetype cpp setlocal shiftwidth=4
-  autocmd Filetype cpp setlocal softtabstop=4
-  autocmd Filetype cpp setlocal tabstop=4
-  autocmd Filetype cpp set foldmethod=syntax foldlevel=99 foldlevel=99
-endif
+" " }}}
+" EasyMotion {{{
+" Search with easy motion, also re-map n,N for search traversal to get
+" different highlighting
+map ? <Plug>(easymotion-sn)
+omap ? <Plug>(easymotion-tn)
+map /  <Plug>(incsearch-forward)
+map ?  <Plug>(incsearch-backward)
+map g/ <Plug>(incsearch-stay)
+nmap s <Plug>(easymotion-s)
+nmap S <Plug>(easymotion-s2)
+" map leader hjkl to trigger easymotion moves
+map <Leader>l <Plug>(easymotion-lineforward)
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
+map <Leader>h <Plug>(easymotion-linebackward)
 
+let g:EasyMotion_startofline = 0 " keep cursor colum when JK motion
 " }}}
 " HTML {{{
 if has("autocmd")
@@ -294,48 +306,40 @@ if has("autocmd")
   let g:html_indent_inctags = "body,head,tbody"
   let g:syntastic_html_tidy_ignore_errors=[" proprietary attribute \"ng-"]
   let g:syntastic_check_on_open=1
-
-  autocmd Filetype html set foldmethod=syntax foldlevel=99 foldlevel=99
+  let g:syntastic_always_populate_loc_list=1
+  autocmd Filetype html set foldmethod=indent foldlevel=99
 endif
 " }}}
-" }}}
-" Plugin Settings {{{
-" Powerline {{{
-"set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
-set laststatus=2
-"set noshowmode
-"  }}}
 " Airline {{{
 let g:airline_powerline_fonts = 1
-"let g:airline_theme='powerlineish'
+"let g:airline_theme='base16'
 " }}}
 " CtrlP {{{
 let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/]\.(git|hg|svn)|node_modules$|bower_components$|build$|tmp$|packages$|node_modules$',
-  \ 'file': '\v\.(exe|so|dll)$',
-  \ 'link': 'some_bad_symbolic_links',
-  \ }
-" }}}
-" Expand Regions {{{
-"nmap <M-Up> <Plug>(expand_region_expand)
-"vmap <Esc><Up> <Plug>(expand_region_expand)
-"imap <Esc><Up> <Esc><Plug>(expand_region_expand)
-"nmap <Esc><Down> <Plug>(expand_region_shrink)
-"vmap <Esc><Down> <Plug>(expand_region_shrink)
-" }}}
-" Python Mode {{{
-let g:pymode_rope_guess_project=0
-let g:pymode_rope=0
+            \ 'dir':  '\v[\/]\.(git|hg|svn)|node_modules$|bower_components$|build$|tmp$|packages$|node_modules$',
+            \ 'file': '\v\.(exe|so|dll)$',
+            \ 'link': 'some_bad_symbolic_links',
+            \ }
+let g:ctrlp_use_caching = 0
+if executable('ag')
+    set grepprg=ag\ --nogroup\ --nocolor
 
+    let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+else
+  let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files . -co --exclude-standard', 'find %s -type f']
+  let g:ctrlp_prompt_mappings = {
+    \ 'AcceptSelection("e")': ['<space>', '<cr>', '<2-LeftMouse>'],
+    \ }
+endif
 " }}}
-"{{{ JEDI
-let g:jedi#use_tabs_not_buffers = 0
-let g:jedi#popup_on_dot = 0
-let g:jedi#popup_select_first = 1
-let g:jedi#auto_initialization = 1
-
-" hide docstring while completing
-autocmd FileType python setlocal completeopt-=preview
+" Syntastic {{{
+let g:syntastic_disabled_filetypes=['go']
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 0
+let g:syntastic_python_checkers = ['pep8']
+" }}}
+" Clang Format {{{
+let g:clang_format#auto_formatexpr=1
 "}}}
 "{{{ Go Lang
 let g:go_fmt_fail_silently = 1
@@ -348,65 +352,76 @@ au FileType go nmap <F6> <Plug>(go-rename)
 au FileType go vmap <F6> <Plug>(go-rename)
 au FileType go imap <F6> <Plug>(go-rename)
 " }}}
-" {{{ Snipmate
-imap <C-J> <esc>a<Plug>snipMateNextOrTrigger
-smap <C-J> <Plug>snipMateNextOrTrigger
+" Multiple cursors {{{
+let g:multi_cursor_use_default_mapping=0
+let g:multi_cursor_next_key='<C-n>'
+let g:multi_cursor_prev_key='<C-p>'
+let g:multi_cursor_skip_key='<C-x>'
+let g:multi_cursor_quit_key='<Esc>'
 " }}}
-" {{{ NeoComplCache
-let g:neocomplcache_enable_at_startup = 1
-" TAB completion
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-" Use smartcase.
-let g:neocomplcache_enable_smart_case = 1
-
-" Enable omni completion.
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-" Enable heavy omni completion.
-if !exists('g:neocomplcache_omni_patterns')
-      let g:neocomplcache_omni_patterns = {}
-endif
-let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-let g:neocomplcache_omni_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
-let g:neocomplcache_omni_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-
-
-"  }}}
-"  tmux navigator {{{
-"let g:tmux_navigator_no_mappings = 1
-"  }}}
-" Incsearch {{{
-map /  <Plug>(incsearch-forward)
-map ?  <Plug>(incsearch-backward)
-map g/ <Plug>(incsearch-stay)
-"  }}}
-"  Clang Format {{{
-let g:clang_format#auto_formatexpr=1
-"  }}}
+" " {{{ Completion
+set complete=.,w,b,u,t,i,kspell
+set completeopt=menu,longest
+" "  }}}
 " YMC you compelte me configuration {{{
-let g:ycm_confirm_extra_conf = 0
-let g:ycm_server_use_vim_stdout = 0
-let g:ycm_server_keep_logfiles = 0
-let g:ycm_always_populate_location_list = 1
+"let g:ycm_filetype_blacklist = { 'python': 1 }
+let g:ycm_auto_trigger = 1
+let g:ycm_add_preview_to_completeopt = 0
 nmap <leader>b :YcmCompleter GoTo<CR>
 vmap <leader>b :YcmCompleter GoTo<CR>
-"  }}}
-"  Extradite {{{
-command! Tig Extradite
-"  }}}
+
+let g:ulti_expand_or_jump_res = 0
+function! ExpandSnippetOrCarriageReturn()
+    let snippet = UltiSnips#ExpandSnippetOrJump()
+    if g:ulti_expand_or_jump_res > 0
+        return snippet
+    else
+        return "\<CR>"
+    endif
+endfunction
+inoremap <expr> <CR> pumvisible() ? "<C-R>=ExpandSnippetOrCarriageReturn()<CR>" : "\<CR>"
+"}}}
 " UltiSnips {{{
-let g:UltiSnipsExpandTrigger       = "<C-j>"
-let g:UltiSnipsJumpForwardTrigger  = "<C-f>"
-let g:UltiSnipsJumpBackwardTrigger = "<C-b>"
+let g:UltiSnipsExpandTrigger="<c-j>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 " }}}
-" Syntastic {{{
-"let g:syntastic_disabled_filetypes=['go']
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 0
+" NetRW {{{
+let g:netrw_list_hide = '\.o,\.obj,\.pyc'
+" }}}
+" NerdCommenter {{{
+let g:NERDSpaceDelims=1
+let g:NERDCustomDelimiters = { 'py' : { 'left': '# ', 'leftAlt': '', 'rightAlt': ''}}
+" }}}
+" Pencil {{{
+let g:lexical#thesaurus = ['~/.vim/thesaurus/mthesaur.txt',]
+augroup pencil
+  autocmd!
+  autocmd FileType markdown,mkd call pencil#init()
+                            \ | call lexical#init()
+                            \ | call litecorrect#init()
+                            \ | call textobj#quote#init()
+                            \ | call textobj#sentence#init()
+augroup END
+" }}}
+" yaml {{{
+if has("autocmd")
+  autocmd Filetype yaml set foldmethod=indent foldlevel=99
+endif
+" }}}
+" Expand Region {{{
+vmap v <Plug>(expand_region_expand)
+vmap <C-v> <Plug>(expand_region_shrink)
+
+" Extend the global default
+call expand_region#custom_text_objects({
+      \ 'a]' :1,
+      \ 'ab' :1,
+      \ 'aB' :1,
+      \ 'ii' :0,
+      \ 'ai' :0,
+      \ })
+
 " }}}
 " Vundle install {{{
 if install_bundles == 1
