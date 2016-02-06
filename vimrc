@@ -57,6 +57,7 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'rhysd/vim-clang-format'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'scrooloose/syntastic'
+Plugin 'davidhalter/jedi-vim'
 
 "" tmux pane navigation
 Plugin 'christoomey/vim-tmux-navigator'
@@ -90,6 +91,7 @@ Plugin 'reedes/vim-one'
 " TExt objects
 Plugin 'michaeljsmith/vim-indent-object'
 Plugin 'tpope/vim-vinegar'
+Plugin 'wellle/targets.vim'
 
 call vundle#end()
 " }}}
@@ -312,6 +314,7 @@ endif
 " }}}
 " Airline {{{
 let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
 "let g:airline_theme='base16'
 " }}}
 " CtrlP {{{
@@ -364,7 +367,7 @@ set complete=.,w,b,u,t,i,kspell
 set completeopt=menu,longest
 " "  }}}
 " YMC you compelte me configuration {{{
-"let g:ycm_filetype_blacklist = { 'python': 1 }
+let g:ycm_filetype_blacklist = { 'python': 0 }
 let g:ycm_auto_trigger = 1
 let g:ycm_add_preview_to_completeopt = 0
 nmap <leader>b :YcmCompleter GoTo<CR>
@@ -381,6 +384,9 @@ function! ExpandSnippetOrCarriageReturn()
 endfunction
 inoremap <expr> <CR> pumvisible() ? "<C-R>=ExpandSnippetOrCarriageReturn()<CR>" : "\<CR>"
 "}}}
+" Jedi {{{
+let g:jedi#show_call_signatures = "0"
+" }}}
 " UltiSnips {{{
 let g:UltiSnipsExpandTrigger="<c-j>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
@@ -407,6 +413,11 @@ augroup END
 " yaml {{{
 if has("autocmd")
   autocmd Filetype yaml set foldmethod=indent foldlevel=99
+endif
+" }}}
+" podspec {{{
+if has("autocmd")
+  autocmd BufNewFile,BufRead Podfile,*.podspec set filetype=ruby
 endif
 " }}}
 " Expand Region {{{

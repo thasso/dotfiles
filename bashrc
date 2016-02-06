@@ -81,3 +81,5 @@ if [ -d "$HOME/.bashrc.d" ]; then
         . $file
     done
 fi
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

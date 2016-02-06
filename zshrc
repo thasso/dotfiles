@@ -49,7 +49,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/usr/lib
 # disable ssh askpass
 unset SSH_ASKPASS
 # terminal configuration
-export TERM="xterm-256color"
+#export TERM="xterm-256color"
 # language setup
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
@@ -73,3 +73,5 @@ for config_file ($ext_files); do
   source $config_file
 done
 
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
