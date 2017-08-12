@@ -2,7 +2,7 @@
 " Plugins {{{
 call plug#begin('~/.config/nvim/plugins')
 " Color schemese
-Plug 'chriskempson/base16-vim'
+Plug 'flazz/vim-colorschemes'
 
 " General plugins
 Plug 'tpope/vim-sensible'
@@ -11,18 +11,16 @@ Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-vinegar'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-markdown'
-Plug 'bling/vim-airline'
 Plug 'scrooloose/nerdcommenter'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'tfnico/vim-gradle'
 Plug 'dietsche/vim-lastplace'
+
+" File and buffer completion
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'haya14busa/incsearch.vim'
-Plug 'flazz/vim-colorschemes'
-Plug 'reedes/vim-pencil'
-Plug 'reedes/vim-colors-pencil'
+Plug 'kien/ctrlp.vim'
 
 " Add plugins to &runtimepath
 call plug#end()
@@ -70,15 +68,44 @@ autocmd BufNewFile,BufRead *.md set filetype=markdown
 let mapleader = "\<space>"
 nmap <leader>w :w<CR>
 nmap <leader>q :q<CR>
+" nmap <leader>k :OnlineThesaurusCurrentWord<CR>
 " Buffer and file mappings
 nnoremap <leader>t :FZF<CR>
+nnoremap <leader>T :CtrlPBuffer<CR>
+
 " Copy paste to system clipboard
+set clipboard=unnamed
 vmap <Leader>y "+y
 vmap <Leader>d "+d
 nmap <Leader>p "+p
 nmap <Leader>P "+P
 vmap <Leader>p "+p
 vmap <Leader>P "+P
+
+"function! s:buflist()
+  "redir => ls
+  "silent ls
+  "redir END
+  "return split(ls, '\n')
+"endfunction
+
+"function! s:bufopen(e)
+  "execute 'buffer' matchstr(a:e, '^[ 0-9]*')
+"endfunction
+
+"nnoremap <silent> <F2> :call fzf#run({
+"\   'source':  reverse(<sid>buflist()),
+"\   'sink':    function('<sid>bufopen'),
+"\   'options': '+m',
+"\   'down':    len(<sid>buflist()) + 2
+"\ })<CR>
+
+"nnoremap <silent> <leader>T :call fzf#run({
+"\   'source':  reverse(<sid>buflist()),
+"\   'sink':    function('<sid>bufopen'),
+"\   'options': '+m',
+"\   'down':    len(<sid>buflist()) + 2
+"\ })<CR>
 
 " " }}}
 " Keybindings {{{
@@ -97,10 +124,11 @@ map  <F14> <M-Down>
 nmap <silent> cog :GitGutterToggle<CR>
 " }}}
 " Color scheme {{{
-set background=dark
-let base16colorspace=256
-colorscheme base16-tomorrow
-highlight ColorColumn ctermbg=235
+ set background=dark
+ let base16colorspace=256
+" colorscheme base16-tomorrow
+ colorscheme Tomorrow-Night
+ highlight ColorColumn ctermbg=235
 " }}}
 " Tabs, Spaces, and Wrap {{{
 set expandtab
@@ -111,34 +139,14 @@ set shiftwidth=4
 set shiftround
 set wrap
 " Delete trailing whitespace
-" autocmd BufWritePre * :%s/\s\+$//e
-" }}}
-" Airline {{{
-let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline_theme='base16'
+autocmd BufWritePre * :%s/\s\+$//e
 " }}}
 " GitGutter {{{
 " Disable by default and use 'cog' to enable
 let g:gitgutter_enabled = 0
 " }}}
-" Incsearch {{{
-map /  <Plug>(incsearch-forward)
-map ?  <Plug>(incsearch-backward)
-map g/ <Plug>(incsearch-stay)
-" }}}
 " podspec {{{
 if has("autocmd")
   autocmd BufNewFile,BufRead Podfile,*.podspec set filetype=ruby
 endif
-" }}}
-" vim Pencil {{{
-augroup pencil
-  autocmd!
-  autocmd FileType markdown,mkd call pencil#init()
-  autocmd FileType text         call pencil#init()
-  autocmd Filetype git,gitsendemail,*commit*,*COMMIT* call pencil#init({'wrap': 'hard', 'textwidth': 72})
-  let g:pencil_terminal_italics = 1
-  let g:airline_section_x = '%{PencilMode()}'
-augroup END
 " }}}

@@ -1,14 +1,52 @@
 [user]
-    name = Thasso Griebel
-    email = thasso.griebel@googlemail.com
+	name = Thasso Griebel
+	email = thasso.griebel@gmail.com
 
 [alias]
-    ci = commit
-    st = status
 	dt = difftool
     ;release = !sh -c \"git checkout production && git pull --rebase origin production && git flow release start $1 && git flow release finish $1\"
     subup = submodule update --init --recursive
     tags = !sh -c \"git for-each-ref --format='%(color:green)%(refname:short)|%(color:white)[%(taggerdate:relative)]|%(color:blue)%(objectname:short)|%(color:yellow)%(contents:subject)|%(color:white)Tagged by %(taggername)' --sort='-taggerdate' --count=10 refs/tags | awk -F'|' '{printf \\\"%-12s %-20s %s %-35s %s\\n\\\", \\$1, \\$2, \\$3, \\$5, \\$4}'\"
+    branches = "branch -a"
+    remotes = "remote -v"
+
+    # Shorten common commands
+    co = "checkout"
+    st = "status"
+    br = "branch"
+    ci = "commit"
+    d = "diff"
+
+    # Log that shows titles of last 16 commits
+    l = "log -16 --color=always --all --topo-order --pretty='%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
+
+    # Log that starts a pager with titles of all the commits in your tree
+    ll = log --color=always --all --topo-order --pretty='%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+
+    # Log that shows the last 10 commits as a graph
+    lg = "log -10 --color=always --all --graph --topo-order --pretty='%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
+
+    # Log that shows all commits as a graph (using a pager)
+    lgl = "log --color=always --all --graph --topo-order --pretty='%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+
+    # Show outgoing commits
+    out = "log @{u}.."
+
+    # Print the title of the current branch; sometimes useful for scripting
+    currentbranch = "!git branch --contains HEAD | grep '*' | tr -s ' ' | cut -d ' ' -f2"
+
+    # Better diffs for prose
+    wdiff = "diff --color-words"
+
+    # Safer pulls; don't do anything other than a fast forward on merge
+    pull = "pull --ff-only"
+
+    # Amend last commit without modifying commit message
+    amend = "!git log -n 1 --pretty=tformat:%s%n%n%b | git commit -F - --amend"
+
+    # Create a commit that will be automatically squashed as a fixup when you
+    # run `git rebase --autosquash`
+    fixup = "commit --fixup=HEAD"
 [color]
     ui = auto
 
@@ -21,7 +59,7 @@
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
 [mergetool "sourcetree"]
-	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	cmd = /Users/thasso/Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
 [diff]
 	tool = vimdiff
@@ -29,3 +67,6 @@
 	prompt = false
 [core]
 	autocrlf = input
+	excludesfile = /Users/thasso/.gitignore_global
+[commit]
+	template = /Users/thasso/.stCommitMsg
