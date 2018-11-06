@@ -12,7 +12,7 @@ gitconfig-clean:
 
 gitconfig: gitconfig-clean
 	ln -sf $(CURDIR)/gitconfig ~/.gitconfig
-	
+
 vim-clean:
 	rm -f ~/.vimrc
 	rm -Rf ~/.vim
@@ -48,3 +48,9 @@ tmux-clean:
 
 tmux: tmux-clean
 	ln -s $(CURDIR)/tmux.conf ~/.tmux.conf
+
+vscode:
+	mkdir -p $(HOME)/Library/Application\ Support/Code/User
+	ln -s VSCode/settings.json $(HOME)/Library/Application\ Support/Code/User/settings.json
+	ln -s VSCode/keybindings.json $(HOME)/Library/Application\ Support/Code/User/keybindings.json
+	ln -s VSCode/snippets $(HOME)/Library/Application\ Support/Code/User/snippets

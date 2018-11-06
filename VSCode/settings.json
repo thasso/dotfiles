@@ -1,0 +1,50 @@
+// Place your settings in this file to overwrite the default settings
+{
+    "editor.renderWhitespace": "boundary",
+    "editor.cursorBlinking": "solid",
+    "editor.minimap.enabled": false,
+    "cSpell.userWords": [
+        "Widevine",
+        "clpp",
+        "goog",
+        "interruptbegin",
+        "interruptend",
+        "minetype",
+        "mozaudioavailable",
+        "struct",
+        "waitingforkey",
+        "webkitneedkey"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext",
+        "javascript"
+    ],
+    "window.zoomLevel": 0,
+    "editor.renderControlCharacters": false,
+    "workbench.activityBar.visible": false,
+    "workbench.statusBar.visible": false,
+    "gitlens.advanced.messages": {
+        "suppressShowKeyBindingsNotice": true,
+        "suppressWelcomeNotice": true
+    },
+    "gitlens.annotations.line.hover.details": false,
+    "editor.fontFamily": "'Source Code Pro for Powerline', Menlo, Monaco, 'Courier New', monospace",
+    "editor.fontWeight": "400",
+    "workbench.startupEditor": "newUntitledFile",
+    "gitlens.blame.line.enabled": false,
+    "gitlens.currentLine.enabled": false,
+    "gitlens.hovers.currentLine.enabled": false,
+    "gitlens.keymap": "chorded",
+    "telemetry.enableCrashReporter": false,
+    "telemetry.enableTelemetry": false,
+    "java.errors.incompleteClasspath.severity": "ignore",
+    "python.linting.enabled": false,
+    "terminal.integrated.fontSize": 12,
+    "editor.fontSize": 12,
+    "workbench.iconTheme": "eq-material-theme-icons",
+    "workbench.colorTheme": "Monokai Dimmed",
+    "explorer.autoReveal": false,
+    "python.jediEnabled": false
+}
