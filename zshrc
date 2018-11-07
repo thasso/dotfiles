@@ -14,6 +14,7 @@ export LANG=en_US.UTF-8
 
 # aliases
 alias tmux="env TERM=screen-256color tmux -2"
+alias github="open `git remote get-url origin | sed -e 's/git@//; s/:/\//; s/\.git$//; s/^/https:\/\//'`"
 
 # Android setup
 export NDK_CCACHE=/usr/local/bin/ccache

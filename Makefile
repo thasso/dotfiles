@@ -4,6 +4,7 @@ all: vim bash zsh tmux gitconfig
 init:
 	git submodule init
 	# install colors, they are used by the shells
+	@mkdir -p ~/.config
 	@rm -rf ~/.config/base16-shell
 	ln -sf $(CURDIR)/base16-colors ~/.config/base16-shell
 
@@ -12,6 +13,15 @@ gitconfig-clean:
 
 gitconfig: gitconfig-clean
 	ln -sf $(CURDIR)/gitconfig ~/.gitconfig
+
+nvim-clean:
+	rm -rf ~/.config/nvim
+
+.PHONY: nvim
+nvim:
+	@mkdir -p ~/.config/nvim
+	ln -s $(CURDIR)/nvim/init.vim ~/.config/nvim/init.vim
+	ln -s $(CURDIR)/nvim/autoload ~/.config/nvim/autoload
 
 vim-clean:
 	rm -f ~/.vimrc
@@ -38,10 +48,12 @@ bash: init bash-clean
 zsh-clean:
 	rm -f ~/.zshrc
 	rm -f ~/.zsh.d
+	rm -f ~/.oh-my-zsh
 
 zsh: init zsh-clean
 	ln -s $(CURDIR)/zshrc ~/.zshrc
 	ln -s $(CURDIR)/zsh.d ~/.zsh.d
+	ln -s $(CURDIR)/oh-my-zsh ~/.oh-my-zsh
 
 tmux-clean:
 	rm -f ~/.tmux.conf
