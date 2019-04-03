@@ -17,6 +17,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'tfnico/vim-gradle'
 Plug 'dietsche/vim-lastplace'
+Plug 'dag/vim-fish'
 
 " File and buffer completion
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
