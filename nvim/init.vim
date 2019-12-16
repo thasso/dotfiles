@@ -131,7 +131,7 @@ nmap <silent> cog :GitGutterToggle<CR>
  colorscheme Tomorrow-Night
  highlight ColorColumn ctermbg=235
 " }}}
-" Tabs, Spaces, and Wrap {{{
+" Tabs, Spaces, Cursor, and Wrap {{{
 set expandtab
 set linebreak
 set tabstop=4
@@ -139,6 +139,7 @@ set softtabstop=4
 set shiftwidth=4
 set shiftround
 set wrap
+set guicursor=
 " Delete trailing whitespace
 autocmd BufWritePre * :%s/\s\+$//e
 " }}}

@@ -17,6 +17,7 @@ export LANG=en_US.UTF-8
 
 # aliases
 alias tmux="env TERM=screen-256color tmux -2"
+alias lg="lazygit"
 function github () {
     open `git remote get-url origin | sed -e 's/git@//; s/:/\//; s/\.git$//; s/^/https:\/\//'`
 }
