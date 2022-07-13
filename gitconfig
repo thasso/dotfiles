@@ -68,5 +68,3 @@
 [core]
 	autocrlf = input
 	excludesfile = /Users/thasso/.gitignore_global
-[commit]
-	template = /Users/thasso/.stCommitMsg

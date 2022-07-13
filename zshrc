@@ -1,5 +1,5 @@
 # Homebrew path
-export PATH=$HOME/bin:$HOME/usr/bin:/usr/local/bin:$PATH
+export PATH=$HOME/bin:$HOME/.local/bin:$HOME/usr/bin:/usr/local/bin:$PATH
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 #ZSH_THEME="sorin"
@@ -39,16 +39,16 @@ export PATH=/usr/local/lib/ruby/gems/2.2.0/bin:$PATH
 export MANPATH="/usr/local/man:$MANPATH"
 
 # vim and editor
-alias vim=nvim
-export EDITOR=nvim
-export NVIM_TUI_ENABLE_TRUE_COLOR=1
+export EDITOR=vim
 
 #Pyenv setup
 # export PATH=/usr/local/opt/python/libexec/bin:$PATH
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+#eval "$(pyenv init -)"
+#eval "$(pyenv virtualenv-init -)"
 
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home
+#export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home
 
 # fzf setup
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+[ -f ~/.tokens.sh ] && source ~/.tokens.sh
