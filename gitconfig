@@ -1,6 +1,7 @@
 [user]
 	name = Thasso Griebel
 	email = thasso.griebel@gmail.com
+	signingkey = /Users/thasso/.ssh/id_ed25519_sk_590.pub
 
 [alias]
 	dt = difftool
@@ -68,7 +69,11 @@
 [core]
 	autocrlf = input
 	excludesfile = /Users/thasso/.gitignore_global
-[commit]
-	template = /Users/thasso/.stCommitMsg
 [init]
 	defaultBranch = main
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
