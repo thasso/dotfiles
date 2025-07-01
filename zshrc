@@ -22,21 +22,6 @@ function github () {
     open `git remote get-url origin | sed -e 's/git@//; s/:/\//; s/\.git$//; s/^/https:\/\//'`
 }
 
-# Android setup
-export NDK_CCACHE=/usr/local/bin/ccache
-export NDK_HOME=$HOME/usr/android/ndk
-export ANDROID_HOME=$HOME/usr/android/sdk
-export PATH=$NDK_HOME:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH
-# ccache
-export CACHE_BASEDIR=$HOME/
-
-# Node setup
-export NODE_PATH="/usr/local/lib/node:/usr/local/lib/node_modules"
-export PATH="/usr/local/share/npm/bin:$PATH"
-
-# more paths
-export PATH=/usr/local/lib/ruby/gems/2.2.0/bin:$PATH
-export MANPATH="/usr/local/man:$MANPATH"
 
 # vim and editor
 export EDITOR=vim
