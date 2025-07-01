@@ -1,7 +1,7 @@
 [user]
 	name = Thasso Griebel
 	email = thasso.griebel@gmail.com
-	signingkey = /Users/thasso/.ssh/id_ed25519_sk_590.pub
+  	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+CLIkUMfm+8w4AFuVES+o9z124opVlyRfTbwUxwiUV
 
 [alias]
 	dt = difftool
@@ -56,24 +56,49 @@
 
 [branch]
 	autosetuprebase = always
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "sourcetree"]
-	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
+
+[merge]
+	conflictstyle = diff3
+
 [diff]
-	tool = vimdiff
-[difftool]
-	prompt = false
+    colorMoved = default
+
 [core]
 	autocrlf = input
 	excludesfile = /Users/thasso/.gitignore_global
+	pager = delta
+	editor = nvim
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    side-by-side=true
+
 [init]
 	defaultBranch = main
+
 [gpg]
 	format = ssh
+
+[gpg "ssh"]
+	program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
 [commit]
 	gpgsign = true
+
 [tag]
 	gpgsign = true
+
+
+[commit]
+  gpgsign = true
+
+
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
