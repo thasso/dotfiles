@@ -6,15 +6,20 @@
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
-source $HOMEBREW_PREFIX/share/powerlevel10k/powerlevel10k.zsh-theme
+
+if [[ -d "${HOMEBREW_PREFIX}" ]]; then
+  source $HOMEBREW_PREFIX/share/powerlevel10k/powerlevel10k.zsh-theme
+else
+  source ~/opt/powerlevel10k/powerlevel10k.zsh-theme
+fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # history setup
 HISTFILE=$HOME/.zhistory
-SAVEHIST=1000
-HISTSIZE=999
+SAVEHIST=10000
+HISTSIZE=9999
 setopt share_history
 setopt hist_expire_dups_first
 setopt hist_ignore_dups

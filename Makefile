@@ -48,12 +48,14 @@ zsh-clean:
 	rm -f ~/.zprofile
 	rm -f ~/.zshenv
 	rm -f ~/.zpath
+	rm -f ~/.p10k.zsh
 
 zsh: init zsh-clean
 	ln -s $(CURDIR)/zshrc ~/.zshrc
 	ln -s $(CURDIR)/zprofile ~/.zprofile
 	ln -s $(CURDIR)/zpath ~/.zpath
 	ln -s $(CURDIR)/zshenv ~/.zshenv
+	ln -s $(CURDIR)/p10k.zsh ~/.p10k.zsh
 
 tmux-clean:
 	rm -f ~/.tmux.conf
