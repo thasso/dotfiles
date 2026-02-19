@@ -59,6 +59,19 @@ zsh: init zsh-clean
 	ln -s $(CURDIR)/p10k.zsh ~/.p10k.zsh
 	ln -s $(CURDIR)/zsh ~/.zsh
 
+opencode-clean:
+	rm -f ~/.config/opencode/agent
+	rm -f ~/.config/opencode/command
+	rm -f ~/.config/opencode/tool
+	rm -f ~/.config/opencode/opencode.json
+
+opencode: init opencode-clean
+	@mkdir -p ~/.config/opencode
+	ln -s $(CURDIR)/opencode/agent ~/.config/opencode/agent
+	ln -s $(CURDIR)/opencode/command ~/.config/opencode/command
+	ln -s $(CURDIR)/opencode/tool ~/.config/opencode/tool
+	ln -s $(CURDIR)/opencode/opencode.json ~/.config/opencode/opencode.json
+
 tmux-clean:
 	rm -f ~/.tmux.conf
 

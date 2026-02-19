@@ -29,3 +29,4 @@ export CPPFLAGS="${CPPFLAGS} -I${HOMEBREW_PREFIX}/opt/ruby/include"
 if [[ -f $HOME/.zpath ]]; then
   source $HOME/.zpath
 fi
+. "$HOME/.cargo/env"
