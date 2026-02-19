@@ -45,13 +45,15 @@ bash: init bash-clean
 
 zsh-clean:
 	rm -f ~/.zshrc
-	rm -f ~/.zsh.d
-	rm -f ~/.oh-my-zsh
+	rm -f ~/.zprofile
+	rm -f ~/.zshenv
+	rm -f ~/.zpath
 
 zsh: init zsh-clean
 	ln -s $(CURDIR)/zshrc ~/.zshrc
-	ln -s $(CURDIR)/zsh.d ~/.zsh.d
-	ln -s $(CURDIR)/oh-my-zsh ~/.oh-my-zsh
+	ln -s $(CURDIR)/zprofile ~/.zprofile
+	ln -s $(CURDIR)/zpath ~/.zpath
+	ln -s $(CURDIR)/zshenv ~/.zshenv
 
 tmux-clean:
 	rm -f ~/.tmux.conf
