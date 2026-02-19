@@ -9,10 +9,14 @@ if [[ -f $HOME/.zpath ]]; then
 fi
 
 # Pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - zsh)"
-eval "$(pyenv virtualenv-init -)"
+if command -v pyenv >/dev/null 2>&1; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init - zsh)"
+  eval "$(pyenv virtualenv-init -)"
+else
+  echo "pyenv not installed. skipping"
+fi
 
 # Extend the path for things we want we a login shell
 # most of the basic are aleady sourced from .zpath

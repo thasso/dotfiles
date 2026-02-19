@@ -8,6 +8,7 @@ path=(
   $HOME/bin
   $HOME/.cargo/bin
   $HOME/go/bin
+  $HOME/.opencode/bin
   $ANDROID_HOME/platform-tools
   $HOMEBREW_PREFIX/bin
   $HOMEBREW_PREFIX/sbin

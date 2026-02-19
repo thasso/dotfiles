@@ -49,6 +49,7 @@ zsh-clean:
 	rm -f ~/.zshenv
 	rm -f ~/.zpath
 	rm -f ~/.p10k.zsh
+	rm -f ~/.zsh
 
 zsh: init zsh-clean
 	ln -s $(CURDIR)/zshrc ~/.zshrc
@@ -56,6 +57,7 @@ zsh: init zsh-clean
 	ln -s $(CURDIR)/zpath ~/.zpath
 	ln -s $(CURDIR)/zshenv ~/.zshenv
 	ln -s $(CURDIR)/p10k.zsh ~/.p10k.zsh
+	ln -s $(CURDIR)/zsh ~/.zsh
 
 tmux-clean:
 	rm -f ~/.tmux.conf
