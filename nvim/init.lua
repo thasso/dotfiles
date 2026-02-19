@@ -1,3 +1,3 @@
-require("thasso.core.options")
-require("thasso.core")
-require("thasso.lazy")
+require("core.keymaps")
+require("core.options")
+require("core.lazy")
