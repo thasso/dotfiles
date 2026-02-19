@@ -19,9 +19,7 @@ nvim-clean:
 
 .PHONY: nvim
 nvim:
-	@mkdir -p ~/.config/nvim
-	ln -s $(CURDIR)/nvim/init.vim ~/.config/nvim/init.vim
-	ln -s $(CURDIR)/nvim/autoload ~/.config/nvim/autoload
+	ln -sf $(CURDIR)/nvim ~/.config/nvim
 
 vim-clean:
 	rm -f ~/.vimrc

@@ -1,7 +1,7 @@
 [user]
 	name = Thasso Griebel
 	email = thasso.griebel@gmail.com
-  	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+CLIkUMfm+8w4AFuVES+o9z124opVlyRfTbwUxwiUV
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+CLIkUMfm+8w4AFuVES+o9z124opVlyRfTbwUxwiUV
 
 [alias]
 	dt = difftool
@@ -84,21 +84,12 @@
 
 [gpg "ssh"]
 	program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
-
-[commit]
-	gpgsign = true
-
 [tag]
 	gpgsign = true
-
-
-[commit]
-  gpgsign = true
-
-
-
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[commit]
+	gpgsign = false
