@@ -16,6 +16,7 @@ local function toggle_wrap()
 end
 
 vim.keymap.set("n", "<leader>w", toggle_wrap, { desc = "Toggle wrap at 80 chars" })
+vim.keymap.set("x", "p", '"_dP', { desc = "Paste without yanking replaced text" })
 
 -- Quit commands
 vim.keymap.set("n", "<leader>qq", "<cmd>quit<cr>", { desc = "Quit" })
