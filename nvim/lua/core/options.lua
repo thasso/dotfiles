@@ -40,6 +40,10 @@ vim.opt.signcolumn = "yes" -- show sign column so that text doesn't shift
 vim.opt.backspace = "indent,eol,start" -- allow backspace on indent, eol or insert mode start position
 
 -- clipboard
+if vim.env.SSH_CONNECTION then
+  vim.g.clipboard = "osc52"
+end
+
 vim.opt.clipboard:append("unnamedplus") -- use system clipboard as the default register
 
 -- split windows
@@ -67,4 +71,3 @@ vim.opt.listchars = {
 	nbsp = space,
   eol = "¬",
 }
-
