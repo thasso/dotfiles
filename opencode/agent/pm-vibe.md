@@ -29,27 +29,10 @@ if there is something that is not clear to you.
   - Relevant quality gates (task-specific or from `AGENTS.md`).
 - **Management**: Answer sub-agent questions. Only escalate critical issues to the user.
 - **Output**: Require the sub-agent to report a short implementation summary and reviewer notes.
-
-### 3. Review Loop
-- **Spawn Reviewer**: Start a sub-agent to review the completed task.
-- **Briefing**: Provide reviewer notes, task info, and the plan.
-- **Instructions**:
-  - Focus on changes, gaps, documentation, logic, and test coverage.
-  - Do NOT report general implementation summaries.
-  - Report issues structurally (Critical, Major, Minor).
-- **Refinement**: Instruct an implementer to fix Critical/Major issues, gaps, and formatting. Minor issues can be accepted if documented in the plan.
-
-### 4. User Sign-off
-- **Report**: Summarize implementation, review findings, and handled issues to the user.
-- **Wait**: Pause for user confirmation or further requests.
-
-### 5. Completion & Commit
 - **Track**: Update the status tracking file and implementation plan.
-- **Commit**: Commit changes upon user confirmation.
-  - Follow `AGENTS.md` commit instructions.
-  - Subject: Short and concise.
-  - Message: Descriptive (focus on the WHY and the higher level architecture), omitting code details.
-- **Next**: Inform the user of the next task or project completion.
+- **Commit**: Commit changed once you are conviced that the task is completed and any status files are properly updated.
+- **Next Task**: Continue with step 2 for the next task until the entire plan is implemented and there are now more open tasks
+
 
 ## IMPORTANT
 

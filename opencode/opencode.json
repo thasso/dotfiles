@@ -9,11 +9,8 @@
   },
   "mcp": {
     "playwright": {
-      "type": "local",
-      "command": [
-        "npx",
-        "@playwright/mcp@latest"
-      ],
+      "type": "remote",
+      "url": "http://host.lima.internal:8931/mcp",
       "enabled": true
     }
   },
