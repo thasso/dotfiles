@@ -17,6 +17,8 @@ return {
       "c",
       "markdown",
       "markdown_inline",
+      "regex",
+      "bash",
       "python",
       "lua",
       "vim",

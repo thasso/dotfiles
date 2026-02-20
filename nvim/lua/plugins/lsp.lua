@@ -65,6 +65,26 @@ return {
             vim.lsp.buf.format({ async = true })
           end, vim.tbl_extend("force", opts, { desc = "LSP format" }))
           vim.keymap.set("n", "<leader>ge", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Line diagnostics" }))
+          vim.keymap.set("n", "<leader>gE", function()
+            local cwd = vim.fs.root(args.buf, { ".git" }) or vim.uv.cwd()
+            local ok, telescope = pcall(require, "telescope.builtin")
+            if ok then
+              telescope.diagnostics({ bufnr = args.buf, cwd = cwd, path_display = { "smart" } })
+              return
+            end
+
+            vim.diagnostic.setloclist({ open = true })
+          end, vim.tbl_extend("force", opts, { desc = "File diagnostics" }))
+          vim.keymap.set("n", "<leader>gW", function()
+            local cwd = vim.fs.root(args.buf, { ".git" }) or vim.uv.cwd()
+            local ok, telescope = pcall(require, "telescope.builtin")
+            if ok then
+              telescope.diagnostics({ cwd = cwd, path_display = { "smart" } })
+              return
+            end
+
+            vim.diagnostic.setqflist({ open = true })
+          end, vim.tbl_extend("force", opts, { desc = "Workspace diagnostics" }))
         end,
       })
 
