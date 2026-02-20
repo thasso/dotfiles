@@ -18,8 +18,11 @@ return {
     end
 
     return {
+      options = {
+        theme = "catppuccin",
+      },
       sections = {
-        lualine_x = { lsp_status, "encoding", "fileformat", "filetype" },
+        lualine_x = { lsp_status, "encoding" },
       },
     }
   end,
