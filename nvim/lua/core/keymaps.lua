@@ -18,6 +18,15 @@ end
 vim.keymap.set("n", "<leader>w", toggle_wrap, { desc = "Toggle wrap at 80 chars" })
 vim.keymap.set("x", "p", '"_dP', { desc = "Paste without yanking replaced text" })
 
+if vim.g.format_on_save == nil then
+  vim.g.format_on_save = true
+end
+
+vim.keymap.set("n", "<leader>vf", function()
+  vim.g.format_on_save = not vim.g.format_on_save
+  vim.notify("Format on save: " .. (vim.g.format_on_save and "ON" or "OFF"))
+end, { desc = "Toggle format on save" })
+
 -- Avoid which-key overlap warning with built-in comment maps.
 -- Keep `gc` operator map and provide line toggle on <leader>/.
 pcall(vim.keymap.del, "n", "gcc")
