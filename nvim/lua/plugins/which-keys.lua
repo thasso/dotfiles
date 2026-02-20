@@ -4,12 +4,11 @@ return {
   opts = {
     preset = "helix",
     spec = {
-      { "<leader>f", group = "Files" },
+      { "<leader>f", group = "Find & Explore" },
       { "<leader>q", group = "Quit" },
-      { "<leader>c", group = "Changes" },
       { "<leader>g", group = "Code", mode = { "n", "v" } },
-      { "<leader>z", group = "Zen" }
-    }
+      { "<leader>v", group = "View" },
+    },
   },
   keys = {
     {

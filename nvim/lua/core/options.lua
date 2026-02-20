@@ -8,7 +8,7 @@ vim.g.loaded_ruby_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_node_provider = 0
 
--- line numberes
+-- line number
 vim.opt.relativenumber = false
 vim.opt.number = true -- shows absolute line number on cursor
 
@@ -57,9 +57,9 @@ vim.opt.foldenable = true
 vim.opt.swapfile = false
 
 -- whitespace
-vim.opt.list = false
+vim.opt.list = true
 local space = "·"
-vim.opt.listchars:append {
+vim.opt.listchars = {
 	tab = "→ ",
 	multispace = space,
 	lead = space,
@@ -67,6 +67,4 @@ vim.opt.listchars:append {
 	nbsp = space,
   eol = "¬",
 }
-
--- vim.opt.conceallevel = 2
 

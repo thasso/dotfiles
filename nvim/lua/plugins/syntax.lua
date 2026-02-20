@@ -1,42 +1,43 @@
 return {
-  'nvim-treesitter/nvim-treesitter',
-  event = { "BufReadPre", "BufNewFile" },
+  "nvim-treesitter/nvim-treesitter",
+  lazy = false,
   cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
-  build = ':TSUpdate',
+  build = ":TSUpdate",
   config = function()
-    require("nvim-treesitter.configs").setup({
-      ensure_installed = {
-        "html",
-        "javascript",
-        "typescript",
-        "yaml",
-        "dockerfile",
-        "gitignore",
-        "c",
-        "markdown",
-        "markdown_inline",
-        "python",
-        "lua",
-        "vim",
-        "vimdoc"
-      },
-      auto_install = true,
-      highlight = { 
-        enable = true,
-        additional_vim_regex_highlighting = false,
-        -- Disable for python due to Neovim 0.11.3 query incompatibility
-        disable = function(lang, buf)
-          if lang == "python" then
-            return true
-          end
-          return false
-        end,
-      },
-      indent = { 
-        enable = true,
-        -- Also disable indent for python
-        disable = { "python" },
-      },
+    local ts = require("nvim-treesitter")
+    local parsers = {
+      "html",
+      "javascript",
+      "typescript",
+      "jsx",
+      "tsx",
+      "yaml",
+      "dockerfile",
+      "gitignore",
+      "c",
+      "markdown",
+      "markdown_inline",
+      "python",
+      "lua",
+      "vim",
+      "vimdoc",
+    }
+
+    ts.setup({
+      install_dir = vim.fn.stdpath("data") .. "/site",
     })
+
+    -- We need this to make sure that we have treesitter enabled for the 
+    -- filetypes with support. Otherwise it will default to the regexp based
+    -- highlighting
+    local group = vim.api.nvim_create_augroup("TreesitterStart", { clear = true })
+    vim.api.nvim_create_autocmd("FileType", {
+      group = group,
+      callback = function(args)
+        pcall(vim.treesitter.start, args.buf)
+      end,
+    })
+
+    ts.install(parsers)
   end,
 }
