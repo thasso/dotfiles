@@ -1,55 +1,34 @@
 return {
   "stevearc/conform.nvim",
   event = { "BufReadPre", "BufNewFile" },
+  init = function()
+    vim.api.nvim_create_user_command("Format", function(args)
+      local range = nil
+      if args.count ~= -1 then
+        local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1] or ""
+        range = {
+          start = { args.line1, 0 },
+          ["end"] = { args.line2, #end_line },
+        }
+      end
+
+      require("conform").format({
+        async = true,
+        lsp_format = "fallback",
+        range = range,
+      })
+    end, { range = true, desc = "Format buffer or selection" })
+  end,
   keys = {
     {
       "<leader>gf",
-      function()
-        require("conform").format({ async = true, lsp_format = "fallback" })
-      end,
+      "<cmd>Format<cr>",
       mode = "n",
       desc = "Format",
     },
     {
       "<leader>gf",
-      function()
-        local bufnr = vim.api.nvim_get_current_buf()
-        local start_pos = vim.api.nvim_buf_get_mark(bufnr, "<")
-        local end_pos = vim.api.nvim_buf_get_mark(bufnr, ">")
-
-        if start_pos[1] == 0 or end_pos[1] == 0 then
-          require("conform").format({ async = true, lsp_format = "fallback" })
-          return
-        end
-
-        local start_row = start_pos[1]
-        local start_col = start_pos[2]
-        local end_row = end_pos[1]
-        local end_col = end_pos[2]
-
-        if start_row > end_row or (start_row == end_row and start_col > end_col) then
-          start_row, end_row = end_row, start_row
-          start_col, end_col = end_col, start_col
-        end
-
-        local line_count = vim.api.nvim_buf_line_count(bufnr)
-        start_row = math.min(math.max(start_row, 1), line_count)
-        end_row = math.min(math.max(end_row, 1), line_count)
-
-        local start_line = vim.api.nvim_buf_get_lines(bufnr, start_row - 1, start_row, true)[1] or ""
-        local end_line = vim.api.nvim_buf_get_lines(bufnr, end_row - 1, end_row, true)[1] or ""
-        start_col = math.min(math.max(start_col, 0), #start_line)
-        end_col = math.min(math.max(end_col, 0), #end_line)
-
-        require("conform").format({
-          async = true,
-          lsp_format = "fallback",
-          range = {
-            start = { start_row, start_col },
-            ["end"] = { end_row, end_col },
-          },
-        })
-      end,
+      "<cmd>'<,'>Format<cr>",
       mode = "x",
       desc = "Format",
     },
