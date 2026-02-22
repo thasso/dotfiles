@@ -62,6 +62,8 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
 - **LSP**:
   - LSP navigation/actions are under `<leader>g*` (custom mappings), not `gd/gD/gr`-style defaults.
   - Prefer Snacks picker for LSP list UIs (references, definitions, diagnostics).
+  - LTEX uses `ltex_plus` with `ltex_extra.nvim` integration.
+  - LTEX dictionary additions are routed to Neovim `spellfile` (`spell/en.utf-8.add`).
 
 - **Formatting**:
   - Formatting is managed by `conform.nvim` (`lua/plugins/format.lua`).
@@ -75,11 +77,12 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
 
 - **View Group (`<leader>v`)**:
   - Keep editor-UX toggles here (wrap, spell, format-on-save, etc.).
-  - Current core toggles include `<leader>vw` (wrap), `<leader>vs` (spell), `<leader>vf` (format-on-save).
+  - Current core toggles include `<leader>vw` (wrap), `<leader>vs` (spell), `<leader>vh` (search highlight), `<leader>vf` (format-on-save).
 
 - **Spell/Clipboard Environment Details**:
   - Spell language defaults to `en_us`.
   - Spell additions file is tracked in repo at `spell/en.utf-8.add`.
+  - LTEX language should follow `spelllang` (mapped `en_us` -> `en-US`).
   - Over SSH, clipboard uses OSC52 (`vim.g.clipboard = "osc52"`).
 
 ## Important
