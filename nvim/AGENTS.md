@@ -77,7 +77,7 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
 
 - **View Group (`<leader>v`)**:
   - Keep editor-UX toggles here (wrap, spell, format-on-save, etc.).
-  - Current core toggles include `<leader>vw` (wrap), `<leader>vs` (spell), `<leader>vh` (search highlight), `<leader>vf` (format-on-save).
+  - Current toggles include `<leader>vw` (wrap), `<leader>vs` (spell), `<leader>vh` (search highlight), `<leader>vf` (format-on-save), `<leader>vz` (Snacks zen mode).
 
 - **Spell/Clipboard Environment Details**:
   - Spell language defaults to `en_us`.
