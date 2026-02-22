@@ -46,6 +46,10 @@ end
 
 vim.opt.clipboard:append("unnamedplus") -- use system clipboard as the default register
 
+-- spell checking
+vim.opt.spelllang = { "en_us" }
+vim.opt.spellfile = vim.fn.stdpath("config") .. "/spell/en.utf-8.add"
+
 -- split windows
 vim.opt.splitright = true
 vim.opt.splitbelow = true

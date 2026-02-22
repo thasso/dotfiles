@@ -15,7 +15,11 @@ local function toggle_wrap()
   end
 end
 
-vim.keymap.set("n", "<leader>w", toggle_wrap, { desc = "Toggle wrap at 80 chars" })
+vim.keymap.set("n", "<leader>vw", toggle_wrap, { desc = "Toggle wrap at 80 chars" })
+vim.keymap.set("n", "<leader>vs", function()
+  vim.opt.spell = not vim.opt.spell:get()
+  vim.notify("Spell check: " .. (vim.opt.spell:get() and "ON" or "OFF"))
+end, { desc = "Toggle spell check" })
 vim.keymap.set("x", "p", '"_dP', { desc = "Paste without yanking replaced text" })
 
 if vim.g.format_on_save == nil then
