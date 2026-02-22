@@ -72,6 +72,12 @@ opencode: init opencode-clean
 	ln -s $(CURDIR)/opencode/tool ~/.config/opencode/tool
 	ln -s $(CURDIR)/opencode/opencode.json ~/.config/opencode/opencode.json
 
+atuin-clean:
+	rm -f ~/.config/atuin
+
+atuin: init atuin-clean
+	ln -s $(CURDIR)/atuin ~/.config/atuin
+
 tmux-clean:
 	rm -f ~/.tmux.conf
 
