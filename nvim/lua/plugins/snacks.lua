@@ -5,7 +5,17 @@ return {
   opts = {
     notifier = { enabled = true },
     input = { enabled = true },
-    picker = { enabled = true },
+    picker = {
+      enabled = true,
+      sources = {
+        explorer = {
+          layout = {
+            hidden = { "input" },
+            auto_hide = { "input" },
+          },
+        },
+      },
+    },
     explorer = { enabled = true },
     quickfile = { enabled = true },
     zen = {
