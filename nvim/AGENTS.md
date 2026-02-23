@@ -87,6 +87,7 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
 
 - **Spell/Clipboard Environment Details**:
   - Spell language defaults to `en_us`.
+  - Spell check is enabled by default for text-centric filetypes (`markdown`, `text`, `gitcommit`, `org`, `norg`, `rst`, `tex`).
   - Spell additions file is tracked in repo at `spell/en.utf-8.add`.
   - LTEX language should follow `spelllang` (mapped `en_us` -> `en-US`).
   - Over SSH, clipboard uses OSC52 (`vim.g.clipboard = "osc52"`).
