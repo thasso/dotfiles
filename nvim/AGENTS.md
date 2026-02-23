@@ -62,8 +62,8 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
 - **LSP**:
   - LSP navigation/actions are under `<leader>g*` (custom mappings), not `gd/gD/gr`-style defaults.
   - Prefer Snacks picker for LSP list UIs (references, definitions, diagnostics).
-  - LTEX uses `ltex_plus` with `ltex_extra.nvim` integration.
-  - LTEX dictionary additions are routed to Neovim `spellfile` (`spell/en.utf-8.add`).
+  - Harper grammar/spell checking uses `harper_ls`.
+  - Harper dictionary uses Neovim `spellfile` (`spell/en.utf-8.add`) via `harper-ls.userDictPath`.
 
 - **Formatting**:
   - Formatting is managed by `conform.nvim` (`lua/plugins/format.lua`).
@@ -89,7 +89,7 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
   - Spell language defaults to `en_us`.
   - Spell check is enabled by default for text-centric filetypes (`markdown`, `text`, `gitcommit`, `org`, `norg`, `rst`, `tex`).
   - Spell additions file is tracked in repo at `spell/en.utf-8.add`.
-  - LTEX language should follow `spelllang` (mapped `en_us` -> `en-US`).
+  - Harper user dictionary points to the tracked spell additions file.
   - Over SSH, clipboard uses OSC52 (`vim.g.clipboard = "osc52"`).
 
 ## Important

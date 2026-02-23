@@ -9,21 +9,19 @@ local servers = {
 	"cmake",
 	"bashls",
 	"astro",
-	"ltex_plus",
+	"harper_ls",
 	"clangd",
 }
 
-local function get_default_spelllang()
-	local spelllangs = vim.opt.spelllang:get()
-	return spelllangs[1] or "en_us"
-end
-
-local function spelllang_to_ltex_language(spelllang)
-	local parts = vim.split(spelllang, "[-_]")
-	if #parts == 2 then
-		return string.lower(parts[1]) .. "-" .. string.upper(parts[2])
+local function get_spellfile_path()
+	local spellfile = vim.opt.spellfile:get()
+	if type(spellfile) == "table" then
+		return spellfile[1]
 	end
-	return spelllang
+	if type(spellfile) == "string" and spellfile ~= "" then
+		return vim.split(spellfile, ",", { plain = true })[1]
+	end
+	return vim.fn.stdpath("config") .. "/spell/en.utf-8.add"
 end
 
 return {
@@ -125,10 +123,10 @@ return {
 				},
 			})
 
-			vim.lsp.config("ltex_plus", {
+			vim.lsp.config("harper_ls", {
 				settings = {
-					ltex = {
-						language = spelllang_to_ltex_language(get_default_spelllang()),
+					["harper-ls"] = {
+						userDictPath = get_spellfile_path(),
 					},
 				},
 			})
