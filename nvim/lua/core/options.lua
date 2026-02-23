@@ -50,7 +50,10 @@ vim.opt.autoread = true -- auto reload files that changed
 vim.opt.autowrite = false -- no auto save
 
 -- behavior
-vim.g.clipboard = "osc52" -- use OSC52 as the main clipboard. Let's me copy into system clipboard over ssh
+local is_ssh = vim.env.SSH_TTY ~= nil or vim.env.SSH_CONNECTION ~= nil or vim.env.SSH_CLIENT ~= nil
+if is_ssh then
+	vim.g.clipboard = "osc52" -- use OSC52 clipboard provider only over SSH
+end
 vim.opt.clipboard:append("unnamedplus") -- use system clipboard as the default register
 vim.opt.encoding = "UTF-8"
 
