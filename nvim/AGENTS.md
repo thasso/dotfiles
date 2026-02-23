@@ -48,7 +48,6 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
    - Use which-key's `spec` to define group names only
    - Example: `{ "<leader>f", group = "Files" }`
    - Provides overview of keymap organization without duplication
-   - Common groups: `<leader>f` (Files), `<leader>g` (Git), `<leader>s` (Search), `<leader>b` (Buffers)
    - Common groups: `<leader>c` (Changes), `<leader>f` (Files), `<leader>g` (Git/Code), `<leader>o` (Opencode), `<leader>s` (Search), `<leader>b` (Buffers)
 
 **Important**: Do NOT duplicate keybinding definitions in which-key if already defined in plugin files
@@ -71,6 +70,12 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
   - `<leader>gf` is the canonical format key (normal + visual range).
   - Format-on-save defaults to enabled and is toggled with `<leader>vf`.
   - For JS/TS/CSS/HTML/etc., prefer `prettierd` then `prettier`.
+
+- **AI Assistant**:
+  - `opencode.nvim` is integrated with `snacks.nvim` (`lua/plugins/opencode.lua`).
+  - Use `<leader>oa` to ask with `@this`, `<leader>oo` for prompt/command selection, `<leader>ot` to toggle the opencode terminal, and `<leader>oc` to run an opencode command.
+  - `:Opencode <command>` runs direct opencode commands (for example `:Opencode session.select`).
+  - Prefer the Snacks provider (`vim.g.opencode_opts.provider.enabled = "snacks"`).
 
 - **Treesitter**:
   - Use the new `nvim-treesitter` API (`require("nvim-treesitter")` + `ts.install(...)`).

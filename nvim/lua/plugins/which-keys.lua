@@ -8,6 +8,7 @@ return {
       { "<leader>f", group = "Find & Explore" },
       { "<leader>q", group = "Quit" },
       { "<leader>g", group = "Code", mode = { "n", "v" } },
+      { "<leader>o", group = "Opencode" },
       { "<leader>v", group = "View" },
     },
   },
