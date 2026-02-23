@@ -7,6 +7,8 @@ return {
   ft = { "markdown" },
   opts = {
     enabled = true,
+    render_modes = { "n", "c", "t" },
+    anti_conceal = { enabled = false },
     latex = { enabled = false }
   },
   keys = {

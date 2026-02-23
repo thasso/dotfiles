@@ -60,7 +60,7 @@ return {
 					vim.keymap.set("n", "<leader>gd", function()
 						Snacks.picker.lsp_definitions({ cwd = cwd })
 					end, vim.tbl_extend("force", opts, { desc = "LSP definitions" }))
-					vim.keymap.set("n", "<leader>gD", function()
+					vim.keymap.set("n", "<leader>gY", function()
 						Snacks.picker.lsp_declarations({ cwd = cwd })
 					end, vim.tbl_extend("force", opts, { desc = "LSP declarations" }))
 					vim.keymap.set("n", "<leader>gi", function()
