@@ -46,6 +46,17 @@ return {
       provider = {
         enabled = "snacks",
       },
+      lsp = {
+        enabled = true,
+        handlers = {
+          hover = {
+            enabled = false,
+          },
+          code_action = {
+            enabled = true,
+          },
+        },
+      },
     })
 
     vim.api.nvim_create_user_command("Opencode", function(args)

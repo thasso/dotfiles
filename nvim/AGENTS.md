@@ -73,6 +73,7 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
 
 - **AI Assistant**:
   - `opencode.nvim` is integrated with `snacks.nvim` (`lua/plugins/opencode.lua`).
+  - In-process `opencode` LSP integration is enabled for code actions.
   - Use `<leader>oa` to ask with `@this`, `<leader>oo` for prompt/command selection, `<leader>ot` to toggle the opencode terminal, and `<leader>oc` to run an opencode command.
   - `:Opencode <command>` runs direct opencode commands (for example `:Opencode session.select`).
   - Prefer the Snacks provider (`vim.g.opencode_opts.provider.enabled = "snacks"`).
