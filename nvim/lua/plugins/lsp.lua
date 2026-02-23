@@ -10,7 +10,50 @@ local servers = {
   "bashls",
   "astro",
   "ltex_plus",
+  "cspell_ls",
   "clangd",
+}
+
+local ltex_filetypes = {
+  "bib",
+  "gitcommit",
+  "mail",
+  "markdown",
+  "org",
+  "pandoc",
+  "plaintex",
+  "quarto",
+  "rmd",
+  "rnoweb",
+  "rst",
+  "tex",
+  "text",
+}
+
+local cspell_filetypes = {
+  "astro",
+  "bash",
+  "c",
+  "cmake",
+  "cpp",
+  "css",
+  "go",
+  "html",
+  "javascript",
+  "javascriptreact",
+  "json",
+  "jsonc",
+  "kotlin",
+  "lua",
+  "python",
+  "rust",
+  "scss",
+  "sh",
+  "toml",
+  "typescript",
+  "typescriptreact",
+  "yaml",
+  "zsh",
 }
 
 local function open_line_diagnostics()
@@ -130,8 +173,29 @@ return {
       })
 
       vim.lsp.config("ltex_plus", {
+        filetypes = ltex_filetypes,
         settings = {
           ltex = {
+            language = "en-US",
+          },
+        },
+      })
+
+      vim.lsp.config("cspell_ls", {
+        cmd = { "cspell-lsp", "--stdio" },
+        filetypes = cspell_filetypes,
+        root_markers = {
+          "cspell.json",
+          ".cspell.json",
+          "cspell.config.yaml",
+          ".cspell.config.yaml",
+          "cspell.config.yml",
+          ".cspell.config.yml",
+          ".git",
+        },
+        settings = {
+          cSpell = {
+            diagnosticLevel = "Hint",
             language = "en-US",
           },
         },

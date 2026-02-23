@@ -63,6 +63,7 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
   - LSP navigation/actions are under `<leader>g*` (custom mappings), not `gd/gD/gr`-style defaults.
   - Prefer Snacks picker for LSP list UIs (references, definitions, diagnostics).
   - Extended grammar/spell checking uses `ltex_plus`.
+  - Code-aware spell checking uses `cspell_ls` (`cspell-lsp`).
 
 - **Formatting**:
   - Formatting is managed by `conform.nvim` (`lua/plugins/format.lua`).
