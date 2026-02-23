@@ -4,6 +4,7 @@ return {
   opts = {
     preset = "helix",
     spec = {
+      { "<leader>c", group = "Changes" },
       { "<leader>f", group = "Find & Explore" },
       { "<leader>q", group = "Quit" },
       { "<leader>g", group = "Code", mode = { "n", "v" } },

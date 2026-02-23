@@ -49,6 +49,7 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
    - Example: `{ "<leader>f", group = "Files" }`
    - Provides overview of keymap organization without duplication
    - Common groups: `<leader>f` (Files), `<leader>g` (Git), `<leader>s` (Search), `<leader>b` (Buffers)
+   - Common groups: `<leader>c` (Changes), `<leader>f` (Files), `<leader>g` (Git/Code), `<leader>o` (Opencode), `<leader>s` (Search), `<leader>b` (Buffers)
 
 **Important**: Do NOT duplicate keybinding definitions in which-key if already defined in plugin files
 
