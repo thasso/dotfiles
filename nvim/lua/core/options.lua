@@ -61,25 +61,6 @@ vim.opt.encoding = "UTF-8"
 vim.opt.spelllang = { "en_us" }
 vim.opt.spellfile = vim.fn.stdpath("config") .. "/spell/en.utf-8.add"
 
-local spell_filetypes = {
-	"markdown",
-	"text",
-	"gitcommit",
-	"org",
-	"norg",
-	"rst",
-	"tex",
-}
-
-local spell_group = vim.api.nvim_create_augroup("spell_for_text_filetypes", { clear = true })
-vim.api.nvim_create_autocmd("FileType", {
-	group = spell_group,
-	pattern = spell_filetypes,
-	callback = function()
-		vim.opt_local.spell = true
-	end,
-})
-
 -- split windows
 vim.opt.splitright = true
 vim.opt.splitbelow = true

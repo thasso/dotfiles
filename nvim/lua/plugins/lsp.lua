@@ -89,11 +89,16 @@ return {
       "mason-org/mason.nvim",
       "neovim/nvim-lspconfig",
     },
-    opts = {
-      ensure_installed = servers,
-      automatic_enable = true,
-    },
-  },
+		opts = {
+			ensure_installed = servers,
+			automatic_enable = {
+				exclude = {
+					"ltex_plus",
+					"cspell_ls",
+				},
+			},
+		},
+	},
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },

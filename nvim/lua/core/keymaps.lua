@@ -16,10 +16,59 @@ local function toggle_wrap()
 end
 
 vim.keymap.set("n", "<leader>vw", toggle_wrap, { desc = "Toggle wrap at 80 chars" })
+
+local prose_filetypes = {
+	bib = true,
+	gitcommit = true,
+	mail = true,
+	markdown = true,
+	org = true,
+	pandoc = true,
+	plaintex = true,
+	quarto = true,
+	rmd = true,
+	rnoweb = true,
+	rst = true,
+	tex = true,
+	text = true,
+}
+
+local function stop_spell_clients(bufnr)
+	for _, server in ipairs({ "ltex_plus", "cspell_ls" }) do
+		for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr, name = server })) do
+			vim.lsp.buf_detach_client(bufnr, client.id)
+			if client.attached_buffers and vim.tbl_isempty(client.attached_buffers) then
+				vim.lsp.stop_client(client.id)
+			end
+		end
+	end
+end
+
+local function has_spell_client(bufnr, server)
+	return #vim.lsp.get_clients({ bufnr = bufnr, name = server }) > 0
+end
+
 vim.keymap.set("n", "<leader>vs", function()
-	vim.opt.spell = not vim.opt.spell:get()
-	vim.notify("Spell check: " .. (vim.opt.spell:get() and "ON" or "OFF"))
-end, { desc = "Toggle spell check" })
+	local bufnr = vim.api.nvim_get_current_buf()
+	local ft = vim.bo[bufnr].filetype
+	local target = prose_filetypes[ft] and "ltex_plus" or "cspell_ls"
+	local target_label = target == "ltex_plus" and "LTeX+" or "cspell"
+
+	if has_spell_client(bufnr, "ltex_plus") or has_spell_client(bufnr, "cspell_ls") or vim.opt_local.spell:get() then
+		stop_spell_clients(bufnr)
+		vim.opt_local.spell = false
+		vim.notify("Spell check: OFF")
+		return
+	end
+
+	vim.opt_local.spell = false
+	local ok = pcall(vim.cmd, "LspStart " .. target)
+	if not ok then
+		vim.notify("Spell check: failed to start " .. target_label, vim.log.levels.ERROR)
+		return
+	end
+	vim.notify("Spell check: ON (" .. target_label .. ")")
+end, { desc = "Toggle spell check (LSP)" })
 vim.keymap.set("n", "<leader>vh", function()
 	vim.opt.hlsearch = not vim.opt.hlsearch:get()
 	vim.notify("Search highlight: " .. (vim.opt.hlsearch:get() and "ON" or "OFF"))
