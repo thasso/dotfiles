@@ -24,6 +24,25 @@ local function get_spellfile_path()
 	return vim.fn.stdpath("config") .. "/spell/en.utf-8.add"
 end
 
+local function open_line_diagnostics()
+	vim.diagnostic.open_float({
+		scope = "line",
+		focus = false,
+		source = "if_many",
+		border = "rounded",
+		header = "Diagnostics",
+		prefix = function(diagnostic)
+			local severity_prefix = {
+				[vim.diagnostic.severity.ERROR] = "[E] ",
+				[vim.diagnostic.severity.WARN] = "[W] ",
+				[vim.diagnostic.severity.INFO] = "[I] ",
+				[vim.diagnostic.severity.HINT] = "[H] ",
+			}
+			return severity_prefix[diagnostic.severity] or "[?] "
+		end,
+	})
+end
+
 return {
 	{
 		"mason-org/mason.nvim",
@@ -50,6 +69,14 @@ return {
 			"Saghen/blink.cmp",
 		},
 		init = function()
+			vim.diagnostic.config({
+				float = {
+					border = "rounded",
+					source = "if_many",
+					header = "Diagnostics",
+				},
+			})
+
 			vim.api.nvim_create_autocmd("LspAttach", {
 				callback = function(args)
 					local opts = { buffer = args.buf }
@@ -91,7 +118,7 @@ return {
 					vim.keymap.set(
 						"n",
 						"<leader>ge",
-						vim.diagnostic.open_float,
+						open_line_diagnostics,
 						vim.tbl_extend("force", opts, { desc = "Line diagnostics" })
 					)
 					vim.keymap.set("n", "<leader>gE", function()
