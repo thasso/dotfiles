@@ -79,6 +79,13 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
   - `:Opencode <command>` runs direct opencode commands (for example `:Opencode session.select`).
   - Prefer the Snacks provider (`vim.g.opencode_opts.provider.enabled = "snacks"`).
 
+- **Git**:
+  - `gitsigns.nvim` provides in-buffer git signs, hunk navigation (`]c`/`[c`), and hunk preview/diff (`<leader>cp`, `<leader>cw`, `<leader>cd`).
+  - `diffview.nvim` provides a file-explorer-style diff view for all changed files and file history.
+  - Diffview keymaps are under `<leader>c` (Changes): `<leader>cv` (open diffview), `<leader>ch` (file history for current file), `<leader>cH` (repo file history), `<leader>cq` (close diffview).
+  - `<leader>fs` opens the Snacks git_status picker for a quick changed-files list.
+  - `<leader>gD` opens a git diff picker with word-diff coloring.
+
 - **Treesitter**:
   - Use the new `nvim-treesitter` API (`require("nvim-treesitter")` + `ts.install(...)`).
   - Keep `lazy = false` for treesitter.
