@@ -89,16 +89,26 @@ return {
       "mason-org/mason.nvim",
       "neovim/nvim-lspconfig",
     },
-		opts = {
-			ensure_installed = servers,
-			automatic_enable = {
-				exclude = {
-					"ltex_plus",
-					"cspell_ls",
-				},
-			},
-		},
-	},
+    opts = {
+      ensure_installed = servers,
+      automatic_enable = {
+        exclude = {
+          "ltex_plus",
+          "cspell_ls",
+        },
+      },
+    },
+  },
+  {
+    "barreiroleo/ltex_extra.nvim",
+    branch = "dev",
+    ft = ltex_filetypes,
+    opts = {
+      init_check = false,
+      load_langs = { "en-US" },
+      path = vim.fn.stdpath("config") .. "/spell",
+    },
+  },
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
@@ -118,6 +128,14 @@ return {
         callback = function(args)
           local opts = { buffer = args.buf }
           local cwd = vim.fs.root(args.buf, { ".git" }) or vim.uv.cwd()
+          local client = args.data and args.data.client_id and vim.lsp.get_client_by_id(args.data.client_id) or nil
+
+          if client and client.name == "ltex_plus" then
+            local ok_ltex_extra, ltex_extra = pcall(require, "ltex_extra")
+            if ok_ltex_extra then
+              ltex_extra.reload({ "en-US" })
+            end
+          end
 
           vim.keymap.set("n", "<leader>gd", function()
             Snacks.picker.lsp_definitions({ cwd = cwd })

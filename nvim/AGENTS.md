@@ -63,6 +63,7 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
   - LSP navigation/actions are under `<leader>g*` (custom mappings), not `gd/gD/gr`-style defaults.
   - Prefer Snacks picker for LSP list UIs (references, definitions, diagnostics).
   - Extended grammar/spell checking uses `ltex_plus`.
+  - `ltex_extra.nvim` handles LTeX code-action commands (add to dictionary, disable rules, hide false positives).
   - Code-aware spell checking uses `cspell_ls` (`cspell-lsp`).
 
 - **Formatting**:
@@ -91,6 +92,7 @@ This is a Neovim configuration (not a library). Test by running `nvim` and verif
   - Spell tooling is toggled with `<leader>vs` and uses one LSP provider at a time.
   - `<leader>vs` uses `ltex_plus` for prose-oriented filetypes and `cspell_ls` for code-oriented filetypes.
   - Spell additions file is tracked in repo at `spell/en.utf-8.add`.
+  - LTeX dictionary/rule files are stored globally under `spell/` via `ltex_extra.nvim`.
   - Over SSH, clipboard uses OSC52 (`vim.g.clipboard = "osc52"`).
 
 ## Important
