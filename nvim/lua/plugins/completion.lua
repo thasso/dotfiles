@@ -6,7 +6,7 @@ return {
     keymap = {
       preset = "default",
       ["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
-      ["<CR>"] = { "accept", "fallback" },
+      ["<CR>"] = { "fallback" },
       ["<Tab>"] = { "select_and_accept", "fallback" },
       ["<S-Tab>"] = { "select_prev", "fallback" },
       ["<C-e>"] = { "hide", "fallback" },
