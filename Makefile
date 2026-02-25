@@ -14,6 +14,14 @@ gitconfig-clean:
 gitconfig: gitconfig-clean
 	ln -sf $(CURDIR)/gitconfig ~/.gitconfig
 
+ghostty-clean:
+	rm -rf ~/.config/ghostty
+
+.PHONY: ghostty
+ghostty:
+	ln -sf $(CURDIR)/ghostty ~/.config/ghostty
+
+
 nvim-clean:
 	rm -rf ~/.config/nvim
 
@@ -80,9 +88,11 @@ atuin: init atuin-clean
 
 tmux-clean:
 	rm -f ~/.tmux.conf
+	rm -f ~/.config/tmux
 
 tmux: tmux-clean
 	ln -s $(CURDIR)/tmux.conf ~/.tmux.conf
+	ln -s $(CURDIR)/tmux ~/.config/tmux
 
 vscode:
 	mkdir -p $(HOME)/Library/Application\ Support/Code/User
