@@ -1,4 +1,5 @@
 theme = Catppuccin Mocha
+bell-features = no-system,no-audio,no-attention,no-title,no-border
 split-divider-color = #FFFFFF
 keybind = shift+enter=text:\n
 auto-update-channel = tip
@@ -35,3 +36,18 @@ keybind = cmd+shift+n=text:\x02C
 
 # Switch tmux session with Cmd+Shift+S (prefix + s, built-in tree view)
 keybind = cmd+shift+s=text:\x02s
+
+# Navigate tmux panes with Cmd+Opt+Arrow (prefix + h/j/k/l)
+keybind = cmd+alt+left=text:\x02h
+keybind = cmd+alt+right=text:\x02l
+keybind = cmd+alt+up=text:\x02k
+keybind = cmd+alt+down=text:\x02j
+
+# Resize tmux panes with Cmd+Ctrl+Arrow (prefix + Alt+h/j/k/l in tmux)
+keybind = cmd+ctrl+left=text:\x02\x1bh
+keybind = cmd+ctrl+right=text:\x02\x1bl
+keybind = cmd+ctrl+up=text:\x02\x1bk
+keybind = cmd+ctrl+down=text:\x02\x1bj
+
+# Move/swap tmux pane with Cmd+Shift+M (prefix + W, shows pane numbers)
+keybind = cmd+shift+m=text:\x02W
