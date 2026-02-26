@@ -1,0 +1,4 @@
+#!/bin/bash
+# OpenCode wrapper script
+# Starts OpenCode with mDNS enabled
+exec opencode --port --mdns $@

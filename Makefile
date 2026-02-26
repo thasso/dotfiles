@@ -99,3 +99,12 @@ vscode:
 	ln -s VSCode/settings.json $(HOME)/Library/Application\ Support/Code/User/settings.json
 	ln -s VSCode/keybindings.json $(HOME)/Library/Application\ Support/Code/User/keybindings.json
 	ln -s VSCode/snippets $(HOME)/Library/Application\ Support/Code/User/snippets
+
+bin-scripts:
+	@mkdir -p $(HOME)/bin
+	@for script in $(CURDIR)/bin/*; do \
+		if [ -f "$$script" ]; then \
+			ln -sf "$$script" $(HOME)/bin/$$(basename "$$script"); \
+		fi; \
+	done
+	@echo "Linked bin scripts to ~/bin"
