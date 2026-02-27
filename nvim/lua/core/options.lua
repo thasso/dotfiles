@@ -25,7 +25,7 @@ vim.opt.incsearch = true -- show matches as I type
 
 -- appearance
 vim.opt.termguicolors = true -- turn on more colors
-vim.opt.signcolumn = "auto" -- show sign column only when needed
+vim.opt.signcolumn = "yes" -- keep sign column width stable
 vim.opt.showmatch = true -- highlight matching brackets
 vim.opt.matchtime = 2 -- for how long are matching brackets shown
 vim.opt.showmode = false -- custom status line will handle this
