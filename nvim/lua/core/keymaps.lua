@@ -94,6 +94,8 @@ end, { expr = true, desc = "Toggle comment line" })
 -- Quit commands
 vim.keymap.set("n", "<leader>qq", "<cmd>quit<cr>", { desc = "Quit" })
 vim.keymap.set("n", "<leader>qQ", "<cmd>quit!<cr>", { desc = "Force quit without save" })
+vim.keymap.set("n", "<leader>qa", "<cmd>qall<cr>", { desc = "Quit all" })
+vim.keymap.set("n", "<leader>qA", "<cmd>qall!<cr>", { desc = "Force quit all without save" })
 
 -- simpler window navigation
 vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
