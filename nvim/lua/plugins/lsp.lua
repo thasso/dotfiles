@@ -159,6 +159,12 @@ return {
             vim.lsp.buf.code_action,
             vim.tbl_extend("force", opts, { desc = "LSP code action" })
           )
+          vim.keymap.set(
+            "n",
+            "<C-Space>",
+            vim.lsp.buf.code_action,
+            vim.tbl_extend("force", opts, { desc = "LSP code action" })
+          )
           vim.keymap.set("n", "<leader>gr", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "LSP rename" }))
           vim.keymap.set(
             "n",
