@@ -26,7 +26,7 @@ return {
         auto_show_delay_ms = 150,
       },
       ghost_text = {
-        enabled = true,
+        enabled = false,
       },
     },
     signature = {
