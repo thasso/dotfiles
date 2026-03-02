@@ -9,6 +9,10 @@ permission:
     "gh issue*": allow
     "gh pr create *": allow
     "gh pr view *": allow
+    "gh pr comment *": allow
+    "gh api repos/*/pulls/*": allow
+    "gh api repos/*/pulls/*/comments*": allow
+    "gh api repos/*/issues/*/comments*": allow
     "git push *": allow
 ---
 
@@ -73,7 +77,26 @@ only when critical information is missing.
   findings. Minor findings may be accepted only if documented in the issue
   comments.
 
-### 5. Progress Tracking on Issue
+### 5. PR Feedback Handling
+
+- **Read PR Feedback**: Read open review comments and review summaries from the
+  active pull request.
+- **Triage**: Classify each reviewer comment as:
+  - Addressed by code change.
+  - Intentionally not addressed (with rationale).
+  - Needs clarification from reviewer/user.
+- **Respond Explicitly**: Reply on each comment thread so reviewers can see the
+  outcome.
+  - If addressed: explain what changed and where.
+  - If not addressed: explain why (scope, tradeoff, invalid assumption, or
+    deferred follow-up issue).
+  - If unclear: ask a concise follow-up question in-thread.
+- **Link Decisions**: When a comment results in a follow-up issue, include the
+  issue URL in the PR reply and in the parent issue comments.
+- **Close the Loop**: Do not treat review as complete until every substantive PR
+  comment has a response.
+
+### 6. Progress Tracking on Issue
 
 - **Update Checklist**: Mark completed work in the issue checklist.
 - **Comment Milestones**: Post concise milestone comments (started, major
@@ -81,7 +104,7 @@ only when critical information is missing.
 - **Decisions/Tradeoffs**: Capture meaningful decisions in issue comments for
   auditability.
 
-### 6. Out-of-Scope Capture (Follow-up Issues)
+### 7. Out-of-Scope Capture (Follow-up Issues)
 
 - **Detect Gaps**: When you identify meaningful work that is important but out of
   scope for the current issue/PR, capture it.
@@ -102,9 +125,9 @@ only when critical information is missing.
 - **Do Not Block Delivery**: Follow-up issues must not block current issue
   completion unless the finding is a correctness, security, or release blocker.
 
-### 7. Completion, Commit, and Pull Request
+### 8. Completion, Commit, and Pull Request
 
-- **Quality Gates**: Ensure that all defined quality gats pass.
+- **Quality Gates**: Ensure that all defined quality gates pass.
 - **Commit**: Commit implementation changes with concise subject and descriptive
   body focused on why a change was made and how it relates to the overall
   architecture.
@@ -124,6 +147,8 @@ only when critical information is missing.
 - **Follow-up Discipline**: Capture important out-of-scope work as linked
   follow-up issues or structured comments; avoid creating low-signal issue
   noise.
+- **PR Comment Closure**: Every substantive reviewer comment must have an
+  explicit reply (addressed or declined with rationale).
 - **Branch Rule**: Creating/switching to a non-main branch is mandatory before
   implementation.
 - **Sub-agents**: ALWAYS use sequential sub-agents for implementation,
