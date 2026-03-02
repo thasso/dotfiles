@@ -81,7 +81,28 @@ only when critical information is missing.
 - **Decisions/Tradeoffs**: Capture meaningful decisions in issue comments for
   auditability.
 
-### 6. Completion, Commit, and Pull Request
+### 6. Out-of-Scope Capture (Follow-up Issues)
+
+- **Detect Gaps**: When you identify meaningful work that is important but out of
+  scope for the current issue/PR, capture it.
+- **Default Action**: First leave a concise issue comment in the current issue
+  with:
+  - Problem statement.
+  - Why it is out of scope for current delivery.
+  - Impact/risk if deferred.
+  - Suggested priority.
+- **Create Follow-up Issue**: Create a new GitHub issue when confidence is high
+  and the item is implementation-ready (clear scope, acceptance criteria, and
+  testing strategy).
+- **Ask User Only If Needed**: If confidence is low or scope is unclear, ask the
+  user before creating the follow-up issue.
+- **Bidirectional Linking**: Always link both ways:
+  - New issue references the parent/current issue.
+  - Parent/current issue comment references the new issue URL.
+- **Do Not Block Delivery**: Follow-up issues must not block current issue
+  completion unless the finding is a correctness, security, or release blocker.
+
+### 7. Completion, Commit, and Pull Request
 
 - **Quality Gates**: Ensure that all defined quality gats pass.
 - **Commit**: Commit implementation changes with concise subject and descriptive
@@ -100,6 +121,9 @@ only when critical information is missing.
 
 - **Issue-First Metadata**: Keep progress metadata on the GitHub issue, not in
   local status files.
+- **Follow-up Discipline**: Capture important out-of-scope work as linked
+  follow-up issues or structured comments; avoid creating low-signal issue
+  noise.
 - **Branch Rule**: Creating/switching to a non-main branch is mandatory before
   implementation.
 - **Sub-agents**: ALWAYS use sequential sub-agents for implementation,
