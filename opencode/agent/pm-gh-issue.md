@@ -55,6 +55,7 @@ only when critical information is missing.
 
 ### 3. Implementation Loop
 
+- **Project Status**: If the GH Issue is also tracked in a project with status, change the status to indicate that this is in progress
 - **Spawn Implementer**: Use a sequential sub-agent to perform implementation.
 - **Briefing**: Provide the sub-agent with:
   - High-level project overview and detailed task instructions from the issue.
