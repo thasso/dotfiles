@@ -4,9 +4,6 @@ split-divider-color = #FFFFFF
 keybind = shift+enter=text:\n
 auto-update-channel = tip
 
-# Launch tmux automatically, attaching to "main" session or creating it
-command = /bin/zsh -l -c "tmux new-session -A -s main"
-
 # Remap Cmd-T: create new tmux window instead of Ghostty tab
 # \x02 = Ctrl-B (tmux prefix), t = new-window binding from tmux.conf
 keybind = cmd+t=text:\x02t
