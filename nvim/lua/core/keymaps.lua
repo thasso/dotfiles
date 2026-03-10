@@ -112,3 +112,28 @@ vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
 -- Better indenting in visual mode
 vim.keymap.set("v", "<", "<gv", { desc = "Indent left and reselect" })
 vim.keymap.set("v", ">", ">gv", { desc = "Indent right and reselect" })
+
+-- Open URL / file under cursor in default browser/app
+local function open_url()
+  local url = vim.fn.expand("<cfile>")
+  if url ~= "" then
+    vim.ui.open(url)
+  end
+end
+
+vim.keymap.set("n", "gx", open_url, { desc = "Open URL in browser" })
+vim.keymap.set("n", "<leader>fo", open_url, { desc = "Open URL in browser" })
+
+-- Jump between URLs in buffer
+local url_pattern = [[\vhttps?://[^ \t\r\n\]\)>,"'`]+]]
+
+local function jump_url(direction)
+  local flags = direction == "next" and "W" or "bW"
+  local found = vim.fn.search(url_pattern, flags)
+  if found == 0 then
+    vim.notify("No " .. direction .. " URL found", vim.log.levels.INFO)
+  end
+end
+
+vim.keymap.set("n", "]l", function() jump_url("next") end, { desc = "Next URL" })
+vim.keymap.set("n", "[l", function() jump_url("prev") end, { desc = "Previous URL" })

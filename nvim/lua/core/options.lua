@@ -49,6 +49,12 @@ vim.opt.writebackup = false -- don't create a backup before writing
 vim.opt.autoread = true -- auto reload files that changed
 vim.opt.autowrite = false -- no auto save
 
+-- Auto-detect external file changes on focus/idle
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+  command = "silent! checktime",
+  desc = "Reload files changed outside of Neovim",
+})
+
 -- behavior
 local is_ssh = vim.env.SSH_TTY ~= nil or vim.env.SSH_CONNECTION ~= nil or vim.env.SSH_CLIENT ~= nil
 if is_ssh then
