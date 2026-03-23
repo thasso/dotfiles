@@ -89,6 +89,12 @@
     enable = true;
     enableZshIntegration = true;
     flags = [ "--disable-up-arrow" ];
+    settings = {
+      filter_mode = "global";
+      filter_mode_shell_up_key_binding = "directory";
+      enter_accept = true;
+      sync.records = true;
+    };
   };
 
   # ── Fd (used by fzf) ───────────────────────────────────────
