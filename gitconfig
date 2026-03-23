@@ -66,11 +66,11 @@
 [core]
 	autocrlf = input
 	excludesfile = /Users/thasso/.gitignore_global
-	pager = delta
+	pager = cat
 	editor = nvim
 
 [interactive]
-    diffFilter = delta --color-only
+    diffFilter = cat
 
 [delta]
     navigate = true
