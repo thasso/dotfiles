@@ -285,6 +285,10 @@
     claude-code
     opencode
     tig
+    rustup
+    go
+    nodejs
+    yarn
   ]);
 
   # ── Dotfiles ────────────────────────────────────────────────
