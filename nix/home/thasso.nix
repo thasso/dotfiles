@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   home.stateVersion = "25.11";
 
@@ -106,8 +106,86 @@
   # ── Fd (used by fzf) ───────────────────────────────────────
   programs.fd.enable = true;
 
+  # ── Delta (git pager) ───────────────────────────────────────
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options = {
+      navigate = true;
+      side-by-side = true;
+    };
+  };
+
   # ── Git ─────────────────────────────────────────────────────
-  programs.git.enable = true;
+  programs.git = {
+    enable = true;
+
+    lfs.enable = true;
+
+    signing = {
+      key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+CLIkUMfm+8w4AFuVES+o9z124opVlyRfTbwUxwiUV";
+      signByDefault = true;
+      format = "ssh";
+    };
+
+    ignores = [
+      ".DS_Store"
+      "*.swp"
+      "*.swo"
+      "*~"
+    ];
+
+    settings = {
+      user = {
+        name = "Thasso Griebel";
+        email = "thasso.griebel@gmail.com";
+      };
+
+      alias = {
+        dt = "difftool";
+        subup = "submodule update --init --recursive";
+        tags = ''!sh -c "git for-each-ref --format='%(color:green)%(refname:short)|%(color:white)[%(taggerdate:relative)]|%(color:blue)%(objectname:short)|%(color:yellow)%(contents:subject)|%(color:white)Tagged by %(taggername)' --sort='-taggerdate' --count=10 refs/tags | awk -F'|' '{printf \"%-12s %-20s %s %-35s %s\\n\", \$1, \$2, \$3, \$5, \$4}'"'';
+        branches = "branch -a";
+        remotes = "remote -v";
+
+        # Shorten common commands
+        co = "checkout";
+        st = "status";
+        br = "branch";
+        ci = "commit";
+        d = "diff";
+
+        # Show outgoing commits
+        out = "log @{u}..";
+
+        # Current branch name
+        currentbranch = "!git branch --contains HEAD | grep '*' | tr -s ' ' | cut -d ' ' -f2";
+
+        # Better diffs for prose
+        wdiff = "diff --color-words";
+
+        # Amend last commit without modifying commit message
+        amend = ''!git log -n 1 --pretty=tformat:%s%n%n%b | git commit -F - --amend'';
+
+        # Fixup commit for autosquash
+        fixup = "commit --fixup=HEAD";
+      };
+
+      push.default = "simple";
+      branch.autosetuprebase = "always";
+      merge.conflictstyle = "diff3";
+      diff.colorMoved = "default";
+      core = {
+        autocrlf = "input";
+        editor = "nvim";
+      };
+      init.defaultBranch = "main";
+      pull.rebase = true;
+      tag.gpgsign = true;
+    } // lib.optionalAttrs pkgs.stdenv.isDarwin {
+      gpg.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
+    };
+  };
 
   # ── Tmux ────────────────────────────────────────────────────
   programs.tmux = {
