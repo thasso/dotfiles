@@ -271,6 +271,7 @@
     gh
     jira-cli-go
     claude-code
+    opencode
   ];
 
   # ── Dotfiles ────────────────────────────────────────────────
