@@ -57,6 +57,7 @@
     neovim
     zsh
     git
+    tmux
   ];
   
   security.sudo.wheelNeedsPassword = false;
