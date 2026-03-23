@@ -268,6 +268,7 @@
   # ── Google Chrome (macOS only) ─────────────────────────────
   home.packages = lib.optionals pkgs.stdenv.isDarwin [
     pkgs.google-chrome
+    pkgs.raycast
   ] ++
 
   # ── Extra packages ──────────────────────────────────────────
