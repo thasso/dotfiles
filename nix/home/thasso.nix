@@ -3,6 +3,7 @@
   home.stateVersion = "25.11";
 
   # ── Environment ──────────────────────────────────────────────
+  home.sessionPath = [ "$HOME/bin" ];
   home.sessionVariables = {
     EDITOR = "nvim";
     VISUAL = "nvim";
@@ -278,5 +279,7 @@
   # ── Dotfiles ────────────────────────────────────────────────
   home.file = {
     ".p10k.zsh".source = ./zsh/p10k.zsh;
+    "bin/git-cm".source = ../../bin/git-cm;
+    "bin/oc".source = ../../bin/oc;
   };
 }
