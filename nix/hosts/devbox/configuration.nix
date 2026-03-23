@@ -53,11 +53,9 @@
 
   # Packages
   nixpkgs.config.allowUnfree = true;
+  # Most user tools are managed by Home Manager (tmux, git, neovim, etc.)
   environment.systemPackages = with pkgs; [
-    neovim
     zsh
-    git
-    tmux
     claude-code
   ];
   

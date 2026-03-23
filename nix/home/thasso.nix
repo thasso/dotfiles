@@ -2,14 +2,102 @@
 {
   home.stateVersion = "25.11";
 
+  # ── Environment ──────────────────────────────────────────────
+  home.sessionVariables = {
+    EDITOR = "nvim";
+    VISUAL = "nvim";
+    LANG = "en_US.UTF-8";
+  };
+
+  # ── Zsh ──────────────────────────────────────────────────────
   programs.zsh = {
     enable = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+    enableCompletion = true;
+
+    history = {
+      size = 10000;
+      save = 10000;
+      ignoreDups = true;
+      share = true;
+      expireDuplicatesFirst = true;
+    };
+
+    completionInit = ''
+      autoload -Uz compinit && compinit
+      zstyle ':completion:*' menu select
+    '';
+
+    shellAliases = {
+      gs  = "git status";
+      gst = "git status";
+      gc  = "git commit";
+      gco = "git checkout";
+      gcm = "git cm";
+      gp  = "git push";
+      lg  = "lazygit";
+    };
+
     initContent = ''
+      # Powerlevel10k instant prompt (must be at top)
+      if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
+        source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
+      fi
+
       source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
-      ${builtins.readFile ./zsh/init.zsh}
+      [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+
+      # Source secrets if present
+      [[ -f ~/.zsecrets ]] && source ~/.zsecrets
     '';
   };
 
+  # ── Fzf ──────────────────────────────────────────────────────
+  programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
+    defaultCommand = "fd --hidden --strip-cwd-prefix --exclude .git";
+    changeDirWidgetCommand = "fd --type=d --hidden --strip-cwd-prefix --exclude .git";
+    changeDirWidgetOptions = [ "--preview 'eza --tree --color=always {} | head -200'" ];
+    fileWidgetCommand = "fd --hidden --strip-cwd-prefix --exclude .git";
+    fileWidgetOptions = [ "--preview 'bat -n --color=always --line-range :500 {}'" ];
+  };
+
+  # ── Zoxide (better cd) ──────────────────────────────────────
+  programs.zoxide = {
+    enable = true;
+    enableZshIntegration = true;
+    options = [ "--cmd" "cd" ];
+  };
+
+  # ── Eza (better ls) ─────────────────────────────────────────
+  programs.eza = {
+    enable = true;
+    icons = "auto";
+    extraOptions = [ "--icons=always" ];
+  };
+
+  # ── Bat (better cat) ────────────────────────────────────────
+  programs.bat = {
+    enable = true;
+    config.theme = "Dracula";
+  };
+
+  # ── Atuin (shell history) ───────────────────────────────────
+  programs.atuin = {
+    enable = true;
+    enableZshIntegration = true;
+    flags = [ "--disable-up-arrow" ];
+  };
+
+  # ── Fd (used by fzf) ───────────────────────────────────────
+  programs.fd.enable = true;
+
+  # ── Git ─────────────────────────────────────────────────────
+  programs.git.enable = true;
+
+  # ── Tmux ────────────────────────────────────────────────────
   programs.tmux = {
     enable = true;
     mouse = true;
@@ -80,13 +168,16 @@
     '';
   };
 
+  # ── Extra packages ──────────────────────────────────────────
   home.packages = with pkgs; [
     zsh-powerlevel10k
+    lazygit
+    neovim
+    ripgrep
   ];
 
-  # Symlink config files from dotfiles repo
+  # ── Dotfiles ────────────────────────────────────────────────
   home.file = {
-   ".p10k.zsh".source = ./zsh/p10k.zsh;
+    ".p10k.zsh".source = ./zsh/p10k.zsh;
   };
-
 }
