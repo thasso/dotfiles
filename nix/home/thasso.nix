@@ -187,6 +187,8 @@
     lazygit
     neovim
     ripgrep
+    python314
+    pyenv
   ];
 
   # ── Dotfiles ────────────────────────────────────────────────
