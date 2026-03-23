@@ -265,8 +265,13 @@
     enable = true;
   };
 
+  # ── Google Chrome (macOS only) ─────────────────────────────
+  home.packages = lib.optionals pkgs.stdenv.isDarwin [
+    pkgs.google-chrome
+  ] ++
+
   # ── Extra packages ──────────────────────────────────────────
-  home.packages = with pkgs; [
+  (with pkgs; [
     zsh-powerlevel10k
     lazygit
     neovim
@@ -279,7 +284,7 @@
     claude-code
     opencode
     tig
-  ];
+  ]);
 
   # ── Dotfiles ────────────────────────────────────────────────
   home.file = {
