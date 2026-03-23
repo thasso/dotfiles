@@ -281,6 +281,7 @@
     jq
     gh
     jira-cli-go
+    awscli2
     claude-code
     opencode
     tig
