@@ -1,9 +1,4 @@
 { config, pkgs, ... }:
-
-let
- dotfiles = "${config.home.homeDirectory}/dotfiles";
-in
-
 {
   home.stateVersion = "25.11";
 
