@@ -30,6 +30,7 @@
     '';
 
     shellAliases = {
+      # Git
       gs  = "git status";
       gst = "git status";
       gc  = "git commit";
@@ -37,6 +38,11 @@
       gcm = "git cm";
       gp  = "git push";
       lg  = "lazygit";
+
+      # Tool replacements
+      cat = "bat";
+      ls  = "eza --icons=always";
+      ll  = "eza -l --no-user --no-time --no-permissions --icons=always";
     };
 
     initContent = ''
