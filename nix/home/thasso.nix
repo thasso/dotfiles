@@ -189,6 +189,9 @@
     ripgrep
     python314
     pyenv
+    jq
+    gh
+    jira-cli-go
   ];
 
   # ── Dotfiles ────────────────────────────────────────────────
