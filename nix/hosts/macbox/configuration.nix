@@ -18,7 +18,6 @@
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
     zsh
-    claude-code
   ];
 
   # Enable tailscale VPN

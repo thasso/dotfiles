@@ -56,7 +56,6 @@
   # Most user tools are managed by Home Manager (tmux, git, neovim, etc.)
   environment.systemPackages = with pkgs; [
     zsh
-    claude-code
   ];
   
   security.sudo.wheelNeedsPassword = false;
