@@ -9,10 +9,10 @@
     let
       system = "x86_64-linux";
     in {
-      nixosConfigurations.vm = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.devbox = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
-          ./configuration.nix
+          ./hosts/devbox/configuration.nix
         ];
       };
     };
