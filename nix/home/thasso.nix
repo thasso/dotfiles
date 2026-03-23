@@ -118,6 +118,7 @@
     historyLimit = 30000;
     baseIndex = 1;
     keyMode = "vi";
+    focusEvents = true;
 
     plugins = with pkgs.tmuxPlugins; [
       {
