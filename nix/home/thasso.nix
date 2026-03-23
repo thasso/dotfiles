@@ -272,6 +272,7 @@
     jira-cli-go
     claude-code
     opencode
+    tig
   ];
 
   # ── Dotfiles ────────────────────────────────────────────────
