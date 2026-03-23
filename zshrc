@@ -135,3 +135,7 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 
 export LIMA_SHELL=/usr/bin/zsh
+
+export OP_PLUGIN_ALIASES_SOURCED=1
+alias gh="op plugin run -- gh"
+
