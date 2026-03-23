@@ -58,6 +58,7 @@
     zsh
     git
     tmux
+    claude-code
   ];
   
   security.sudo.wheelNeedsPassword = false;
