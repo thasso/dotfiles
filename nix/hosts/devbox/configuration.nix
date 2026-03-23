@@ -66,6 +66,10 @@
   services.openssh.enable = true;
   networking.firewall.allowedTCPPorts = [ 22 ];
 
+  # Enable tailscale VPN
+  services.tailscale.enable = true;
+  services.tailscale.openFirewall = true;
+
   # leave this as it is
   system.stateVersion = "25.11";
 
