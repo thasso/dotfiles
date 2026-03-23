@@ -260,6 +260,42 @@
     '';
   };
 
+  # ── Ghostty (macOS only) ──────────────────────────────────
+  programs.ghostty = lib.mkIf pkgs.stdenv.isDarwin {
+    enable = true;
+    package = pkgs.ghostty-bin; # ghostty is Linux-only; ghostty-bin supports macOS
+    enableZshIntegration = true;
+    settings = {
+      theme = "Catppuccin Mocha";
+      bell-features = "no-system,no-audio,no-attention,no-title,no-border";
+      split-divider-color = "#FFFFFF";
+      auto-update-channel = "tip";
+      macos-titlebar-style = "transparent";
+      keybind = [
+        "shift+enter=text:\\n"
+        "cmd+t=text:\\x02t"
+        "cmd+shift+left_bracket=text:\\x02p"
+        "cmd+shift+right_bracket=text:\\x02n"
+        "cmd+w=text:\\x02&"
+        "cmd+r=text:\\x02,"
+        "cmd+shift+r=text:\\x02$"
+        "cmd+d=text:\\x02%"
+        ''cmd+shift+d=text:\x02"''
+        "cmd+shift+n=text:\\x02C"
+        "cmd+shift+s=text:\\x02s"
+        "cmd+alt+left=text:\\x02h"
+        "cmd+alt+right=text:\\x02l"
+        "cmd+alt+up=text:\\x02k"
+        "cmd+alt+down=text:\\x02j"
+        "cmd+ctrl+left=text:\\x02\\x1bh"
+        "cmd+ctrl+right=text:\\x02\\x1bl"
+        "cmd+ctrl+up=text:\\x02\\x1bk"
+        "cmd+ctrl+down=text:\\x02\\x1bj"
+        "cmd+shift+m=text:\\x02W"
+      ];
+    };
+  };
+
   # ── VS Code (macOS only) ───────────────────────────────────
   programs.vscode = lib.mkIf pkgs.stdenv.isDarwin {
     enable = true;
