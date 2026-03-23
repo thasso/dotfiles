@@ -29,6 +29,13 @@ To pull the latest versions of nixpkgs, home-manager, nix-darwin, etc:
 nix flake update
 ```
 
+To update a single input:
+
+```bash
+nix flake update nixpkgs        # only update nixpkgs
+nix flake update home-manager   # only update home-manager
+```
+
 Then rebuild as above.
 
 ## First-time setup (macOS)
