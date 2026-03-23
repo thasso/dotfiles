@@ -260,6 +260,11 @@
     '';
   };
 
+  # ── VS Code (macOS only) ───────────────────────────────────
+  programs.vscode = lib.mkIf pkgs.stdenv.isDarwin {
+    enable = true;
+  };
+
   # ── Extra packages ──────────────────────────────────────────
   home.packages = with pkgs; [
     zsh-powerlevel10k
