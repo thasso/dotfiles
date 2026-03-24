@@ -34,6 +34,17 @@
         ];
       };
 
+      # ── NixOS (Lima VM) ────────────────────────────────────────
+      nixosConfigurations.limabox = nixpkgs.lib.nixosSystem {
+        system = "aarch64-linux";
+        modules = [
+          claudeCodeOverlay
+          ./hosts/limabox/configuration.nix
+          home-manager.nixosModules.home-manager
+          homeManagerConfig
+        ];
+      };
+
       # ── nix-darwin (macOS) ─────────────────────────────────────
       darwinConfigurations.macbox = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
