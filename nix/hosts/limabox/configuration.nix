@@ -58,6 +58,7 @@
   users.mutableUsers = true;
   users.users.thasso = {
     isNormalUser = true;
+    home = "/home/thasso.linux";
     extraGroups = [ "networkmanager" "wheel" ];
     shell = pkgs.zsh;
   };
