@@ -67,6 +67,9 @@
 
   # Packages
   nixpkgs.config.allowUnfree = true;
+  # Ghostty terminfo so $TERM=xterm-ghostty works over SSH
+  environment.enableAllTerminfo = true;
+
   environment.systemPackages = with pkgs; [
     zsh
   ];
