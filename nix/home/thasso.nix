@@ -324,6 +324,7 @@
     awscli2
     claude-code
     opencode
+    gnumake
     tig
     rustup
     go
