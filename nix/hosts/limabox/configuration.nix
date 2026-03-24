@@ -54,10 +54,14 @@
   };
 
   # User is created imperatively by lima-init from cloud-init data.
-  # Allow mutable users so Lima can manage SSH keys and user setup.
+  # We still need a minimal declaration for Home Manager.
   users.mutableUsers = true;
-  # Set default shell for the Lima-created user
-  users.defaultUserShell = pkgs.zsh;
+  users.users.thasso = {
+    isNormalUser = true;
+    extraGroups = [ "networkmanager" "wheel" ];
+    shell = pkgs.zsh;
+  };
+  users.groups.thasso = {};
   programs.zsh.enable = true;
 
   # Packages
