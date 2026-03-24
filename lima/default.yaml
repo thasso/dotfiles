@@ -12,6 +12,11 @@ mounts:
   writable: false
   9p:
     cache: "mmap"
+- location: "~/castlabs/projects"
+  mountPoint: "/home/thasso.linux/castlabs/projects"
+  writable: true
+  9p:
+    cache: "mmap"
 - location: "/tmp/lima"
   writable: true
   9p:
