@@ -3,9 +3,13 @@ NIX_DIR := $(CURDIR)/nix
 # ── Nix targets ────────────────────────────────────────────
 .PHONY: switch update dry-update
 
+HOSTNAME := $(shell hostname)
+
 switch:
 ifeq ($(shell uname), Darwin)
 	sudo darwin-rebuild switch --flake $(NIX_DIR)#macbox
+else ifeq ($(HOSTNAME), limabox)
+	sudo nixos-rebuild switch --flake $(NIX_DIR)#limabox
 else
 	sudo nixos-rebuild switch --flake $(NIX_DIR)#devbox
 endif
