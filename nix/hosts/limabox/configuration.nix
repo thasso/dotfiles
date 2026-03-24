@@ -1,13 +1,33 @@
-{ config, pkgs, ... }:
+{ config, modulesPath, pkgs, lib, nixos-lima, ... }:
 
 {
   imports = [
-    ./hardware-configuration.nix
+    (modulesPath + "/profiles/qemu-guest.nix")
+    nixos-lima.nixosModules.lima
   ];
 
-  # Bootloader
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  # Lima guest agent
+  services.lima.enable = true;
+
+  # Bootloader (Lima uses GRUB, not systemd-boot)
+  boot.loader.grub = {
+    device = "nodev";
+    efiSupport = true;
+    efiInstallAsRemovable = true;
+  };
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  # Filesystems matching the Lima image layout
+  fileSystems."/" = {
+    device = "/dev/disk/by-label/nixos";
+    autoResize = true;
+    fsType = "ext4";
+    options = [ "noatime" "nodiratime" "discard" ];
+  };
+  fileSystems."/boot" = {
+    device = lib.mkForce "/dev/vda1";
+    fsType = "vfat";
+  };
 
   # enable flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];

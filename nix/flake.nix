@@ -12,9 +12,13 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-lima = {
+      url = "github:nixos-lima/nixos-lima/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, claudeCode, nix-darwin, home-manager, ... }:
+  outputs = { self, nixpkgs, claudeCode, nix-darwin, home-manager, nixos-lima, ... }:
     let
       claudeCodeOverlay = { nixpkgs.overlays = [ claudeCode.overlays.default ]; };
       homeManagerConfig = {
@@ -37,6 +41,7 @@
       # ── NixOS (Lima VM) ────────────────────────────────────────
       nixosConfigurations.limabox = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
+        specialArgs = { inherit nixos-lima; };
         modules = [
           claudeCodeOverlay
           ./hosts/limabox/configuration.nix
