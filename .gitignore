@@ -3,4 +3,7 @@ vim/.netrwhist
 zsh.d/cache
 zsecrets
 opencode/node_modules
+opencode/bun.lock
+opencode/plugin
+opencode/*.bak
 .DS_store

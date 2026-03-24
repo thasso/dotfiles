@@ -1,4 +1,7 @@
 { config, lib, pkgs, ... }:
+let
+  dotfilesPath = "${config.home.homeDirectory}/${if pkgs.stdenv.isDarwin then "git/dotfiles" else "dotfiles"}";
+in
 {
   home.stateVersion = "25.11";
 
@@ -323,7 +326,6 @@
     jira-cli-go
     awscli2
     claude-code
-    opencode
     gnumake
     tig
     rustup
@@ -332,10 +334,41 @@
     yarn
   ]);
 
+  # ── OpenCode ────────────────────────────────────────────────
+  programs.opencode = {
+    enable = true;
+    settings = {
+      theme = "catppuccin";
+      autoupdate = true;
+      plugin = [ "opencode-anthropic-auth@latest" ];
+      provider = {};
+      mcp = {
+        playwright = {
+          type = "remote";
+          url = "http://host.lima.internal:8931/mcp";
+          enabled = true;
+        };
+      };
+      permission = {
+        external_directory = { "~/.cargo/registry/**" = "allow"; };
+        edit = { "~/.cargo/registry/**" = "deny"; };
+        bash = {
+          "* ~/.cargo/registry*" = "deny";
+          "* /Users/thasso/.cargo/registry*" = "deny";
+          "git push" = "ask";
+          "git merge *" = "ask";
+        };
+      };
+    };
+    agents = ../../opencode/agent;
+    commands = ../../opencode/command;
+    tools = ../../opencode/tool;
+  };
+
   # ── Dotfiles ────────────────────────────────────────────────
   home.file = {
     ".p10k.zsh".source = ./zsh/p10k.zsh;
-    ".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/${if pkgs.stdenv.isDarwin then "git/dotfiles" else "dotfiles"}/nvim";
+    ".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim";
     "bin/git-cm".source = ../../bin/git-cm;
     "bin/oc".source = ../../bin/oc;
   };
