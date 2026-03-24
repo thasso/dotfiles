@@ -305,6 +305,7 @@
   home.packages = lib.optionals pkgs.stdenv.isDarwin [
     pkgs.google-chrome
     pkgs.raycast
+    pkgs.lima
   ] ++
 
   # ── Extra packages ──────────────────────────────────────────
@@ -326,7 +327,6 @@
     go
     nodejs
     yarn
-    lima
   ]);
 
   # ── Dotfiles ────────────────────────────────────────────────
