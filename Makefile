@@ -9,18 +9,18 @@ switch:
 ifeq ($(shell uname), Darwin)
 	sudo darwin-rebuild switch --flake $(NIX_DIR)#macbox
 else ifeq ($(HOSTNAME), limabox)
-	sudo nixos-rebuild switch --flake $(NIX_DIR)#limabox --fast
+	sudo nixos-rebuild switch --flake $(NIX_DIR)#limabox --no-reexec
 else
-	sudo nixos-rebuild switch --flake $(NIX_DIR)#devbox --fast
+	sudo nixos-rebuild switch --flake $(NIX_DIR)#devbox --no-reexec
 endif
 
 switch-offline:
 ifeq ($(shell uname), Darwin)
 	sudo darwin-rebuild switch --flake $(NIX_DIR)#macbox --offline
 else ifeq ($(HOSTNAME), limabox)
-	sudo nixos-rebuild switch --flake $(NIX_DIR)#limabox --fast --offline
+	sudo nixos-rebuild switch --flake $(NIX_DIR)#limabox --no-reexec --offline
 else
-	sudo nixos-rebuild switch --flake $(NIX_DIR)#devbox --fast --offline
+	sudo nixos-rebuild switch --flake $(NIX_DIR)#devbox --no-reexec --offline
 endif
 
 update:
