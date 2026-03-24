@@ -331,6 +331,7 @@
   # ── Dotfiles ────────────────────────────────────────────────
   home.file = {
     ".p10k.zsh".source = ./zsh/p10k.zsh;
+    ".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/${if pkgs.stdenv.isDarwin then "git/dotfiles" else "dotfiles"}/nvim";
     "bin/git-cm".source = ../../bin/git-cm;
     "bin/oc".source = ../../bin/oc;
   };

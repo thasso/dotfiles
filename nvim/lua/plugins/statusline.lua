@@ -19,7 +19,7 @@ return {
 
     return {
       options = {
-        theme = "catppuccin",
+        theme = "catppuccin-mocha",
       },
       sections = {
         lualine_x = { lsp_status, "encoding" },
