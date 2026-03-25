@@ -230,6 +230,7 @@ in
       # Window and pane behavior
       set-option -g allow-rename off
       set-option -g automatic-rename off
+      set -g detach-on-destroy off
       set -g display-panes-time 3000
       set -g bell-action none
       set -g visual-bell on
