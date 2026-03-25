@@ -11,6 +11,8 @@ in
     EDITOR = "nvim";
     VISUAL = "nvim";
     LANG = "en_US.UTF-8";
+    CC = "clang";
+    CXX = "clang++";
   } // lib.optionalAttrs pkgs.stdenv.isDarwin {
     SSH_AUTH_SOCK = "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
   };
@@ -221,6 +223,10 @@ in
     ];
 
     extraConfig = ''
+      # Clipboard (OSC 52 passthrough for SSH/VM)
+      set -g allow-passthrough on
+      set -s set-clipboard on
+
       # Window and pane behavior
       set-option -g allow-rename off
       set-option -g automatic-rename off
@@ -239,6 +245,7 @@ in
       # Copy mode
       bind-key Escape copy-mode
       bind-key -T copy-mode-vi 'v' send -X begin-selection
+      bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
 
       # Pane navigation (prefix + h/j/k/l)
       bind h select-pane -L
@@ -333,6 +340,8 @@ in
     gnumake
     tig
     rustup
+    clang
+    cmake
     go
     nodejs
     yarn
