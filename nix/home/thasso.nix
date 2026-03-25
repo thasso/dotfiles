@@ -197,6 +197,21 @@ in
     } // lib.optionalAttrs pkgs.stdenv.isDarwin {
       gpg.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
     };
+
+  };
+
+  programs.claude-code = lib.mkIf (!pkgs.stdenv.isDarwin) {
+    enable = true;
+    package = null;
+    settings = {
+      permissions = {
+        defaultMode = "bypassPermissions";
+        deny = [
+          "Bash(git push)"
+          "Bash(git push *)"
+        ];
+      };
+    };
   };
 
   # ── Tmux ────────────────────────────────────────────────────
@@ -367,11 +382,18 @@ in
       permission = {
         external_directory = { "~/.cargo/registry/**" = "allow"; };
         edit = { "~/.cargo/registry/**" = "deny"; };
+      } // (if pkgs.stdenv.isDarwin then {
         bash = {
           "git push" = "ask";
           "git merge *" = "ask";
         };
-      };
+      } else {
+        bash = {
+          "*" = "allow";
+          "git push" = "deny";
+          "git push *" = "deny";
+        };
+      });
     };
     agents = ../../opencode/agent;
     commands = ../../opencode/command;
