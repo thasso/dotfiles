@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, meridianPort, ... }:
 let
   dotfilesPath = "${config.home.homeDirectory}/${if pkgs.stdenv.isDarwin then "git/dotfiles" else "dotfiles"}";
 in
@@ -355,7 +355,7 @@ in
       theme = "catppuccin";
       autoupdate = true;
       provider = {
-        anthropic = { options = { baseURL = "http://localhost:4141"; apiKey = "x"; }; };
+        anthropic = { options = { baseURL = "http://localhost:${toString meridianPort}"; apiKey = "x"; }; };
       };
       permission = {
         external_directory = { "~/.cargo/registry/**" = "allow"; };
@@ -373,6 +373,36 @@ in
   # ── OpenCode Plugin (session tracking for meridian proxy) ──
   xdg.configFile."opencode/plugins/claude-max-headers.ts".source =
     ../../opencode/plugins/claude-max-headers.ts;
+
+  # ── Meridian Service (Claude Max Proxy) ─────────────────────
+  systemd.user.services.meridian = lib.mkIf (!pkgs.stdenv.isDarwin) {
+    Unit.Description = "Meridian - Claude Max Proxy";
+    Service = {
+      ExecStart = "${pkgs.meridian}/bin/meridian";
+      Environment = [
+        "CLAUDE_PROXY_PORT=${toString meridianPort}"
+        "PATH=${pkgs.claude-code}/bin:${pkgs.nodejs_22}/bin"
+      ];
+      Restart = "on-failure";
+      RestartSec = 5;
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
+
+  launchd.agents.meridian = lib.mkIf pkgs.stdenv.isDarwin {
+    enable = true;
+    config = {
+      ProgramArguments = [ "${pkgs.meridian}/bin/meridian" ];
+      EnvironmentVariables = {
+        CLAUDE_PROXY_PORT = toString meridianPort;
+        PATH = "${pkgs.claude-code}/bin:${pkgs.nodejs_22}/bin";
+      };
+      KeepAlive = true;
+      RunAtLoad = true;
+      StandardOutPath = "/tmp/meridian.log";
+      StandardErrorPath = "/tmp/meridian.err";
+    };
+  };
 
   # ── Dotfiles ────────────────────────────────────────────────
   home.file = {
