@@ -389,24 +389,31 @@ in
     Install.WantedBy = [ "default.target" ];
   };
 
-  launchd.agents.meridian = lib.mkIf pkgs.stdenv.isDarwin {
-    enable = true;
-    config = {
-      ProgramArguments = [ "${pkgs.meridian}/bin/meridian" ];
-      EnvironmentVariables = {
-        CLAUDE_PROXY_PORT = toString meridianPort;
-        PATH = "${pkgs.claude-code}/bin:${pkgs.nodejs_22}/bin";
-      };
-      KeepAlive = true;
-      RunAtLoad = true;
-      StandardOutPath = "/tmp/meridian.log";
-      StandardErrorPath = "/tmp/meridian.err";
-    };
-  };
-
   # ── Dotfiles ────────────────────────────────────────────────
   home.file = {
     ".p10k.zsh".source = ./zsh/p10k.zsh;
+
+    # Meridian launchd agent — managed manually to avoid home-manager's
+    # /bin/sh wrapper (which makes the process show as "sh" in Activity Monitor)
+    "Library/LaunchAgents/meridian.plist" = lib.mkIf pkgs.stdenv.isDarwin {
+      text = lib.generators.toPlist {} {
+        Label = "meridian";
+        ProgramArguments = [
+          "/bin/bash" "-c"
+          "/bin/wait4path /nix/store && exec -a meridian ${pkgs.meridian}/bin/meridian"
+        ];
+        EnvironmentVariables = {
+          CLAUDE_PROXY_PORT = toString meridianPort;
+          HOME = "/Users/thasso";
+          USER = "thasso";
+          PATH = "${pkgs.claude-code}/bin:${pkgs.nodejs_22}/bin:/usr/bin";
+        };
+        KeepAlive = true;
+        RunAtLoad = true;
+        StandardOutPath = "/tmp/meridian.log";
+        StandardErrorPath = "/tmp/meridian.err";
+      };
+    };
     ".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/nvim";
     "bin/git-cm".source = ../../bin/git-cm;
     "bin/oc".source = ../../bin/oc;

@@ -9,6 +9,13 @@ let
     hash = "sha256-EScd+aslfPp8p6uz+NqkKDFvT1MyRZvrdIRlVq/cDpo=";
   };
 
+  # bun install produces platform-specific node_modules, so the hash differs per system
+  depsHash = {
+    "aarch64-darwin" = "sha256-t2xfnRNkVZ3F5UMIbLcSRfFwt3CoX63iJdk2sKcURlw=";
+    "aarch64-linux"  = "sha256-sp5M6S70wVWX3jgIFUmFnoe3eRiAYFeZ7y+jmKdr60Y=";
+    "x86_64-linux"   = lib.fakeHash;  # TODO: build on devbox to get the real hash
+  }.${stdenv.hostPlatform.system} or (throw "meridian: unsupported platform ${stdenv.hostPlatform.system}");
+
   # Fixed-output derivation: allowed network access to fetch bun deps
   node_modules = stdenv.mkDerivation {
     pname = "meridian-deps";
@@ -24,7 +31,7 @@ let
     '';
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
-    outputHash = "sha256-sp5M6S70wVWX3jgIFUmFnoe3eRiAYFeZ7y+jmKdr60Y=";
+    outputHash = depsHash;
   };
 in
 stdenv.mkDerivation {
