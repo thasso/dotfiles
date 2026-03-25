@@ -1,17 +1,17 @@
+-- Servers installed and managed by Mason.
+-- clangd is provided by nix (clang-tools) — Mason has no aarch64-linux binary.
+-- cmake, kotlin_lsp, ltex_plus removed: fail on current platforms
+-- (python too new / platform unsupported). Install manually via :MasonInstall where supported.
 local servers = {
   "lua_ls",
   "pyright",
   "rust_analyzer",
   "tsgo",
   "eslint",
-  "kotlin_lsp",
   "cssls",
-  "cmake",
   "bashls",
   "astro",
-  "ltex_plus",
   "cspell_ls",
-  "clangd",
 }
 
 local ltex_filetypes = {
@@ -209,6 +209,9 @@ return {
           },
         },
       })
+
+      -- clangd is installed via nix (clang-tools), not mason, so enable it explicitly
+      vim.lsp.enable("clangd")
 
       vim.lsp.config("cspell_ls", {
         cmd = { "cspell-lsp", "--stdio" },

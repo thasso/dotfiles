@@ -345,6 +345,8 @@ in
     tig
     rustup
     clang
+    clang-tools # provides clangd
+    tree-sitter
     cmake
     go
     nodejs
