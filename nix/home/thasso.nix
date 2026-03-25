@@ -308,6 +308,10 @@ in
         "cmd+ctrl+up=text:\\x02\\x1bk"
         "cmd+ctrl+down=text:\\x02\\x1bj"
         "cmd+shift+m=text:\\x02W"
+        "cmd+ctrl+shift+t=new_tab"
+        "cmd+ctrl+shift+r=prompt_tab_title"
+        "cmd+ctrl+shift+left_bracket=previous_tab"
+        "cmd+ctrl+shift+right_bracket=next_tab"
       ];
     };
   };
@@ -381,6 +385,7 @@ in
       ExecStart = "${pkgs.meridian}/bin/meridian";
       Environment = [
         "CLAUDE_PROXY_PORT=${toString meridianPort}"
+        "CLAUDE_PROXY_PASSTHROUGH=1"
         "PATH=${pkgs.claude-code}/bin:${pkgs.nodejs_22}/bin"
       ];
       Restart = "on-failure";
@@ -404,6 +409,7 @@ in
         ];
         EnvironmentVariables = {
           CLAUDE_PROXY_PORT = toString meridianPort;
+          CLAUDE_PROXY_PASSTHROUGH = "1";
           HOME = "/Users/thasso";
           USER = "thasso";
           PATH = "${pkgs.claude-code}/bin:${pkgs.nodejs_22}/bin:/usr/bin";
