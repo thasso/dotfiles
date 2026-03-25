@@ -345,6 +345,7 @@ in
     go
     nodejs
     yarn
+    meridian
   ]);
 
   # ── OpenCode ────────────────────────────────────────────────
@@ -353,7 +354,9 @@ in
     settings = {
       theme = "catppuccin";
       autoupdate = true;
-      provider = {};
+      provider = {
+        anthropic = { options = { baseURL = "http://localhost:4141"; apiKey = "x"; }; };
+      };
       permission = {
         external_directory = { "~/.cargo/registry/**" = "allow"; };
         edit = { "~/.cargo/registry/**" = "deny"; };
@@ -366,6 +369,10 @@ in
     agents = ../../opencode/agent;
     commands = ../../opencode/command;
   };
+
+  # ── OpenCode Plugin (session tracking for meridian proxy) ──
+  xdg.configFile."opencode/plugins/claude-max-headers.ts".source =
+    ../../opencode/plugins/claude-max-headers.ts;
 
   # ── Dotfiles ────────────────────────────────────────────────
   home.file = {

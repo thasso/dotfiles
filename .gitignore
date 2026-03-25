@@ -6,4 +6,5 @@ opencode/node_modules
 opencode/bun.lock
 opencode/plugin
 opencode/*.bak
+result
 .DS_store

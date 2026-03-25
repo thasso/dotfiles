@@ -23,7 +23,10 @@
 
   outputs = { self, nixpkgs, claudeCode, nix-darwin, home-manager, nixos-lima, ... }:
     let
-      claudeCodeOverlay = { nixpkgs.overlays = [ claudeCode.overlays.default ]; };
+      overlays = { nixpkgs.overlays = [
+        claudeCode.overlays.default
+        (final: prev: { meridian = final.callPackage ./pkgs/meridian.nix {}; })
+      ]; };
       homeManagerConfig = {
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
@@ -34,7 +37,7 @@
       nixosConfigurations.devbox = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          claudeCodeOverlay
+          overlays
           ./hosts/devbox/configuration.nix
           home-manager.nixosModules.home-manager
           homeManagerConfig
@@ -46,7 +49,7 @@
         system = "aarch64-linux";
         specialArgs = { inherit nixos-lima; };
         modules = [
-          claudeCodeOverlay
+          overlays
           ./hosts/limabox/configuration.nix
           home-manager.nixosModules.home-manager
           homeManagerConfig
@@ -57,7 +60,7 @@
       darwinConfigurations.macbox = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         modules = [
-          claudeCodeOverlay
+          overlays
           ./hosts/macbox/configuration.nix
           home-manager.darwinModules.home-manager
           homeManagerConfig
