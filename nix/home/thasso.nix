@@ -352,7 +352,6 @@ in
     };
     agents = ../../opencode/agent;
     commands = ../../opencode/command;
-    tools = ../../opencode/tool;
   };
 
   # ── Dotfiles ────────────────────────────────────────────────
