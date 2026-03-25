@@ -118,6 +118,12 @@ in
   # ── Fd (used by fzf) ───────────────────────────────────────
   programs.fd.enable = true;
 
+  # ── Direnv (auto-activate per-project dev shells) ──────────
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
   # ── Delta (git pager) ───────────────────────────────────────
   programs.delta = {
     enable = true;
