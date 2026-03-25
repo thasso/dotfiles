@@ -45,6 +45,10 @@ in
       gp  = "git push";
       lg  = "lazygit";
 
+      # Nix
+      nix-shell = "nix-shell --command zsh";
+      nix-develop = "nix develop --command zsh";
+
       # Tool replacements
       cat = "bat";
       ls  = "eza --icons=always";
