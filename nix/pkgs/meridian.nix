@@ -13,7 +13,7 @@ let
   depsHash = {
     "aarch64-darwin" = "sha256-t2xfnRNkVZ3F5UMIbLcSRfFwt3CoX63iJdk2sKcURlw=";
     "aarch64-linux"  = "sha256-sp5M6S70wVWX3jgIFUmFnoe3eRiAYFeZ7y+jmKdr60Y=";
-    "x86_64-linux"   = lib.fakeHash;  # TODO: build on devbox to get the real hash
+    "x86_64-linux"   = "sha256-Sjm43JfPaux6D61Tu61xGwkboZqikJTMXZ/pAcYqzkI=";
   }.${stdenv.hostPlatform.system} or (throw "meridian: unsupported platform ${stdenv.hostPlatform.system}");
 
   # Fixed-output derivation: allowed network access to fetch bun deps
