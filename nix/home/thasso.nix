@@ -340,21 +340,11 @@ in
     settings = {
       theme = "catppuccin";
       autoupdate = true;
-      plugin = [ "opencode-anthropic-auth@latest" ];
       provider = {};
-      mcp = {
-        playwright = {
-          type = "remote";
-          url = "http://host.lima.internal:8931/mcp";
-          enabled = true;
-        };
-      };
       permission = {
         external_directory = { "~/.cargo/registry/**" = "allow"; };
         edit = { "~/.cargo/registry/**" = "deny"; };
         bash = {
-          "* ~/.cargo/registry*" = "deny";
-          "* /Users/thasso/.cargo/registry*" = "deny";
           "git push" = "ask";
           "git merge *" = "ask";
         };
