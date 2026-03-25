@@ -30,13 +30,8 @@
   };
 
   # Lima host mounts (managed by lima-init, declared here so systemd doesn't fight them)
-  fileSystems."/Users/thasso" = {
-    device = "mount0";
-    fsType = "virtiofs";
-    options = [ "ro" ];
-  };
   fileSystems."/tmp/lima" = {
-    device = "mount1";
+    device = "mount0";
     fsType = "virtiofs";
     options = [ "rw" ];
   };
