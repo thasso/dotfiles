@@ -367,6 +367,8 @@ in
     go
     nodejs
     yarn
+    prettier
+    prettierd
     meridian
   ]);
 
