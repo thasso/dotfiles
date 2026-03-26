@@ -9,6 +9,7 @@ return {
       enabled = true,
       sources = {
         explorer = {
+          hidden = true,
           layout = {
             hidden = { "input" },
             auto_hide = { "input" },
