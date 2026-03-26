@@ -372,6 +372,7 @@ in
     cmake
     go
     golangci-lint
+    gogcli
     nodejs
     yarn
     prettier

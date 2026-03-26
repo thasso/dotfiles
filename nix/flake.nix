@@ -26,6 +26,7 @@
       overlays = { nixpkgs.overlays = [
         claudeCode.overlays.default
         (final: prev: { meridian = final.callPackage ./pkgs/meridian.nix {}; })
+        (final: prev: { gogcli = final.callPackage ./pkgs/gogcli.nix {}; })
       ]; };
       homeManagerConfig = { meridianPort }: {
         home-manager.useGlobalPkgs = true;
