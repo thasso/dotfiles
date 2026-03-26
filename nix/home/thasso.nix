@@ -294,7 +294,7 @@ in
       set -g status-right-length 100
       set -g status-left-length 100
       set -g status-left ""
-      set -g status-right "#{E:@catppuccin_status_session}#{E:@catppuccin_status_host}"
+      set -g status-right "#{?window_zoomed_flag,#[bold,fg=#1e1e2e,bg=#f9e2af] ZOOM #[default],}#{E:@catppuccin_status_session}#{E:@catppuccin_status_host}"
     '';
   };
 
@@ -371,6 +371,7 @@ in
     tree-sitter
     cmake
     go
+    golangci-lint
     nodejs
     yarn
     prettier
