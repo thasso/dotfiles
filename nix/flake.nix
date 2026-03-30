@@ -27,6 +27,7 @@
         claudeCode.overlays.default
         (final: prev: { meridian = final.callPackage ./pkgs/meridian.nix {}; })
         (final: prev: { gogcli = final.callPackage ./pkgs/gogcli.nix {}; })
+        (final: prev: { tempomat = final.callPackage ./pkgs/tempomat.nix {}; })
       ]; };
       homeManagerConfig = { meridianPort }: {
         home-manager.useGlobalPkgs = true;

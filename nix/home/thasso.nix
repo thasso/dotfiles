@@ -361,6 +361,7 @@ in
     jq
     gh
     jira-cli-go
+    tempomat
     awscli2
     claude-code
     gnumake
