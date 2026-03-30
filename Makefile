@@ -1,7 +1,7 @@
 NIX_DIR := $(CURDIR)/nix
 
 # ── Nix targets ────────────────────────────────────────────
-.PHONY: switch switch-offline update dry-update
+.PHONY: switch switch-offline update dry-update deploy-all
 
 HOSTNAME := $(shell hostname)
 
@@ -38,4 +38,20 @@ dry-update:
 	@mv $(NIX_DIR)/flake.lock.bak $(NIX_DIR)/flake.lock
 	@echo ""
 	@echo "Lock file restored. Run 'make update' to apply."
+
+# ── Remote deployment ─────────────────────────────────────
+# Syncs repo to remote host and rebuilds there (works from macOS)
+deploy-%:
+	@. $(NIX_DIR)/hosts/deploy-targets.env && \
+	echo "==> Syncing to $$($*)..." && \
+	rsync -az --delete --exclude='.git' --exclude='result' \
+		$(CURDIR)/ root@$${$*}:/etc/dotfiles/ && \
+	ssh root@$${$*} "cd /etc/dotfiles && nix run nixpkgs\#git -- config --global --add safe.directory /etc/dotfiles && nix run nixpkgs\#git -- init -q && nix run nixpkgs\#git -- add -A && nix run nixpkgs\#git -- -c user.name=deploy -c user.email=deploy@localhost commit -q -m deploy --allow-empty && cd nix && nixos-rebuild switch --flake .\#$*"
+
+deploy-all:
+	@. $(NIX_DIR)/hosts/deploy-targets.env && \
+	for host in $$(grep -v '^\#' $(NIX_DIR)/hosts/deploy-targets.env | grep -v '^\s*$$' | cut -d= -f1); do \
+		echo "==> Deploying $$host"; \
+		$(MAKE) deploy-$$host; \
+	done
 

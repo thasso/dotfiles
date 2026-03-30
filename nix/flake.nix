@@ -23,9 +23,13 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, claudeCode, nix-darwin, home-manager, nixos-lima, sops-nix, ... }:
+  outputs = { self, nixpkgs, claudeCode, nix-darwin, home-manager, nixos-lima, sops-nix, disko, ... }:
     let
       overlays = { nixpkgs.overlays = [
         claudeCode.overlays.default
@@ -82,6 +86,19 @@
         ];
       };
 
+
+      # ── NixOS (Hetzner VPS: testbox) ───────────────────────────
+      nixosConfigurations.testbox = nixpkgs.lib.nixosSystem {
+        system = "aarch64-linux";
+        modules = [
+          overlays
+          sops-nix.nixosModules.sops
+          disko.nixosModules.disko
+          ./hosts/testbox/configuration.nix
+          home-manager.nixosModules.home-manager
+          serverHomeManagerConfig
+        ];
+      };
       # ── nix-darwin (macOS) ─────────────────────────────────────
       darwinConfigurations.macbox = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";

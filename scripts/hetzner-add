@@ -1,0 +1,291 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+NIX_DIR="$REPO_DIR/nix"
+FLAKE_NIX="$NIX_DIR/flake.nix"
+SOPS_YAML="$REPO_DIR/.sops.yaml"
+DEPLOY_TARGETS="$NIX_DIR/hosts/deploy-targets.env"
+
+SSH_PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+CLIkUMfm+8w4AFuVES+o9z124opVlyRfTbwUxwiUV"
+
+usage() {
+  echo "Usage: $0 <hostname> <ip-address> <arch>"
+  echo ""
+  echo "  hostname:   Name for the new host (e.g., webbox)"
+  echo "  ip-address: Public IPv4 address from Hetzner"
+  echo "  arch:       aarch64-linux or x86_64-linux"
+  echo ""
+  echo "Prerequisites:"
+  echo "  1. Create the server in Hetzner Cloud web UI"
+  echo "  2. Add your SSH key during creation"
+  echo "  3. Activate rescue mode from the console and reboot"
+  echo "  4. Run this script (safe to re-run if interrupted)"
+  exit 1
+}
+
+log() { echo "==> $*"; }
+skip() { echo "--- $* (already done, skipping)"; }
+err() { echo "ERROR: $*" >&2; exit 1; }
+
+ssh_cmd() {
+  ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null \
+      -o LogLevel=ERROR "root@$IP" "$@"
+}
+
+# --- Parse arguments ---
+[[ $# -lt 3 ]] && usage
+
+HOSTNAME="$1"
+IP="$2"
+ARCH="$3"
+
+[[ "$ARCH" == "aarch64-linux" || "$ARCH" == "x86_64-linux" ]] || err "arch must be aarch64-linux or x86_64-linux"
+
+HOST_DIR="$NIX_DIR/hosts/$HOSTNAME"
+
+# --- Step 1: Check SSH connectivity ---
+log "Checking SSH connectivity to root@$IP..."
+ssh_cmd "echo ok" >/dev/null 2>&1 || err "Cannot SSH into root@$IP. Is the server in rescue mode?"
+log "SSH connection OK"
+
+# --- Step 2: Gather network info ---
+log "Gathering network info..."
+
+MAC=$(ssh_cmd "ip link show eth0 2>/dev/null | grep 'link/ether' | awk '{print \$2}'" || true)
+if [[ -z "$MAC" ]]; then
+  MAC=$(ssh_cmd "ip -o link show | grep -v 'lo:' | head -1 | grep -oP 'link/ether \K[^ ]+'")
+fi
+[[ -z "$MAC" ]] && err "Could not determine MAC address"
+log "MAC: $MAC"
+
+IPV6=$(ssh_cmd "ip -6 addr show scope global | grep 'inet6' | head -1 | awk '{print \$2}' | cut -d/ -f1" || true)
+IPV6_LL=$(ssh_cmd "ip -6 addr show scope link | grep 'inet6' | head -1 | awk '{print \$2}' | cut -d/ -f1" || true)
+
+if [[ -n "$IPV6" ]]; then
+  log "IPv6: $IPV6"
+else
+  log "IPv6: not detected (will need manual configuration)"
+  IPV6="FIXME"
+fi
+if [[ -n "$IPV6_LL" ]]; then
+  log "IPv6 link-local: $IPV6_LL"
+else
+  log "IPv6 link-local: not detected (will need manual configuration)"
+  IPV6_LL="FIXME"
+fi
+
+# --- Step 3: Detect disk device ---
+log "Detecting primary disk..."
+DISK=$(ssh_cmd "lsblk -dno NAME,TYPE | grep disk | head -1 | awk '{print \"/dev/\" \$1}'")
+[[ -z "$DISK" ]] && err "Could not detect disk device"
+log "Disk: $DISK"
+
+# --- Step 4: Scaffold host configuration ---
+if [[ -f "$HOST_DIR/configuration.nix" ]]; then
+  skip "Host configuration $HOST_DIR/configuration.nix exists"
+else
+  log "Scaffolding $HOST_DIR..."
+  mkdir -p "$HOST_DIR"
+
+  cat > "$HOST_DIR/configuration.nix" <<NIXEOF
+{ config, pkgs, ... }:
+
+{
+  imports = [
+    ../../modules/hetzner-base.nix
+  ];
+
+  networking.hostName = "$HOSTNAME";
+
+  hetzner.networking = {
+    enable = true;
+    ipv4 = "$IP";
+    ipv6 = "$IPV6";
+    ipv6LinkLocal = "$IPV6_LL";
+    mac = "$MAC";
+  };
+
+  hetzner.disk = {
+    enable = true;
+    device = "$DISK";
+  };
+
+  users.users.thasso.openssh.authorizedKeys.keys = [
+    "$SSH_PUBKEY"
+  ];
+  users.users.root.openssh.authorizedKeys.keys = [
+    "$SSH_PUBKEY"
+  ];
+
+  system.stateVersion = "24.11";
+}
+NIXEOF
+
+  log "Created $HOST_DIR/configuration.nix"
+fi
+
+# --- Step 5: Update flake.nix ---
+if grep -q "nixosConfigurations\.$HOSTNAME" "$FLAKE_NIX"; then
+  skip "$HOSTNAME already in flake.nix"
+else
+  log "Adding $HOSTNAME to flake.nix..."
+
+  FLAKE_ENTRY=$(cat <<FLAKEEOF
+
+      # ── NixOS (Hetzner VPS: $HOSTNAME) ───────────────────────────
+      nixosConfigurations.$HOSTNAME = nixpkgs.lib.nixosSystem {
+        system = "$ARCH";
+        modules = [
+          overlays
+          sops-nix.nixosModules.sops
+          disko.nixosModules.disko
+          ./hosts/$HOSTNAME/configuration.nix
+          home-manager.nixosModules.home-manager
+          serverHomeManagerConfig
+        ];
+      };
+FLAKEEOF
+  )
+
+  sed -i '' "/# ── nix-darwin/i\\
+$(echo "$FLAKE_ENTRY" | sed 's/$/\\/' | sed '$ s/\\$//')
+" "$FLAKE_NIX"
+
+  log "Updated flake.nix"
+fi
+
+# --- Step 6: Add deploy target ---
+if grep -q "^$HOSTNAME=" "$DEPLOY_TARGETS" 2>/dev/null; then
+  skip "$HOSTNAME already in deploy-targets.env"
+else
+  log "Adding deploy target..."
+  if [[ -f "$DEPLOY_TARGETS" ]]; then
+    echo "$HOSTNAME=$IP" >> "$DEPLOY_TARGETS"
+  else
+    echo "$HOSTNAME=$IP" > "$DEPLOY_TARGETS"
+  fi
+  log "Updated deploy-targets.env"
+fi
+
+# --- Step 7: Stage new files (nix flakes only see git-tracked files) ---
+log "Staging new/modified files for nix flake visibility..."
+git -C "$REPO_DIR" add \
+  "$HOST_DIR/configuration.nix" \
+  "$FLAKE_NIX" \
+  "$NIX_DIR/modules/hetzner-base.nix" \
+  "$NIX_DIR/modules/hetzner-disk.nix" \
+  "$DEPLOY_TARGETS"
+
+# --- Step 8: Run nixos-anywhere ---
+# Check if NixOS is installed and booted (not just the installer) by verifying hostname
+NEEDS_INSTALL=true
+REMOTE_HOSTNAME=$(ssh_cmd "hostname" 2>/dev/null || true)
+if [[ "$REMOTE_HOSTNAME" == "$HOSTNAME" ]]; then
+  skip "NixOS already installed and booted as $HOSTNAME"
+  NEEDS_INSTALL=false
+fi
+
+if [[ "$NEEDS_INSTALL" == "true" ]]; then
+  log "Installing NixOS via nixos-anywhere (this will take a while)..."
+  log "Building on remote ($ARCH)..."
+
+  ssh-keygen -R "$IP" 2>/dev/null || true
+
+  nix run github:nix-community/nixos-anywhere -- \
+    --flake "$NIX_DIR#$HOSTNAME" \
+    --target-host "root@$IP" \
+    --build-on-remote
+
+  log "NixOS installed successfully"
+
+  # Wait for reboot
+  log "Waiting for host to come back up..."
+  sleep 10  # Give it a moment to start rebooting
+  for i in $(seq 1 30); do
+    if ssh_cmd "true" 2>/dev/null; then
+      break
+    fi
+    if [[ $i -eq 30 ]]; then
+      err "Host did not come back after 5 minutes"
+    fi
+    sleep 10
+  done
+  log "Host is back up"
+
+  # Add temporary swap for the final rebuild (small servers may OOM)
+  log "Adding temporary swap for rebuild..."
+  ssh_cmd "fallocate -l 4G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile" 2>/dev/null || true
+fi
+
+# --- Step 9: Extract age key and update sops ---
+if grep -q "# $HOSTNAME" "$SOPS_YAML"; then
+  skip "$HOSTNAME already in .sops.yaml"
+else
+  log "Extracting age public key from SSH host key..."
+  AGE_KEY=$(ssh_cmd "nix run nixpkgs#ssh-to-age -- < /etc/ssh/ssh_host_ed25519_key.pub")
+  [[ -z "$AGE_KEY" ]] && err "Could not extract age key"
+  log "Age key: $AGE_KEY"
+
+  log "Updating .sops.yaml..."
+
+  # Add to common.yaml rule (after the last existing host key in common section)
+  sed -i '' "s/\(.*# devbox\)/\1\n          - $AGE_KEY # $HOSTNAME/" "$SOPS_YAML"
+
+  # Add host-specific secrets rule
+  cat >> "$SOPS_YAML" <<SOPSEOF
+
+  # ${HOSTNAME}-only secrets
+  - path_regex: nix/secrets/${HOSTNAME}\.yaml\$
+    key_groups:
+      - age:
+          - age160hzd3cahej40u6226t6c24hurcg8skg8l3l058jz4gvj24x23jshem5zg # thasso
+          - $AGE_KEY # $HOSTNAME
+SOPSEOF
+
+  log "Updated .sops.yaml"
+
+  # Re-encrypt shared secrets for the new host
+  # Ensure SOPS_AGE_KEY_CMD is set (key is in 1Password)
+  export SOPS_AGE_KEY_CMD="${SOPS_AGE_KEY_CMD:-op read 'op://Private/sops-age-key/private_key'}"
+  log "Re-encrypting shared secrets..."
+  (cd "$REPO_DIR" && sops updatekeys nix/secrets/common.yaml --yes)
+
+  # Create empty host-specific secrets file
+  log "Creating nix/secrets/$HOSTNAME.yaml..."
+  (cd "$REPO_DIR" && echo "{}" > "nix/secrets/$HOSTNAME.yaml" && sops -e -i "nix/secrets/$HOSTNAME.yaml")
+fi
+
+# --- Step 10: Final deployment with secrets ---
+log "Running final deployment to activate secrets..."
+ssh-keygen -R "$IP" 2>/dev/null || true
+
+# Stage sops changes so they're included in the git archive
+git -C "$REPO_DIR" add "$SOPS_YAML" "$NIX_DIR/secrets/" 2>/dev/null || true
+
+# Copy the repo to the remote and rebuild there (nixos-rebuild isn't available on macOS)
+log "Copying repo to remote..."
+rsync -az --delete \
+  --exclude='.git' \
+  --exclude='result' \
+  -e "ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR" \
+  "$REPO_DIR/" "root@$IP:/etc/dotfiles/"
+
+# Init a git repo on remote so nix flake can read it
+ssh_cmd "cd /etc/dotfiles && nix run nixpkgs#git -- config --global --add safe.directory /etc/dotfiles && nix run nixpkgs#git -- init -q && nix run nixpkgs#git -- add -A && nix run nixpkgs#git -- -c user.name=deploy -c user.email=deploy@localhost commit -q -m init --allow-empty"
+ssh_cmd "cd /etc/dotfiles/nix && nixos-rebuild switch --flake .#$HOSTNAME"
+
+log ""
+log "Done! $HOSTNAME ($IP) is now fully provisioned."
+log ""
+log "Changes left uncommitted for your review:"
+log "  - nix/hosts/$HOSTNAME/configuration.nix"
+log "  - nix/flake.nix (new host entry)"
+log "  - nix/flake.lock (disko input if first run)"
+log "  - nix/hosts/deploy-targets.env"
+log "  - .sops.yaml (new age key)"
+log "  - nix/secrets/common.yaml (re-encrypted)"
+log "  - nix/secrets/$HOSTNAME.yaml"
+log ""
+log "Ongoing management: make deploy-$HOSTNAME"
