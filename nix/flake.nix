@@ -19,9 +19,13 @@
       url = "github:nixos-lima/nixos-lima/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, claudeCode, nix-darwin, home-manager, nixos-lima, ... }:
+  outputs = { self, nixpkgs, claudeCode, nix-darwin, home-manager, nixos-lima, sops-nix, ... }:
     let
       overlays = { nixpkgs.overlays = [
         claudeCode.overlays.default
@@ -46,6 +50,7 @@
         system = "x86_64-linux";
         modules = [
           overlays
+          sops-nix.nixosModules.sops
           ./hosts/devbox/configuration.nix
           home-manager.nixosModules.home-manager
           (homeManagerConfig { meridianPort = 4141; })
@@ -58,6 +63,7 @@
         specialArgs = { inherit nixos-lima; };
         modules = [
           overlays
+          sops-nix.nixosModules.sops
           ./hosts/limabox/configuration.nix
           home-manager.nixosModules.home-manager
           (homeManagerConfig { meridianPort = 4142; })
@@ -69,6 +75,7 @@
         system = "aarch64-linux";
         modules = [
           overlays
+          sops-nix.nixosModules.sops
           ./hosts/immobox/configuration.nix
           home-manager.nixosModules.home-manager
           serverHomeManagerConfig
@@ -80,6 +87,7 @@
         system = "aarch64-darwin";
         modules = [
           overlays
+          sops-nix.darwinModules.sops
           ./hosts/macbox/configuration.nix
           home-manager.darwinModules.home-manager
           (homeManagerConfig { meridianPort = 4143; })

@@ -8,6 +8,7 @@
     CXX = "clang++";
   } // lib.optionalAttrs pkgs.stdenv.isDarwin {
     SSH_AUTH_SOCK = "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
+    SOPS_AGE_KEY_CMD = "op read 'op://Private/sops-age-key/private_key'";
   };
 
   # ── Claude Code ────────────────────────────────────────────
@@ -131,6 +132,8 @@
     tempomat
     awscli2
     claude-code
+    sops
+    ssh-to-age
 
     rustup
     clang
