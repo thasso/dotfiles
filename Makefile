@@ -8,23 +8,15 @@ HOSTNAME := $(shell hostname)
 switch:
 ifeq ($(shell uname), Darwin)
 	sudo darwin-rebuild switch --flake $(NIX_DIR)#macbox
-else ifeq ($(HOSTNAME), limabox)
-	sudo nixos-rebuild switch --flake $(NIX_DIR)#limabox --no-reexec
-else ifeq ($(HOSTNAME), immobox)
-	sudo nixos-rebuild switch --flake $(NIX_DIR)#immobox --no-reexec
 else
-	sudo nixos-rebuild switch --flake $(NIX_DIR)#devbox --no-reexec
+	sudo nixos-rebuild switch --flake $(NIX_DIR)#$(HOSTNAME)
 endif
 
 switch-offline:
 ifeq ($(shell uname), Darwin)
 	sudo darwin-rebuild switch --flake $(NIX_DIR)#macbox --offline
-else ifeq ($(HOSTNAME), limabox)
-	sudo nixos-rebuild switch --flake $(NIX_DIR)#limabox --no-reexec --offline
-else ifeq ($(HOSTNAME), immobox)
-	sudo nixos-rebuild switch --flake $(NIX_DIR)#immobox --no-reexec --offline
 else
-	sudo nixos-rebuild switch --flake $(NIX_DIR)#devbox --no-reexec --offline
+	sudo nixos-rebuild switch --flake $(NIX_DIR)#$(HOSTNAME) --offline
 endif
 
 update:
@@ -40,13 +32,11 @@ dry-update:
 	@echo "Lock file restored. Run 'make update' to apply."
 
 # ── Remote deployment ─────────────────────────────────────
-# Syncs repo to remote host and rebuilds there (works from macOS)
+# Pulls latest and rebuilds on remote host (requires repo cloned in ~/dotfiles)
 deploy-%:
 	@. $(NIX_DIR)/hosts/deploy-targets.env && \
-	echo "==> Syncing to $$($*)..." && \
-	rsync -az --delete --exclude='.git' --exclude='result' \
-		$(CURDIR)/ root@$${$*}:/etc/dotfiles/ && \
-	ssh root@$${$*} "cd /etc/dotfiles && nix run nixpkgs\#git -- config --global --add safe.directory /etc/dotfiles && nix run nixpkgs\#git -- init -q && nix run nixpkgs\#git -- add -A && nix run nixpkgs\#git -- -c user.name=deploy -c user.email=deploy@localhost commit -q -m deploy --allow-empty && cd nix && nixos-rebuild switch --flake .\#$*"
+	echo "==> Deploying $*..." && \
+	ssh -A thasso@$${$*} "cd ~/dotfiles && git pull && make switch"
 
 deploy-all:
 	@. $(NIX_DIR)/hosts/deploy-targets.env && \

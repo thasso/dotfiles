@@ -30,8 +30,13 @@ skip() { echo "--- $* (already done, skipping)"; }
 err() { echo "ERROR: $*" >&2; exit 1; }
 
 ssh_cmd() {
-  ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null \
+  ssh -A -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null \
       -o LogLevel=ERROR "root@$IP" "$@"
+}
+
+ssh_thasso() {
+  ssh -A -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null \
+      -o LogLevel=ERROR "thasso@$IP" "$@"
 }
 
 # --- Parse arguments ---
@@ -257,35 +262,38 @@ SOPSEOF
   (cd "$REPO_DIR" && echo "{}" > "nix/secrets/$HOSTNAME.yaml" && sops -e -i "nix/secrets/$HOSTNAME.yaml")
 fi
 
-# --- Step 10: Final deployment with secrets ---
-log "Running final deployment to activate secrets..."
+# --- Step 10: Commit, push, clone on remote, and rebuild ---
 ssh-keygen -R "$IP" 2>/dev/null || true
 
-# Stage sops changes so they're included in the git archive
-git -C "$REPO_DIR" add "$SOPS_YAML" "$NIX_DIR/secrets/" 2>/dev/null || true
-
-# Copy the repo to the remote and rebuild there (nixos-rebuild isn't available on macOS)
-log "Copying repo to remote..."
-rsync -az --delete \
-  --exclude='.git' \
-  --exclude='result' \
-  -e "ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR" \
-  "$REPO_DIR/" "root@$IP:/etc/dotfiles/"
-
-# Init a git repo on remote so nix flake can read it
-ssh_cmd "cd /etc/dotfiles && nix run nixpkgs#git -- config --global --add safe.directory /etc/dotfiles && nix run nixpkgs#git -- init -q && nix run nixpkgs#git -- add -A && nix run nixpkgs#git -- -c user.name=deploy -c user.email=deploy@localhost commit -q -m init --allow-empty"
-ssh_cmd "cd /etc/dotfiles/nix && nixos-rebuild switch --flake .#$HOSTNAME"
+REMOTE_URL=$(git -C "$REPO_DIR" remote get-url origin)
 
 log ""
-log "Done! $HOSTNAME ($IP) is now fully provisioned."
+log "All local changes are ready. Please commit and push them now."
 log ""
-log "Changes left uncommitted for your review:"
-log "  - nix/hosts/$HOSTNAME/configuration.nix"
-log "  - nix/flake.nix (new host entry)"
-log "  - nix/flake.lock (disko input if first run)"
-log "  - nix/hosts/deploy-targets.env"
-log "  - .sops.yaml (new age key)"
-log "  - nix/secrets/common.yaml (re-encrypted)"
-log "  - nix/secrets/$HOSTNAME.yaml"
+log "  Files to commit:"
+log "    - nix/hosts/$HOSTNAME/configuration.nix"
+log "    - nix/flake.nix (new host entry)"
+log "    - nix/flake.lock (disko input)"
+log "    - nix/hosts/deploy-targets.env"
+log "    - .sops.yaml (new age key)"
+log "    - nix/secrets/common.yaml (re-encrypted)"
+log "    - nix/secrets/$HOSTNAME.yaml"
 log ""
-log "Ongoing management: make deploy-$HOSTNAME"
+read -rp "Press Enter after you've committed and pushed to continue... "
+
+# Clone the repo on the remote as thasso
+log "Cloning dotfiles on $HOSTNAME as thasso..."
+ssh_thasso "git clone $REMOTE_URL ~/dotfiles"
+
+# Run make switch on the remote
+log "Running make switch on $HOSTNAME (this may take a while)..."
+ssh_thasso "cd ~/dotfiles && make switch"
+
+log ""
+log "Done! $HOSTNAME ($IP) is fully provisioned."
+log ""
+log "Ongoing workflow:"
+log "  ssh $HOSTNAME"
+log "  cd ~/dotfiles && git pull && make switch"
+log ""
+log "Remote deployment: make deploy-$HOSTNAME"
