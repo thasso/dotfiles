@@ -8,7 +8,6 @@ creation_rules:
           - age1gtfh442v4e9ju4gczxjmgdg9n76fngaqr8cxep4lzrxlqwaay3zqv2994s # immobox
           - age1xae0pw26hmspa8h529zyhpg0c5pppef6327uemfc7djfxmtvqu8sgscz5g # limabox
           - age1hkdekhv37pgnrj9vptg35y84mpaupqgawprx4y6q2psaz62y8flqp6hu85 # devbox
-          - age1r8x7s0ecl4nfn2nc8qhjrrq847623zp8mtvz43en0wwa9w4qldjsegq8gm # testbox
 
   # Immobox-only secrets (Hetzner tokens, server-specific)
   - path_regex: nix/secrets/immobox\.yaml$
@@ -23,10 +22,3 @@ creation_rules:
       - age:
           - age160hzd3cahej40u6226t6c24hurcg8skg8l3l058jz4gvj24x23jshem5zg # thasso
           - age1teffze36axkjcz2pzcgzs2hawufxj77mmqvn3h3g9hskfyrmhqqqzv6cn8 # macbox
-
-  # testbox-only secrets
-  - path_regex: nix/secrets/testbox\.yaml$
-    key_groups:
-      - age:
-          - age160hzd3cahej40u6226t6c24hurcg8skg8l3l058jz4gvj24x23jshem5zg # thasso
-          - age1r8x7s0ecl4nfn2nc8qhjrrq847623zp8mtvz43en0wwa9w4qldjsegq8gm # testbox
