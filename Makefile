@@ -10,6 +10,8 @@ ifeq ($(shell uname), Darwin)
 	sudo darwin-rebuild switch --flake $(NIX_DIR)#macbox
 else ifeq ($(HOSTNAME), limabox)
 	sudo nixos-rebuild switch --flake $(NIX_DIR)#limabox --no-reexec
+else ifeq ($(HOSTNAME), immobox)
+	sudo nixos-rebuild switch --flake $(NIX_DIR)#immobox --no-reexec
 else
 	sudo nixos-rebuild switch --flake $(NIX_DIR)#devbox --no-reexec
 endif
@@ -19,6 +21,8 @@ ifeq ($(shell uname), Darwin)
 	sudo darwin-rebuild switch --flake $(NIX_DIR)#macbox --offline
 else ifeq ($(HOSTNAME), limabox)
 	sudo nixos-rebuild switch --flake $(NIX_DIR)#limabox --no-reexec --offline
+else ifeq ($(HOSTNAME), immobox)
+	sudo nixos-rebuild switch --flake $(NIX_DIR)#immobox --no-reexec --offline
 else
 	sudo nixos-rebuild switch --flake $(NIX_DIR)#devbox --no-reexec --offline
 endif
