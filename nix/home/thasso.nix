@@ -131,7 +131,7 @@
     tempomat
     awscli2
     claude-code
-    gnumake
+
     rustup
     clang
     clang-tools
