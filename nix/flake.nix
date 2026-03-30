@@ -1,5 +1,5 @@
 {
-  description = "Devbox & Macbox";
+  description = "Devbox, Macbox & Immobox";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -35,6 +35,11 @@
         home-manager.extraSpecialArgs = { inherit meridianPort; };
         home-manager.users.thasso = import ./home/thasso.nix;
       };
+      serverHomeManagerConfig = {
+        home-manager.useGlobalPkgs = true;
+        home-manager.useUserPackages = true;
+        home-manager.users.thasso = import ./home/base.nix;
+      };
     in {
       # ── NixOS (Linux) ──────────────────────────────────────────
       nixosConfigurations.devbox = nixpkgs.lib.nixosSystem {
@@ -56,6 +61,17 @@
           ./hosts/limabox/configuration.nix
           home-manager.nixosModules.home-manager
           (homeManagerConfig { meridianPort = 4142; })
+        ];
+      };
+
+      # ── NixOS (Hetzner VPS) ────────────────────────────────────
+      nixosConfigurations.immobox = nixpkgs.lib.nixosSystem {
+        system = "aarch64-linux";
+        modules = [
+          overlays
+          ./hosts/immobox/configuration.nix
+          home-manager.nixosModules.home-manager
+          serverHomeManagerConfig
         ];
       };
 
