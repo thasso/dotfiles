@@ -281,6 +281,10 @@ log "    - nix/secrets/$HOSTNAME.yaml"
 log ""
 read -rp "Press Enter after you've committed and pushed to continue... "
 
+# Add GitHub to known_hosts on remote so git clone doesn't prompt
+log "Adding GitHub to known_hosts on $HOSTNAME..."
+ssh_cmd "mkdir -p /home/thasso/.ssh && ssh-keyscan github.com >> /home/thasso/.ssh/known_hosts 2>/dev/null && chown -R thasso:users /home/thasso/.ssh"
+
 # Clone the repo on the remote as thasso
 log "Cloning dotfiles on $HOSTNAME as thasso..."
 ssh_thasso "git clone $REMOTE_URL ~/dotfiles"
