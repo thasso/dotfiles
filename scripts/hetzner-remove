@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+NIX_DIR="$REPO_DIR/nix"
+FLAKE_NIX="$NIX_DIR/flake.nix"
+SOPS_YAML="$REPO_DIR/.sops.yaml"
+DEPLOY_TARGETS="$NIX_DIR/hosts/deploy-targets.env"
+
+usage() {
+  echo "Usage: $0 <hostname>"
+  echo ""
+  echo "Removes a Hetzner host from the local configuration."
+  echo "Does NOT destroy the server — do that in the Hetzner web UI."
+  exit 1
+}
+
+log() { echo "==> $*"; }
+skip() { echo "--- $* (nothing to do, skipping)"; }
+err() {
+  echo "ERROR: $*" >&2
+  exit 1
+}
+
+[[ $# -lt 1 ]] && usage
+
+HOSTNAME="$1"
+HOST_DIR="$NIX_DIR/hosts/$HOSTNAME"
+
+# Safety check: don't remove non-Hetzner hosts
+[[ "$HOSTNAME" == "macbox" || "$HOSTNAME" == "devbox" || "$HOSTNAME" == "limabox" ]] && err "Refusing to remove $HOSTNAME — not a Hetzner host"
+
+log "Removing $HOSTNAME from local configuration..."
+
+# --- Remove host directory ---
+if [[ -d "$HOST_DIR" ]]; then
+  log "Removing $HOST_DIR/"
+  rm -rf "$HOST_DIR"
+else
+  skip "No host directory at $HOST_DIR"
+fi
+
+# --- Remove from flake.nix ---
+if grep -q "nixosConfigurations\.$HOSTNAME" "$FLAKE_NIX"; then
+  log "Removing $HOSTNAME from flake.nix..."
+  # Remove the comment line and the full nixosConfigurations block
+  sed -i '' "/# ── NixOS (Hetzner VPS: $HOSTNAME)/,/};/d" "$FLAKE_NIX"
+  # Clean up any resulting double blank lines
+  sed -i '' '/^$/N;/^\n$/d' "$FLAKE_NIX"
+else
+  skip "$HOSTNAME not in flake.nix"
+fi
+
+# --- Remove from deploy-targets.env ---
+if [[ -f "$DEPLOY_TARGETS" ]] && grep -q "^$HOSTNAME=" "$DEPLOY_TARGETS"; then
+  log "Removing $HOSTNAME from deploy-targets.env..."
+  sed -i '' "/^$HOSTNAME=/d" "$DEPLOY_TARGETS"
+else
+  skip "$HOSTNAME not in deploy-targets.env"
+fi
+
+# --- Remove from .sops.yaml ---
+if grep -q "# $HOSTNAME" "$SOPS_YAML"; then
+  log "Removing $HOSTNAME age key from .sops.yaml..."
+  # Remove the host's key line from the common section
+  sed -i '' "/.*# $HOSTNAME$/d" "$SOPS_YAML"
+  # Remove the host-specific secrets rule block
+  sed -i '' "/# ${HOSTNAME}-only secrets/,/# $HOSTNAME$/d" "$SOPS_YAML"
+  # Clean up trailing blank lines
+  sed -i '' -e :a -e '/^\n*$/{$d;N;ba' -e '}' "$SOPS_YAML"
+else
+  skip "$HOSTNAME not in .sops.yaml"
+fi
+
+# --- Re-encrypt shared secrets without the removed host ---
+if [[ -f "$NIX_DIR/secrets/common.yaml" ]]; then
+  export SOPS_AGE_KEY_CMD="${SOPS_AGE_KEY_CMD:-op read 'op://Private/sops-age-key/private_key'}"
+  log "Re-encrypting shared secrets..."
+  (cd "$REPO_DIR" && sops updatekeys nix/secrets/common.yaml --yes)
+fi
+
+# --- Remove host-specific secrets file ---
+if [[ -f "$NIX_DIR/secrets/$HOSTNAME.yaml" ]]; then
+  log "Removing nix/secrets/$HOSTNAME.yaml..."
+  rm "$NIX_DIR/secrets/$HOSTNAME.yaml"
+else
+  skip "No secrets file for $HOSTNAME"
+fi
+
+log ""
+log "Done! $HOSTNAME removed from local configuration."
+log ""
+log "Changes left uncommitted for your review."
+log "Don't forget to destroy the server in the Hetzner web UI if needed."
