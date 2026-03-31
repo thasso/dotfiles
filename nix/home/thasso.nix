@@ -26,11 +26,18 @@
     };
   };
 
+  # ── Ghostty shell integration (skip in tmux — breaks p10k multiline prompt)
+  programs.zsh.initContent = lib.mkIf pkgs.stdenv.isDarwin ''
+    if [[ -n $GHOSTTY_RESOURCES_DIR && -z $TMUX ]]; then
+      source "$GHOSTTY_RESOURCES_DIR"/shell-integration/zsh/ghostty-integration
+    fi
+  '';
+
   # ── Ghostty (macOS only) ──────────────────────────────────
   programs.ghostty = lib.mkIf pkgs.stdenv.isDarwin {
     enable = true;
     package = pkgs.ghostty-bin;
-    enableZshIntegration = true;
+    enableZshIntegration = false;
     settings = {
       theme = "Catppuccin Mocha";
       bell-features = "no-system,no-audio,no-attention,no-title,no-border";
@@ -128,7 +135,6 @@
   ] ++ (with pkgs; [
     python314
     pyenv
-    jira-cli-go
     tempomat
     awscli2
     claude-code
