@@ -154,6 +154,7 @@
     prettier
     prettierd
     meridian
+    codex
   ]);
 
   # ── Dev Dotfiles ────────────────────────────────────────────
