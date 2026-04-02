@@ -4,6 +4,7 @@
   imports = [
     ../../modules/hetzner-base.nix
     ../../modules/paperless.nix
+    ../../modules/paperless-backup.nix
     ../../modules/caddy.nix
   ];
 
@@ -49,6 +50,12 @@
   services.caddy.virtualHosts."docs.griebel-immobilien.de".extraConfig = ''
     reverse_proxy localhost:${toString config.services.my-paperless.port}
   '';
+
+  # Paperless backup to Hetzner Storage Box
+  services.my-paperless-backup = {
+    enable = true;
+    repository = "sftp:u570801-sub1@u570801-sub1.your-storagebox.de:paperless";
+  };
 
   system.stateVersion = "23.11";
 }
