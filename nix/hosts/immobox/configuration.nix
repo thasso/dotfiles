@@ -54,7 +54,7 @@
   # Paperless backup to Hetzner Storage Box
   services.my-paperless-backup = {
     enable = true;
-    repository = "sftp:u570801-sub1@u570801-sub1.your-storagebox.de:paperless";
+    repository = "sftp://u570801-sub1@u570801-sub1.your-storagebox.de:paperless";
   };
 
   system.stateVersion = "23.11";
