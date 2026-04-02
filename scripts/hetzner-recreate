@@ -203,6 +203,10 @@ if [[ "$NEEDS_INSTALL" == "true" ]]; then
   log "Installing NixOS via nixos-anywhere (this will take a while)..."
   log "Building on remote ($ARCH)..."
 
+  # Add swap before build to prevent OOM on small servers
+  log "Adding temporary swap on rescue system for build..."
+  ssh_cmd "fallocate -l 4G /tmp/buildswap && chmod 600 /tmp/buildswap && mkswap /tmp/buildswap && swapon /tmp/buildswap" 2>/dev/null || true
+
   ssh-keygen -R "$IP" 2>/dev/null || true
 
   nix run github:nix-community/nixos-anywhere -- \
