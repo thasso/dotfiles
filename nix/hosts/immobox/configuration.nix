@@ -5,6 +5,8 @@
     ./hardware-configuration.nix
     ../../modules/common.nix
     ../../modules/hetzner-network.nix
+    ../../modules/paperless.nix
+    ../../modules/caddy.nix
   ];
 
   # Workaround for https://github.com/NixOS/nix/issues/8502
@@ -38,6 +40,27 @@
 
   # Firewall
   networking.firewall.enable = true;
+
+  # Secrets
+  sops.defaultSopsFile = ../../secrets/immobox.yaml;
+  sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+
+  # Caddy reverse proxy
+  services.my-caddy = {
+    enable = true;
+    email = "thasso@gmail.com"; # TODO: replace with your actual email
+  };
+
+  # Paperless-ngx
+  services.my-paperless = {
+    enable = true;
+    domain = "paperless.example.com"; # TODO: replace with your actual domain
+  };
+
+  # Wire Paperless into Caddy
+  services.caddy.virtualHosts."paperless.example.com".extraConfig = ''
+    reverse_proxy localhost:${toString config.services.my-paperless.port}
+  '';
 
   system.stateVersion = "23.11";
 }
