@@ -36,17 +36,17 @@
   # Caddy reverse proxy
   services.my-caddy = {
     enable = true;
-    email = "thasso@gmail.com"; # TODO: replace with your actual email
+    email = "thasso.griebel@gmail.com";
   };
 
   # Paperless-ngx
   services.my-paperless = {
     enable = true;
-    domain = "paperless.example.com"; # TODO: replace with your actual domain
+    domain = "docs.griebel-immobilien.de"; # TODO: replace with your actual domain
   };
 
   # Wire Paperless into Caddy
-  services.caddy.virtualHosts."paperless.example.com".extraConfig = ''
+  services.caddy.virtualHosts."docs.griebel-immobilien.de".extraConfig = ''
     reverse_proxy localhost:${toString config.services.my-paperless.port}
   '';
 
