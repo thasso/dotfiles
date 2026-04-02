@@ -35,6 +35,7 @@ in {
       enable = true;
       port = cfg.port;
       dataDir = cfg.dataDir;
+      passwordFile = config.sops.secrets.paperless_admin_password.path;
       settings = {
         PAPERLESS_URL = "https://${cfg.domain}";
         PAPERLESS_ALLOWED_HOSTS = cfg.domain;
@@ -42,7 +43,6 @@ in {
         PAPERLESS_OCR_LANGUAGE = "deu+eng";
         PAPERLESS_TIME_ZONE = config.time.timeZone;
         PAPERLESS_ADMIN_USER = "admin";
-        PAPERLESS_ADMIN_PASSWORD = config.sops.secrets.paperless_admin_password.path;
         PAPERLESS_SECRET_KEY = config.sops.secrets.paperless_secret_key.path;
       };
     };
