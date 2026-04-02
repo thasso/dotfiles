@@ -11,6 +11,11 @@ in {
       description = "Restic repository URL (sftp:user@host:path)";
       example = "sftp:u123456-sub1@u123456-sub1.your-storagebox.de:paperless";
     };
+    sftpHost = lib.mkOption {
+      type = lib.types.str;
+      description = "user@host for the SFTP connection (used in ssh command)";
+      example = "u123456-sub1@u123456-sub1.your-storagebox.de";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -31,7 +36,7 @@ in {
       ];
 
       extraOptions = [
-        "sftp.command='ssh -p 23 -i ${config.sops.secrets.storagebox_ssh_key.path} -o StrictHostKeyChecking=accept-new -s %h sftp'"
+        "sftp.command='ssh -p 23 -i ${config.sops.secrets.storagebox_ssh_key.path} -o StrictHostKeyChecking=accept-new ${cfg.sftpHost} -s sftp'"
       ];
 
       pruneOpts = [
