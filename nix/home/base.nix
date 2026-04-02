@@ -71,6 +71,7 @@ in
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
+    tmux.enableShellIntegration = true;
     defaultCommand = "fd --hidden --strip-cwd-prefix --exclude .git";
     changeDirWidgetCommand = "fd --type=d --hidden --strip-cwd-prefix --exclude .git";
     changeDirWidgetOptions = [ "--preview 'eza --tree --color=always {} | head -200'" ];
@@ -202,6 +203,13 @@ in
 
   };
 
+  # ── Sesh (tmux session manager) ─────────────────────────────
+  programs.sesh = {
+    enable = true;
+    enableTmuxIntegration = true;
+    tmuxKey = "s";
+  };
+
   # ── Tmux ────────────────────────────────────────────────────
   programs.tmux = {
     enable = true;
@@ -269,6 +277,9 @@ in
       # Window navigation
       bind t new-window -c "#{pane_current_path}"
       bind C-f command-prompt -p find-session 'switch-client -t %%'
+
+      # Native session picker on prefix + S (shift-s)
+      bind S choose-tree -Zs
 
       # Status bar
       set -g status-position top

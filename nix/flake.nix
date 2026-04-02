@@ -7,6 +7,10 @@
       url = "github:sadjow/claude-code-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    codexCli = {
+      url = "github:sadjow/codex-cli-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -29,10 +33,11 @@
     };
   };
 
-  outputs = { self, nixpkgs, claudeCode, nix-darwin, home-manager, nixos-lima, sops-nix, disko, ... }:
+  outputs = { self, nixpkgs, claudeCode, codexCli, nix-darwin, home-manager, nixos-lima, sops-nix, disko, ... }:
     let
       overlays = { nixpkgs.overlays = [
         claudeCode.overlays.default
+        codexCli.overlays.default
         (final: prev: { meridian = final.callPackage ./pkgs/meridian.nix {}; })
         (final: prev: { gogcli = final.callPackage ./pkgs/gogcli.nix {}; })
         (final: prev: { tempomat = final.callPackage ./pkgs/tempomat.nix {}; })
