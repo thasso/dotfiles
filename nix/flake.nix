@@ -85,6 +85,7 @@
         modules = [
           overlays
           sops-nix.nixosModules.sops
+          disko.nixosModules.disko
           ./hosts/immobox/configuration.nix
           home-manager.nixosModules.home-manager
           serverHomeManagerConfig

@@ -14,7 +14,7 @@ creation_rules:
     key_groups:
       - age:
           - age160hzd3cahej40u6226t6c24hurcg8skg8l3l058jz4gvj24x23jshem5zg # thasso
-          - age1gtfh442v4e9ju4gczxjmgdg9n76fngaqr8cxep4lzrxlqwaay3zqv2994s # immobox
+          - age1hlk9ezjjh7kntejjfwad6vmuth6hz9fr8wuhp0k5arc65l74m3ys2az0lh # immobox
 
   # macbox-only secrets
   - path_regex: nix/secrets/macbox\.yaml$

@@ -2,45 +2,33 @@
 
 {
   imports = [
-    ./hardware-configuration.nix
-    ../../modules/common.nix
-    ../../modules/hetzner-network.nix
+    ../../modules/hetzner-base.nix
     ../../modules/paperless.nix
     ../../modules/caddy.nix
   ];
 
-  # Workaround for https://github.com/NixOS/nix/issues/8502
-  services.logrotate.checkConfig = false;
-
-  # Boot
-  boot.tmp.cleanOnBoot = true;
-  zramSwap.enable = true;
-
   # Network
   networking.hostName = "immobox";
-  hetzner.networking = {
+
+  hetzner.disk = {
     enable = true;
-    ipv4 = "91.99.157.222";
-    ipv6 = "2a01:4f8:c012:9a37::1";
-    ipv6LinkLocal = "fe80::9000:7ff:fe78:153a";
-    mac = "92:00:07:78:15:3a";
+    device = "/dev/sda";
   };
 
-  # SSH hardening
-  services.openssh.settings = {
-    PermitRootLogin = "prohibit-password";
-    PasswordAuthentication = false;
+  hetzner.networking = {
+    enable = true;
+    ipv4 = "178.104.109.60";
+    ipv6 = "2a01:4f8:c2c:7bf8::2";
+    ipv6LinkLocal = "fe80::9000:7ff:fe7d:8df1";
+    mac = "92:00:07:7d:8d:f1";
   };
+
   users.users.thasso.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+CLIkUMfm+8w4AFuVES+o9z124opVlyRfTbwUxwiUV"
   ];
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+CLIkUMfm+8w4AFuVES+o9z124opVlyRfTbwUxwiUV"
   ];
-
-  # Firewall
-  networking.firewall.enable = true;
-
   # Secrets
   sops.defaultSopsFile = ../../secrets/immobox.yaml;
   sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
