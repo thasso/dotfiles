@@ -24,6 +24,14 @@ in {
       mode = "0600";
     };
 
+    # Export documents + metadata at 01:30 (before 02:00 restic backup)
+    # Stops paperless during export for consistency, restarts after
+    services.paperless.exporter = {
+      enable = true;
+      directory = "${dataDir}/export";
+      onCalendar = "01:30:00";
+    };
+
     services.restic.backups.paperless = {
       repository = cfg.repository;
       passwordFile = config.sops.secrets.restic_repo_password.path;
@@ -33,6 +41,7 @@ in {
         "${dataDir}/media"
         "${dataDir}/data"
         "${dataDir}/db-backup.sqlite3"
+        "${dataDir}/export"
       ];
 
       extraOptions = [
