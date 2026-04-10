@@ -12,7 +12,7 @@
   };
 
   # ── Claude Code ────────────────────────────────────────────
-  programs.claude-code = lib.mkIf (!pkgs.stdenv.isDarwin) {
+  programs.claude-code = {
     enable = true;
     package = null;
     settings = {
@@ -23,7 +23,14 @@
           "Bash(git push *)"
         ];
       };
+      enabledPlugins = {
+        "rust-analyzer-lsp@claude-plugins-official" = true;
+      };
+      skipDangerousModePermissionPrompt = true;
+      voiceEnabled = true;
     };
+    agentsDir = ../../claude/agent;
+    commandsDir = ../../claude/command;
   };
 
   # ── Ghostty shell integration (skip in tmux — breaks p10k multiline prompt)
