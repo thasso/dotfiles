@@ -88,8 +88,10 @@
   # ── OpenCode ────────────────────────────────────────────────
   programs.opencode = {
     enable = true;
-    settings = {
+    tui = {
       theme = "catppuccin";
+    };
+    settings = {
       autoupdate = true;
       provider = {
         anthropic = { options = { baseURL = "http://localhost:${toString meridianPort}"; apiKey = "x"; }; };
@@ -169,7 +171,7 @@
     # Meridian launchd agent — managed manually to avoid home-manager's
     # /bin/sh wrapper (which makes the process show as "sh" in Activity Monitor)
     "Library/LaunchAgents/meridian.plist" = lib.mkIf pkgs.stdenv.isDarwin {
-      text = lib.generators.toPlist {} {
+      text = lib.generators.toPlist { escape = true; } {
         Label = "meridian";
         ProgramArguments = [
           "/bin/bash" "-c"
