@@ -28,10 +28,16 @@
       };
       skipDangerousModePermissionPrompt = true;
       voiceEnabled = true;
+      statusLine = {
+        type = "command";
+        command = "bash ~/.claude/statusline-command.sh";
+      };
     };
     agentsDir = ../../claude/agent;
     commandsDir = ../../claude/command;
   };
+
+  home.file.".claude/statusline-command.sh".source = ../../claude/statusline-command.sh;
 
   # ── Ghostty shell integration (skip in tmux — breaks p10k multiline prompt)
   programs.zsh.initContent = lib.mkIf pkgs.stdenv.isDarwin ''
