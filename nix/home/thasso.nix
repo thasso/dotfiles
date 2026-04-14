@@ -146,6 +146,7 @@
     prettier
     prettierd
     codex
+    ffmpeg
   ]);
 
   # ── Dev Dotfiles ────────────────────────────────────────────
