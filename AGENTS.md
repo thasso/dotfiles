@@ -25,7 +25,7 @@ automatically.
 nix/
 ├── flake.nix                    # Entry point — defines all hosts and wires Home Manager
 ├── flake.lock
-├── pkgs/                        # Custom package derivations (e.g. meridian.nix)
+├── pkgs/                        # Custom package derivations
 ├── hosts/
 │   ├── macbox/configuration.nix # nix-darwin (macOS aarch64)
 │   ├── devbox/configuration.nix # NixOS (x86_64-linux, bare metal)
@@ -41,14 +41,11 @@ nix/
   (`home/thasso.nix`). Platform differences are handled with `lib.mkIf
 pkgs.stdenv.isDarwin` / `lib.optionals`.
 - **`home/thasso.nix`** is where most tools are configured: zsh, git, tmux,
-  fzf, bat, eza, atuin, delta, ghostty, vscode, opencode, and the meridian
-  proxy service.
+  fzf, bat, eza, atuin, delta, ghostty, vscode, and opencode.
 - **Packages** are declared in `home.packages` inside `thasso.nix`, not in the
   host configs (those only carry system-level concerns like bootloader,
   networking, SSH).
-- **Overlays** in `flake.nix` add `claude-code` and `meridian` to nixpkgs.
-- **Meridian** is a Claude Max proxy. It runs as a systemd user service on
-  Linux and a launchd agent on macOS, with a per-host port (`meridianPort`).
+- **Overlays** in `flake.nix` add `claude-code` to nixpkgs.
 
 ### Where to find things
 
@@ -75,14 +72,13 @@ A full Lua-based Neovim setup using lazy.nvim. Symlinked to `~/.config/nvim`.
 Has its own `nvim/AGENTS.md` with detailed guidelines for plugin structure,
 keybinding conventions, and the current stack.
 
-### `opencode/` — OpenCode agents, commands, and plugins
+### `opencode/` — OpenCode agents and commands
 
 - `opencode/agent/` — Custom agent definitions (PM workflows, planning agents)
 - `opencode/command/` — Slash commands (commit, review)
-- `opencode/plugins/` — Runtime plugins (e.g. session tracking headers for meridian)
 
 These are referenced from `thasso.nix` (`programs.opencode.agents`,
-`programs.opencode.commands`, `xdg.configFile`).
+`programs.opencode.commands`).
 
 ### `bin/` — Helper scripts
 

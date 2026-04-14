@@ -38,14 +38,12 @@
       overlays = { nixpkgs.overlays = [
         claudeCode.overlays.default
         codexCli.overlays.default
-        (final: prev: { meridian = final.callPackage ./pkgs/meridian.nix {}; })
         (final: prev: { gogcli = final.callPackage ./pkgs/gogcli.nix {}; })
         (final: prev: { tempomat = final.callPackage ./pkgs/tempomat.nix {}; })
       ]; };
-      homeManagerConfig = { meridianPort }: {
+      homeManagerConfig = {
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
-        home-manager.extraSpecialArgs = { inherit meridianPort; };
         home-manager.users.thasso = import ./home/thasso.nix;
       };
       serverHomeManagerConfig = {
@@ -62,7 +60,7 @@
           sops-nix.nixosModules.sops
           ./hosts/devbox/configuration.nix
           home-manager.nixosModules.home-manager
-          (homeManagerConfig { meridianPort = 4141; })
+          homeManagerConfig
         ];
       };
 
@@ -75,7 +73,7 @@
           sops-nix.nixosModules.sops
           ./hosts/limabox/configuration.nix
           home-manager.nixosModules.home-manager
-          (homeManagerConfig { meridianPort = 4142; })
+          homeManagerConfig
         ];
       };
 
@@ -100,7 +98,7 @@
           sops-nix.darwinModules.sops
           ./hosts/macbox/configuration.nix
           home-manager.darwinModules.home-manager
-          (homeManagerConfig { meridianPort = 4143; })
+          homeManagerConfig
         ];
       };
     };

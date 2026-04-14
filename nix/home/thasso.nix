@@ -1,4 +1,4 @@
-{ config, lib, pkgs, meridianPort, ... }:
+{ config, lib, pkgs, ... }:
 {
   imports = [ ./base.nix ];
 
@@ -99,9 +99,6 @@
     };
     settings = {
       autoupdate = true;
-      provider = {
-        anthropic = { options = { baseURL = "http://localhost:${toString meridianPort}"; apiKey = "x"; }; };
-      };
       permission = {
         external_directory = { "~/.cargo/registry/**" = "allow"; };
         edit = { "~/.cargo/registry/**" = "deny"; };
@@ -120,26 +117,6 @@
     };
     agents = ../../opencode/agent;
     commands = ../../opencode/command;
-  };
-
-  # ── OpenCode Plugin (session tracking for meridian proxy) ──
-  xdg.configFile."opencode/plugins/claude-max-headers.ts".source =
-    ../../opencode/plugins/claude-max-headers.ts;
-
-  # ── Meridian Service (Claude Max Proxy) ─────────────────────
-  systemd.user.services.meridian = lib.mkIf (!pkgs.stdenv.isDarwin) {
-    Unit.Description = "Meridian - Claude Max Proxy";
-    Service = {
-      ExecStart = "${pkgs.meridian}/bin/meridian";
-      Environment = [
-        "CLAUDE_PROXY_PORT=${toString meridianPort}"
-        "CLAUDE_PROXY_PASSTHROUGH=1"
-        "PATH=${pkgs.claude-code}/bin:${pkgs.nodejs_22}/bin"
-      ];
-      Restart = "on-failure";
-      RestartSec = 5;
-    };
-    Install.WantedBy = [ "default.target" ];
   };
 
   # ── Dev Packages ────────────────────────────────────────────
@@ -168,34 +145,11 @@
     yarn
     prettier
     prettierd
-    meridian
     codex
   ]);
 
   # ── Dev Dotfiles ────────────────────────────────────────────
   home.file = {
-    # Meridian launchd agent — managed manually to avoid home-manager's
-    # /bin/sh wrapper (which makes the process show as "sh" in Activity Monitor)
-    "Library/LaunchAgents/meridian.plist" = lib.mkIf pkgs.stdenv.isDarwin {
-      text = lib.generators.toPlist { escape = true; } {
-        Label = "meridian";
-        ProgramArguments = [
-          "/bin/bash" "-c"
-          "/bin/wait4path /nix/store && exec -a meridian ${pkgs.meridian}/bin/meridian"
-        ];
-        EnvironmentVariables = {
-          CLAUDE_PROXY_PORT = toString meridianPort;
-          CLAUDE_PROXY_PASSTHROUGH = "1";
-          HOME = "/Users/thasso";
-          USER = "thasso";
-          PATH = "${pkgs.claude-code}/bin:${pkgs.nodejs_22}/bin:/usr/bin";
-        };
-        KeepAlive = true;
-        RunAtLoad = true;
-        StandardOutPath = "/tmp/meridian.log";
-        StandardErrorPath = "/tmp/meridian.err";
-      };
-    };
     "bin/oc".source = ../../bin/oc;
   };
 }
