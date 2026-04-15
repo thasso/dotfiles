@@ -23,8 +23,8 @@
   environment.systemPackages = [
     pkgs.zsh
     (pkgs.writeShellScriptBin "jira" ''
-      export JIRA_API_TOKEN="$(${pkgs._1password-cli}/bin/op read 'op://Private/Jira API Token Castlabs/password')"
-      export JIRA_API_USER="$(${pkgs._1password-cli}/bin/op read 'op://Private/Jira API Token Castlabs/username')"
+      export JIRA_API_TOKEN="$(${pkgs._1password-cli}/bin/op read 'op://jira-cli/Jira API Token Castlabs/password')"
+      export JIRA_API_USER="$(${pkgs._1password-cli}/bin/op read 'op://jira-cli/Jira API Token Castlabs/username')"
       exec ${pkgs.jira-cli-go}/bin/jira "$@"
     '')
   ];
