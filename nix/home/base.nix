@@ -145,6 +145,7 @@ in
 
     ignores = [
       ".DS_Store"
+      ".direnv"
       "*.swp"
       "*.swo"
       "*~"

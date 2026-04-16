@@ -126,7 +126,8 @@
     pkgs.lima
   ] ++ (with pkgs; [
     python314
-    pyenv
+    uv
+    jdk21
     tempomat
     awscli2
     claude-code
