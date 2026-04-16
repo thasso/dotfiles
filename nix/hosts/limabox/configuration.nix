@@ -51,6 +51,7 @@
 
   # Packages
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.android_sdk.accept_license = true;
   # Ghostty terminfo so $TERM=xterm-ghostty works over SSH
   environment.enableAllTerminfo = true;
 

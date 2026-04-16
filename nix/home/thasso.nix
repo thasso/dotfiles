@@ -1,4 +1,16 @@
 { config, lib, pkgs, ... }:
+let
+  androidSdk = pkgs.androidenv.composeAndroidPackages {
+    platformToolsVersion = "36.0.2"; # 37.0.0 has a broken hash in nixpkgs
+    platformVersions = [ "35" ];
+    buildToolsVersions = [ "35.0.0" ];
+    cmakeVersions = [ "3.22.1" ];
+    includeNDK = true;
+    ndkVersions = [ "28.2.13676358" ];
+    includeEmulator = false;
+    includeSources = false;
+  };
+in
 {
   imports = [ ./base.nix ];
 
@@ -6,6 +18,7 @@
   home.sessionVariables = {
     CC = "clang";
     CXX = "clang++";
+    ANDROID_HOME = "${androidSdk.androidsdk}/libexec/android-sdk";
   } // lib.optionalAttrs pkgs.stdenv.isDarwin {
     SSH_AUTH_SOCK = "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
     SOPS_AGE_KEY_CMD = "op read 'op://Private/sops-age-key/private_key'";
@@ -128,6 +141,8 @@
     python314
     uv
     jdk21
+    android-tools
+    androidSdk.androidsdk
     tempomat
     awscli2
     claude-code
