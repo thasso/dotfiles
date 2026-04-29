@@ -40,6 +40,13 @@
         codexCli.overlays.default
         (final: prev: { gogcli = final.callPackage ./pkgs/gogcli.nix {}; })
         (final: prev: { tempomat = final.callPackage ./pkgs/tempomat.nix {}; })
+        # direnv's test suite hangs on Darwin (special chars in test dir names)
+        (final: prev: {
+          direnv = prev.direnv.overrideAttrs (_old:
+            prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
+              doCheck = false;
+            });
+        })
       ]; };
       homeManagerConfig = {
         home-manager.useGlobalPkgs = true;
