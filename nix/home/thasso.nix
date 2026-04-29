@@ -162,6 +162,7 @@ in
     prettier
     prettierd
     codex
+    pi-coding-agent
     ffmpeg
   ]);
 

@@ -11,6 +11,10 @@
       url = "github:sadjow/codex-cli-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    piMono = {
+      url = "github:lukasl-dev/pi-mono.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -33,11 +37,23 @@
     };
   };
 
-  outputs = { self, nixpkgs, claudeCode, codexCli, nix-darwin, home-manager, nixos-lima, sops-nix, disko, ... }:
+  outputs = { self, nixpkgs, claudeCode, codexCli, piMono, nix-darwin, home-manager, nixos-lima, sops-nix, disko, ... }:
     let
       overlays = { nixpkgs.overlays = [
         claudeCode.overlays.default
         codexCli.overlays.default
+        piMono.overlays.default
+        # Workaround: upstream pi-mono's tsconfig.base.json targets ES2022
+        # but pi-tui uses regex /v flag (requires ES2024). tsgo rejects this.
+        (final: prev: {
+          pi-coding-agent = prev.pi-coding-agent.overrideAttrs (old: {
+            preBuild = (old.preBuild or "") + ''
+              substituteInPlace tsconfig.base.json \
+                --replace-fail '"target": "ES2022"' '"target": "ES2024"' \
+                --replace-fail '"lib": ["ES2022"]' '"lib": ["ES2024"]'
+            '';
+          });
+        })
         (final: prev: { gogcli = final.callPackage ./pkgs/gogcli.nix {}; })
         (final: prev: { tempomat = final.callPackage ./pkgs/tempomat.nix {}; })
         # direnv's test suite hangs on Darwin (special chars in test dir names)

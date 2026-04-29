@@ -249,6 +249,27 @@
         "type": "github"
       }
     },
+    "piMono": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "systems": "systems_4"
+      },
+      "locked": {
+        "lastModified": 1777444688,
+        "narHash": "sha256-wDLuDbWxeYmJhIaDrIMv3tsszlbE5rRXFArk90yyEYI=",
+        "owner": "lukasl-dev",
+        "repo": "pi-mono.nix",
+        "rev": "14f38d2d9e12a515d3c57ace62c89cbbf546af9e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lukasl-dev",
+        "repo": "pi-mono.nix",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "claudeCode": "claudeCode",
@@ -258,6 +279,7 @@
         "nix-darwin": "nix-darwin",
         "nixos-lima": "nixos-lima",
         "nixpkgs": "nixpkgs",
+        "piMono": "piMono",
         "sops-nix": "sops-nix"
       }
     },
@@ -312,6 +334,21 @@
       }
     },
     "systems_3": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_4": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
