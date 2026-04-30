@@ -235,6 +235,9 @@ in
     ];
 
     extraConfig = ''
+      # Extended key reporting from modern terminals
+      set -s extended-keys on
+
       # Clipboard (OSC 52 passthrough for SSH/VM)
       set -g allow-passthrough on
       set -s set-clipboard on
