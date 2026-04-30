@@ -169,5 +169,15 @@ in
   # ── Dev Dotfiles ────────────────────────────────────────────
   home.file = {
     "bin/oc".source = ../../bin/oc;
+
+    ".agents/skills" = {
+      source = ../../agents/skills;
+      recursive = true;
+    };
+
+    ".claude/skills" = {
+      source = ../../agents/skills;
+      recursive = true;
+    };
   };
 }
