@@ -44,8 +44,8 @@ Then rebuild as above.
 
 1. Install nix: `curl -L https://nixos.org/nix/install | sh`
 2. Bootstrap nix-darwin:
-   ```bash
-   sudo nix run --extra-experimental-features "nix-command flakes" nix-darwin -- switch --flake nix#macbox
+   ```zsh
+   sudo nix run --extra-experimental-features "nix-command flakes" nix-darwin/master#darwin-rebuild -- switch --flake nix/#macbox
    ```
 3. After the initial bootstrap, use `make switch`.
 
