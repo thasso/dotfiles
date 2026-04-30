@@ -237,6 +237,7 @@ in
     extraConfig = ''
       # Extended key reporting from modern terminals
       set -s extended-keys on
+      set -g extended-keys-format csi-u
 
       # Clipboard (OSC 52 passthrough for SSH/VM)
       set -g allow-passthrough on
