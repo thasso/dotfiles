@@ -17,6 +17,10 @@ end
 
 vim.keymap.set("n", "<leader>vw", toggle_wrap, { desc = "Toggle wrap at 80 chars" })
 
+-- Move by visual/display lines when lines wrap, while keeping counts logical.
+vim.keymap.set({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, desc = "Move down display line" })
+vim.keymap.set({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, desc = "Move up display line" })
+
 local prose_filetypes = {
 	bib = true,
 	gitcommit = true,
