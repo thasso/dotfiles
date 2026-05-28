@@ -167,6 +167,9 @@ in
     codex
     pi-coding-agent
     ffmpeg
+    shaka-packager
+    bento4
+    gpac
   ]);
 
   # ── Dev Dotfiles ────────────────────────────────────────────
