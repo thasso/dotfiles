@@ -137,12 +137,6 @@ in
 
     lfs.enable = true;
 
-    signing = {
-      key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+CLIkUMfm+8w4AFuVES+o9z124opVlyRfTbwUxwiUV";
-      signByDefault = true;
-      format = "ssh";
-    };
-
     ignores = [
       ".DS_Store"
       ".direnv"
@@ -197,9 +191,6 @@ in
       };
       init.defaultBranch = "main";
       pull.rebase = true;
-      tag.gpgsign = true;
-    } // lib.optionalAttrs pkgs.stdenv.isDarwin {
-      gpg.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
     };
 
   };
