@@ -8,11 +8,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779931917,
-        "narHash": "sha256-UFVauPK+eQm9HsAIrEoBAOgBFpzQHnyau5cp9dgtg4M=",
+        "lastModified": 1780109992,
+        "narHash": "sha256-qzmk1JsVr3Umi4k9cx5KCLxPSWQpd6NeKCXXSr4bYoY=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "8d8cd609a31b0d40a7949ccf1277bb71d71ceb68",
+        "rev": "66c8b1714f2d45ce71de002baa89f8652483f245",
         "type": "github"
       },
       "original": {
@@ -29,11 +29,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779824545,
-        "narHash": "sha256-Gx/K9PRYQ0+eKMwjnOX2BqOvkjP+MeXXyFA2M2PvBQg=",
+        "lastModified": 1779998039,
+        "narHash": "sha256-TrNmfalbdX4VOXJyBYDX+jH6Ph7YJbUMAnq6/akCyms=",
         "owner": "sadjow",
         "repo": "codex-cli-nix",
-        "rev": "26c2ba2aed14632a04335a2f0a99d14abfb63f14",
+        "rev": "803b7de2cccae3abbb9d23c10826af087428b06e",
         "type": "github"
       },
       "original": {
@@ -49,11 +49,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779942106,
-        "narHash": "sha256-81sATQ+hMCcsqFCN5UyhCoXXf62yQfKtzKzuiFXtdxA=",
+        "lastModified": 1780048612,
+        "narHash": "sha256-Md/eOK5OjmvvHc2H52pLZe4zpP4XyfiS5vHqfRCz2HU=",
         "owner": "nix-community",
         "repo": "disko",
-        "rev": "36c1d04e85fc70f7b94f7434b1ea0a1a13bda4cd",
+        "rev": "caa775cf67bfdc47f940edd96c975b5016df9059",
         "type": "github"
       },
       "original": {
@@ -123,11 +123,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779969295,
-        "narHash": "sha256-HwIJ3tOcwSMiV75L7KqJXciXR9UfT+d7rwOZMX7cTnA=",
+        "lastModified": 1780099287,
+        "narHash": "sha256-efIPwVGtIWIjWcznhaop6XN6HxnOL8800hF6CBNvlqQ=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "61e2c9659324181e0f0ed911958c536333b1d4f6",
+        "rev": "7d8127d308c3fb9664f7e643eec944be74ebb37d",
         "type": "github"
       },
       "original": {
@@ -257,11 +257,11 @@
         "systems": "systems_4"
       },
       "locked": {
-        "lastModified": 1779956029,
-        "narHash": "sha256-8gH1IXLtDt8EVC1JUJ4wNzPZdp8XlwNJLxkOIUwkmcw=",
+        "lastModified": 1780125618,
+        "narHash": "sha256-PGHDdAA+s8LPcj3fYzI1SMMGdNe9CZF08Qf25mLYiAc=",
         "owner": "lukasl-dev",
         "repo": "pi-mono.nix",
-        "rev": "297536c053ab0f07f730b198ba1cc0a98cad8770",
+        "rev": "54c90546e12ddb900fa0e90c12fb1a8c011aee3d",
         "type": "github"
       },
       "original": {
