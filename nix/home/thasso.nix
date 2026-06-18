@@ -162,6 +162,7 @@ in
     gogcli
     nodejs
     yarn
+    pnpm
     prettier
     prettierd
     codex
