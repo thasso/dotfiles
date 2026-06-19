@@ -165,6 +165,7 @@ in
     pnpm
     prettier
     prettierd
+    presenterm
     codex
     pi-coding-agent
     ffmpeg
