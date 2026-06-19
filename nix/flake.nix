@@ -63,6 +63,15 @@
               doCheck = false;
             });
         })
+        # weasyprint has a flaky pixel-rendering test (test_unicode_range) that
+        # fails on a 1-pixel color diff; skip its test suite.
+        (final: prev: {
+          python3Packages = prev.python3Packages // {
+            weasyprint = prev.python3Packages.weasyprint.overridePythonAttrs (_old: {
+              doCheck = false;
+            });
+          };
+        })
       ]; };
       homeManagerConfig = {
         home-manager.useGlobalPkgs = true;

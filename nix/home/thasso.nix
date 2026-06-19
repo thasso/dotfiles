@@ -172,11 +172,13 @@ in
     shaka-packager
     bento4
     gpac
+    python3Packages.weasyprint
   ]);
 
   # ── Dev Dotfiles ────────────────────────────────────────────
   home.file = {
     "bin/oc".source = ../../bin/oc;
+    "bin/cca".source = ../../bin/cca;
 
     ".agents/skills" = {
       source = ../../agents/skills;
