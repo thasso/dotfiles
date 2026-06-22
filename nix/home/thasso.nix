@@ -40,6 +40,13 @@ in
       enabledPlugins = {
         "rust-analyzer-lsp@claude-plugins-official" = true;
       };
+      # Claude's shell snapshot captures zoxide's functions but not the
+      # imperative `chpwd_functions+=(__zoxide_hook)` registration, so the
+      # zoxide "doctor" false-positives on every prepended `cd`. Silence it
+      # only inside Claude's shell; the interactive doctor stays enabled.
+      env = {
+        _ZO_DOCTOR = "0";
+      };
       skipDangerousModePermissionPrompt = true;
       voiceEnabled = true;
       statusLine = {
