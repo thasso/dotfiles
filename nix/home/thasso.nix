@@ -173,6 +173,7 @@ in
     bento4
     gpac
     python3Packages.weasyprint
+    worktrunk
   ]);
 
   # ── Dev Dotfiles ────────────────────────────────────────────
