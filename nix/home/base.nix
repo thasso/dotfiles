@@ -64,6 +64,9 @@ in
 
       # Source secrets if present
       [[ -f ~/.zsecrets ]] && source ~/.zsecrets
+
+      # GitHub PAT (sops-managed) for npm auth, if decrypted on this host
+      [[ -r /run/secrets/github_token ]] && export GITHUB_TOKEN="$(cat /run/secrets/github_token)"
     '';
   };
 

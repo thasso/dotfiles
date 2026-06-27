@@ -18,6 +18,14 @@
   sops.defaultSopsFile = ../../secrets/macbox.yaml;
   sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
 
+  # GitHub PAT for npm auth against GitHub Packages (read at runtime in shell).
+  # Lives in common.yaml so other dev hosts can reuse it; owned by the user
+  # since the build runs as us, not root.
+  sops.secrets.github_token = {
+    owner = "thasso";
+    sopsFile = ../../secrets/common.yaml;
+  };
+
   # Packages
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.android_sdk.accept_license = true;
