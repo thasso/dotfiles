@@ -175,6 +175,7 @@ in
     presenterm
     codex
     pi-coding-agent
+    herdr
     ffmpeg
     shaka-packager
     bento4

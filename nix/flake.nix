@@ -72,6 +72,19 @@
             });
           };
         })
+        # herdr vendors libghostty-vt, whose zig build shells out to
+        # xcrun/xcode-select (SDK detection) and Apple's libtool (fat archive),
+        # and needs the macOS SDK headers — none of which the nixpkgs build
+        # wires up on Darwin, so it fails with DarwinSdkNotFound. Provide the
+        # SDK and cctools/xcbuild toolchain so the aarch64-darwin build works.
+        (final: prev: prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
+          herdr = prev.herdr.overrideAttrs (old: {
+            nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ prev.xcbuild prev.cctools ];
+            buildInputs = (old.buildInputs or [ ]) ++ [ prev.apple-sdk ];
+            SDKROOT = "${prev.apple-sdk.sdkroot}";
+            DEVELOPER_DIR = "${prev.apple-sdk}";
+          });
+        })
       ]; };
       homeManagerConfig = {
         home-manager.useGlobalPkgs = true;
