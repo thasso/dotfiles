@@ -107,6 +107,69 @@ in
     };
   };
 
+  # ── Herdr ──────────────────────────────────────────────────
+  xdg.configFile."herdr/config.toml".text = ''
+    [theme]
+    name = "catppuccin"
+
+    [terminal]
+    new_cwd = "follow"
+
+    [ui]
+    # Match tmux: Cmd-T creates a tab immediately instead of prompting.
+    prompt_new_tab_name = false
+
+    [keys]
+    prefix = "ctrl+b"
+
+    # Ghostty sends tmux-style Ctrl-B sequences for these macOS shortcuts.
+    # Keep Herdr listening on the same post-prefix keys so the same shortcuts
+    # work in either multiplexer.
+    settings = ""
+    new_tab = [ "prefix+t", "prefix+c" ]
+    previous_tab = "prefix+p"
+    next_tab = "prefix+n"
+    close_tab = [ "prefix+ampersand", "prefix+shift+x" ]
+    rename_tab = [ "prefix+comma", "prefix+shift+t" ]
+
+    # Tmux sessions map most closely to Herdr workspaces.
+    new_workspace = [ "prefix+shift+c", "prefix+shift+n" ]
+    workspace_picker = [ "prefix+s", "prefix+w" ]
+    rename_workspace = "prefix+$"
+
+    # Cmd-D: side-by-side split; Cmd-Shift-D: top/bottom split.
+    split_vertical = [ "prefix+percent", "prefix+v" ]
+    split_horizontal = [ "prefix+double_quote", "prefix+minus" ]
+
+    # Cmd-Alt-arrows already arrive as prefix+h/j/k/l via Ghostty and match
+    # Herdr defaults. Cmd-Ctrl-arrows arrive as prefix+Alt+h/j/k/l; use API
+    # commands to emulate tmux's repeatable resize bindings.
+
+    [[keys.command]]
+    key = "prefix+alt+h"
+    type = "shell"
+    command = "herdr pane resize --direction left --amount 0.05 --current"
+    description = "Resize pane left"
+
+    [[keys.command]]
+    key = "prefix+alt+j"
+    type = "shell"
+    command = "herdr pane resize --direction down --amount 0.05 --current"
+    description = "Resize pane down"
+
+    [[keys.command]]
+    key = "prefix+alt+k"
+    type = "shell"
+    command = "herdr pane resize --direction up --amount 0.05 --current"
+    description = "Resize pane up"
+
+    [[keys.command]]
+    key = "prefix+alt+l"
+    type = "shell"
+    command = "herdr pane resize --direction right --amount 0.05 --current"
+    description = "Resize pane right"
+  '';
+
   # ── VS Code (macOS only) ───────────────────────────────────
   programs.vscode = lib.mkIf pkgs.stdenv.isDarwin {
     enable = true;
