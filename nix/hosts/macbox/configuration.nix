@@ -26,6 +26,11 @@
     sopsFile = ../../secrets/common.yaml;
   };
 
+  # Work around nix-darwin's generated manual still passing the removed
+  # nixos-render-docs --toc-depth flag with current nixpkgs.
+  documentation.enable = false;
+  system.tools.darwin-uninstaller.enable = false;
+
   # Packages
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.android_sdk.accept_license = true;
