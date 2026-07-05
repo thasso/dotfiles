@@ -10,6 +10,11 @@ let
     includeEmulator = false;
     includeSources = false;
   };
+  herdrClaudeHook = pkgs.writeTextFile {
+    name = "herdr-agent-state.sh";
+    text = builtins.readFile "${pkgs.herdr.src}/src/integration/assets/claude/herdr-agent-state.sh";
+    executable = true;
+  };
 in
 {
   imports = [ ./base.nix ];
@@ -53,12 +58,30 @@ in
         type = "command";
         command = "bash ~/.claude/statusline-command.sh";
       };
+      hooks = {
+        SessionStart = [{
+          matcher = "*";
+          hooks = [{
+            type = "command";
+            command = "bash '${config.home.homeDirectory}/.claude/hooks/herdr-agent-state.sh' session";
+            timeout = 10;
+          }];
+        }];
+      };
     };
     agentsDir = ../../claude/agent;
     commandsDir = ../../claude/command;
   };
 
   home.file.".claude/statusline-command.sh".source = ../../claude/statusline-command.sh;
+  home.file.".claude/hooks/herdr-agent-state.sh" = {
+    source = herdrClaudeHook;
+    force = true;
+  };
+  home.file.".pi/agent/extensions/herdr-agent-state.ts" = {
+    text = builtins.readFile "${pkgs.herdr.src}/src/integration/assets/pi/herdr-agent-state.ts";
+    force = true;
+  };
 
   # ── Ghostty shell integration (skip in tmux — breaks p10k multiline prompt)
   programs.zsh.initContent = lib.mkIf pkgs.stdenv.isDarwin ''
