@@ -132,6 +132,9 @@ in
 
   # ── Herdr ──────────────────────────────────────────────────
   xdg.configFile."herdr/config.toml".text = ''
+    # Nix manages this file, so skip Herdr's first-run config writer/dialog.
+    onboarding = false
+
     [theme]
     name = "catppuccin"
 
