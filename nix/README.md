@@ -233,7 +233,7 @@ The new installation gets a new SSH host key, so the age key changes.
 | `macbox`  | `age1teffze36axkjcz2pzcgzs2hawufxj77mmqvn3h3g9hskfyrmhqqqzv6cn8` |
 | `immobox` | `age1gtfh442v4e9ju4gczxjmgdg9n76fngaqr8cxep4lzrxlqwaay3zqv2994s` |
 | `limabox` | `age1xae0pw26hmspa8h529zyhpg0c5pppef6327uemfc7djfxmtvqu8sgscz5g` |
-| `devbox`  | `age1hkdekhv37pgnrj9vptg35y84mpaupqgawprx4y6q2psaz62y8flqp6hu85` |
+| `devbox`  | `age1uy27ghcwu629ervwjgwauqvvxyexd4l4z0txu4yw4tcspv6mfgyqrzpndw` |
 
 ### Secrets files
 

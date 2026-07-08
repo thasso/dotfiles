@@ -7,7 +7,7 @@ creation_rules:
           - age1teffze36axkjcz2pzcgzs2hawufxj77mmqvn3h3g9hskfyrmhqqqzv6cn8 # macbox
           - age127fnuqkwdcmsayfnh0ac5tm0pyrvwm7ck0euju9vaeys3c5mpqsqjg79ze # immobox
           - age1xae0pw26hmspa8h529zyhpg0c5pppef6327uemfc7djfxmtvqu8sgscz5g # limabox
-          - age1hkdekhv37pgnrj9vptg35y84mpaupqgawprx4y6q2psaz62y8flqp6hu85 # devbox
+          - age1uy27ghcwu629ervwjgwauqvvxyexd4l4z0txu4yw4tcspv6mfgyqrzpndw # devbox
 
   # Immobox-only secrets (Hetzner tokens, server-specific)
   - path_regex: nix/secrets/immobox\.yaml$
