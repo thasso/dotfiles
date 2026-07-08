@@ -63,10 +63,13 @@
   # amd_pstate active mode gives power-profiles-daemon a real EPP backend
   # (on acpi-cpufreq it falls back to "placeholder" and GNOME's power-saver
   # profile is inert). CPPC is present on this Ryzen 9 3900X, so it works.
-  # pcie_aspm.policy=powersave is the riskiest line — drop it first if a
-  # device misbehaves. powertop autotune enables runtime PM for SATA/USB/PCIe.
-  boot.kernelParams = [ "amd_pstate=active" "pcie_aspm.policy=powersave" ];
-  powerManagement.powertop.enable = true;
+  # CPU-only, so it's safe for connectivity.
+  boot.kernelParams = [ "amd_pstate=active" ];
+
+  # NOTE: pcie_aspm.policy=powersave + powertop autotune stalled the NIC's
+  # PCIe link and broke SSH (banner-exchange timeouts). Removed. Revisit only
+  # with console access to test, and ideally scope ASPM per-device.
+  # powerManagement.powertop.enable = true;
 
   # First install of this machine was NixOS 26.05 — leave as is.
   system.stateVersion = "26.05";
