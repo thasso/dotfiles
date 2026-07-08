@@ -17,7 +17,7 @@ let
   };
 in
 {
-  imports = [ ./base.nix ];
+  imports = [ ./base.nix ./ssh.nix ];
 
   # ── Dev Environment ──────────────────────────────────────────
   home.sessionVariables = {

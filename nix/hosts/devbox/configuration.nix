@@ -78,6 +78,17 @@
     reverse_proxy localhost:${toString config.services.my-forgejo.port}
   '';
 
+  # Expose Forgejo's git-over-SSH port to the tailnet only (loopback is always
+  # allowed, so local pushes from devbox itself keep working regardless).
+  networking.firewall.interfaces."tailscale0".allowedTCPPorts =
+    [ config.services.my-forgejo.sshPort ];
+
+  # Resolve git.codecluster.net to loopback on devbox itself. devbox is both
+  # the server and a daily-driver client, so this lets it push/pull (and browse
+  # the web UI) over 127.0.0.1 without depending on Tailscale being up. Other
+  # tailnet devices still resolve the public DNS record to the Tailscale IP.
+  networking.hosts."127.0.0.1" = [ "git.codecluster.net" ];
+
   # Remote dev box — must stay reachable, so never auto-suspend/sleep.
   # Mask the sleep targets so nothing (GNOME/GDM idle, logind) can suspend it.
   systemd.targets.sleep.enable = false;

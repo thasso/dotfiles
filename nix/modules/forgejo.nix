@@ -14,6 +14,15 @@ in {
       default = 3000;
       description = "Port Forgejo's HTTP server listens on (localhost only; Caddy proxies to it)";
     };
+    sshPort = lib.mkOption {
+      type = lib.types.port;
+      default = 2222;
+      description = ''
+        Port for Forgejo's built-in SSH server (git-over-SSH). Not 22, which
+        belongs to the host's sshd. Advertised in clone URLs. The listener
+        binds all interfaces; restrict external reachability at the firewall.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -31,6 +40,17 @@ in {
           # Bind to localhost only — Caddy terminates TLS and reverse-proxies.
           HTTP_ADDR = "127.0.0.1";
           HTTP_PORT = cfg.port;
+
+          # git-over-SSH via Forgejo's built-in server (authenticates by SSH
+          # key against the Forgejo account — no `git` unix user needed).
+          START_SSH_SERVER = true;
+          SSH_PORT = cfg.sshPort;
+          SSH_LISTEN_PORT = cfg.sshPort;
+          # Accept the conventional `git@` login name on the built-in server
+          # (defaults to RUN_USER = "forgejo"). SSH_USER — the name shown in
+          # clone URLs — defaults to this, so URLs read `git@` too. Still
+          # key-authenticated; no `git` unix account involved.
+          BUILTIN_SSH_SERVER_USER = "git";
         };
         # Personal instance: no open sign-ups. The admin user is created
         # out-of-band via the forgejo CLI after first activation.
