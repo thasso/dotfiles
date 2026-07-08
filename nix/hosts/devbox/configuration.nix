@@ -59,6 +59,21 @@
   # Power measurement tools (`sudo powertop`, `sensors`) for profiling idle draw.
   environment.systemPackages = with pkgs; [ powertop lm_sensors ];
 
+  # ── Extra data disks (added 2026-07-08) ───────────────────
+  # bulk: Samsung 860 EVO 2TB SATA SSD (/dev/sda1)
+  # fast: Samsung 970 PRO 512GB NVMe   (/dev/nvme0n1p1)
+  # nofail so a missing/failed disk never blocks boot on this headless box.
+  fileSystems."/mnt/bulk" = {
+    device = "/dev/disk/by-uuid/e88550a2-189c-44b5-aefb-0f1802b9052d";
+    fsType = "ext4";
+    options = [ "nofail" "x-systemd.device-timeout=5s" ];
+  };
+  fileSystems."/mnt/fast" = {
+    device = "/dev/disk/by-uuid/725eda7b-a820-435e-a389-932cba09bc15";
+    fsType = "ext4";
+    options = [ "nofail" "x-systemd.device-timeout=5s" ];
+  };
+
   # ── Idle power reduction ──────────────────────────────────
   # amd_pstate active mode gives power-profiles-daemon a real EPP backend
   # (on acpi-cpufreq it falls back to "placeholder" and GNOME's power-saver
