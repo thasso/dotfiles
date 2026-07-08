@@ -4,6 +4,8 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules/common.nix
+    ../../modules/caddy.nix
+    ../../modules/forgejo.nix
   ];
 
   # Bootloader (BIOS/GRUB — bare-metal AMD box, no EFI)
@@ -48,6 +50,33 @@
   # Tailscale VPN
   services.tailscale.enable = true;
   services.tailscale.openFirewall = true;
+
+  # Secrets (sops-nix). Host key derives the age identity for decryption.
+  # Secret declarations live in the modules that consume them (e.g. Caddy).
+  sops.defaultSopsFile = ../../secrets/devbox.yaml;
+  sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+
+  # ── Self-hosted services ──────────────────────────────────
+  # Caddy reverse proxy. DNS-01 via Hetzner Cloud DNS gets real Let's Encrypt
+  # certs without any inbound reachability — the box stays private on the
+  # tailnet (service subdomains resolve to its Tailscale IP).
+  services.my-caddy = {
+    enable = true;
+    email = "thasso.griebel@gmail.com";
+    acmeDnsProvider = "hetzner";
+    dnsTokenSecret = "hetzner_dns_token";
+  };
+
+  # Forgejo — personal GitHub replacement, reachable at https://git.codecluster.net
+  services.my-forgejo = {
+    enable = true;
+    domain = "git.codecluster.net";
+  };
+
+  # Wire Forgejo into Caddy.
+  services.caddy.virtualHosts."git.codecluster.net".extraConfig = ''
+    reverse_proxy localhost:${toString config.services.my-forgejo.port}
+  '';
 
   # Remote dev box — must stay reachable, so never auto-suspend/sleep.
   # Mask the sleep targets so nothing (GNOME/GDM idle, logind) can suspend it.

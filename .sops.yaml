@@ -16,6 +16,13 @@ creation_rules:
           - age160hzd3cahej40u6226t6c24hurcg8skg8l3l058jz4gvj24x23jshem5zg # thasso
           - age127fnuqkwdcmsayfnh0ac5tm0pyrvwm7ck0euju9vaeys3c5mpqsqjg79ze # immobox
 
+  # Devbox-only secrets (Hetzner DNS API token for Caddy DNS-01, service secrets)
+  - path_regex: nix/secrets/devbox\.yaml$
+    key_groups:
+      - age:
+          - age160hzd3cahej40u6226t6c24hurcg8skg8l3l058jz4gvj24x23jshem5zg # thasso
+          - age1uy27ghcwu629ervwjgwauqvvxyexd4l4z0txu4yw4tcspv6mfgyqrzpndw # devbox
+
   # macbox-only secrets
   - path_regex: nix/secrets/macbox\.yaml$
     key_groups:
