@@ -49,6 +49,13 @@
   services.tailscale.enable = true;
   services.tailscale.openFirewall = true;
 
+  # Remote dev box — must stay reachable, so never auto-suspend/sleep.
+  # Mask the sleep targets so nothing (GNOME/GDM idle, logind) can suspend it.
+  systemd.targets.sleep.enable = false;
+  systemd.targets.suspend.enable = false;
+  systemd.targets.hibernate.enable = false;
+  systemd.targets.hybrid-sleep.enable = false;
+
   # First install of this machine was NixOS 26.05 — leave as is.
   system.stateVersion = "26.05";
 }
