@@ -113,6 +113,8 @@ in
         ''cmd+shift+d=text:\x02"''
         "cmd+shift+n=text:\\x02C"
         "cmd+shift+s=text:\\x02s"
+        "cmd+shift+up=text:\\x02u"
+        "cmd+shift+down=text:\\x02d"
         "cmd+alt+left=text:\\x02h"
         "cmd+alt+right=text:\\x02l"
         "cmd+alt+up=text:\\x02k"
@@ -162,6 +164,12 @@ in
     new_workspace = [ "prefix+shift+c", "prefix+shift+n" ]
     workspace_picker = [ "prefix+s", "prefix+w" ]
     rename_workspace = "prefix+$"
+    previous_workspace = "prefix+u"
+    next_workspace = "prefix+d"
+
+    # In navigate mode (prefix+s), Shift-Up/Shift-Down jump between agents.
+    previous_agent = "prefix+shift+up"
+    next_agent = "prefix+shift+down"
 
     # Cmd-D: side-by-side split; Cmd-Shift-D: top/bottom split.
     split_vertical = [ "prefix+percent", "prefix+v" ]
