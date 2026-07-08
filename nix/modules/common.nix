@@ -22,6 +22,10 @@
     isNormalUser = true;
     extraGroups = [ "wheel" ];
     shell = pkgs.zsh;
+    # M1 MacBook public key — lets thasso SSH into every Linux host.
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+CLIkUMfm+8w4AFuVES+o9z124opVlyRfTbwUxwiUV"
+    ];
   };
   programs.zsh.enable = true;
   security.sudo.wheelNeedsPassword = false;
