@@ -56,6 +56,9 @@
   systemd.targets.hibernate.enable = false;
   systemd.targets.hybrid-sleep.enable = false;
 
+  # Power measurement tools (`sudo powertop`, `sensors`) for profiling idle draw.
+  environment.systemPackages = with pkgs; [ powertop lm_sensors ];
+
   # First install of this machine was NixOS 26.05 — leave as is.
   system.stateVersion = "26.05";
 }
