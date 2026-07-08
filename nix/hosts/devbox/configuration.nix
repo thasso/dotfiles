@@ -59,6 +59,15 @@
   # Power measurement tools (`sudo powertop`, `sensors`) for profiling idle draw.
   environment.systemPackages = with pkgs; [ powertop lm_sensors ];
 
+  # ── Idle power reduction ──────────────────────────────────
+  # amd_pstate active mode gives power-profiles-daemon a real EPP backend
+  # (on acpi-cpufreq it falls back to "placeholder" and GNOME's power-saver
+  # profile is inert). CPPC is present on this Ryzen 9 3900X, so it works.
+  # pcie_aspm.policy=powersave is the riskiest line — drop it first if a
+  # device misbehaves. powertop autotune enables runtime PM for SATA/USB/PCIe.
+  boot.kernelParams = [ "amd_pstate=active" "pcie_aspm.policy=powersave" ];
+  powerManagement.powertop.enable = true;
+
   # First install of this machine was NixOS 26.05 — leave as is.
   system.stateVersion = "26.05";
 }
