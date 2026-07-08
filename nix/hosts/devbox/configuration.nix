@@ -6,6 +6,7 @@
     ../../modules/common.nix
     ../../modules/caddy.nix
     ../../modules/forgejo.nix
+    ../../modules/forgejo-backup.nix
   ];
 
   # Bootloader (BIOS/GRUB — bare-metal AMD box, no EFI)
@@ -88,6 +89,13 @@
   # the web UI) over 127.0.0.1 without depending on Tailscale being up. Other
   # tailnet devices still resolve the public DNS record to the Tailscale IP.
   networking.hosts."127.0.0.1" = [ "git.codecluster.net" ];
+
+  # Forgejo first-level backup: daily Borg snapshot to the bulk data disk.
+  # Unencrypted (local disk), so no secret; keeps the last 7 days.
+  services.my-forgejo-backup = {
+    enable = true;
+    repository = "/mnt/bulk/backups/forgejo";
+  };
 
   # Remote dev box — must stay reachable, so never auto-suspend/sleep.
   # Mask the sleep targets so nothing (GNOME/GDM idle, logind) can suspend it.
