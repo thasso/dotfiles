@@ -6,57 +6,58 @@
   programs.ssh = {
     enable = true;
     # Reproduce the hand-written config faithfully: don't let home-manager
-    # inject its own `Host *` defaults (ForwardAgent, etc.).
+    # inject its own `Host *` defaults (ForwardAgent, AddKeysToAgent, ...).
     enableDefaultConfig = false;
 
-    matchBlocks = {
+    # Attribute names are `Host` patterns; values use OpenSSH directive names.
+    settings = {
       homelab = {
-        hostname = "192.168.1.200";
-        user = "root";
+        HostName = "192.168.1.200";
+        User = "root";
       };
       pi = {
-        hostname = "192.168.1.3";
-        user = "thasso";
+        HostName = "192.168.1.3";
+        User = "thasso";
       };
       demo-mac = {
-        hostname = "192.168.1.101";
-        user = "castlabdemos";
-        forwardAgent = true;
+        HostName = "192.168.1.101";
+        User = "castlabdemos";
+        ForwardAgent = true;
       };
       "ts.dev" = {
-        hostname = "ts.dev.castlabs.com";
-        port = 2222;
-        user = "runner";
-        forwardAgent = true;
+        HostName = "ts.dev.castlabs.com";
+        Port = 2222;
+        User = "runner";
+        ForwardAgent = true;
       };
       devbox = {
-        hostname = "192.168.1.67";
-        user = "thasso";
-        extraOptions.SetEnv = "TERM=xterm-256color";
+        HostName = "192.168.1.67";
+        User = "thasso";
+        SetEnv = { TERM = "xterm-256color"; };
       };
       "devbox.ts" = {
-        hostname = "100.80.3.49";
-        user = "thasso";
-        extraOptions.SetEnv = "TERM=xterm-256color";
+        HostName = "100.80.3.49";
+        User = "thasso";
+        SetEnv = { TERM = "xterm-256color"; };
       };
       immobox = {
-        hostname = "178.104.109.60";
-        user = "thasso";
-        forwardAgent = true;
-        extraOptions.SetEnv = "TERM=xterm-256color";
+        HostName = "178.104.109.60";
+        User = "thasso";
+        ForwardAgent = true;
+        SetEnv = { TERM = "xterm-256color"; };
       };
 
       # Forgejo git-over-SSH. Enables `git@git.codecluster.net:thasso/repo.git`.
       # On devbox the name resolves to loopback (via /etc/hosts); elsewhere it
       # resolves to the Tailscale IP via public DNS.
       "git.codecluster.net" = {
-        port = 2222;
-        user = "git";
+        Port = 2222;
+        User = "git";
       };
     }
     # macOS only: route SSH auth through the 1Password agent.
     // lib.optionalAttrs pkgs.stdenv.isDarwin {
-      "*".extraOptions.IdentityAgent =
+      "*".IdentityAgent =
         ''"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"'';
     };
   };
