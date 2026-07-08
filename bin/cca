@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Claude Code wrapper script
 # Starts Claude with auto mode enabled
 exec claude --permission-mode auto "$@"
