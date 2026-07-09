@@ -14,11 +14,22 @@ let
     # eval cache land somewhere deterministic regardless of who ran sudo.
     export HOME=/root
     # Root reads thasso's checkout; avoid git "dubious ownership" during eval.
-    git config --global --add safe.directory /home/thasso/dotfiles || true
+    ${pkgs.git}/bin/git config --global --add safe.directory /home/thasso/dotfiles || true
+
+    assistantRev="$(${pkgs.git}/bin/git ls-remote https://git.codecluster.net/thasso/personal-assistant.git refs/heads/main | ${pkgs.gawk}/bin/awk '{print $1}')"
+    if [ -z "$assistantRev" ]; then
+      echo "Could not resolve latest personal-assistant main revision" >&2
+      exit 1
+    fi
+    echo "Deploying personalAssistant rev $assistantRev"
+
     # The flake lives in the repo's nix/ subdirectory (the git root is one up).
+    # Pin the floating app input to the exact remote main rev and refresh Nix's
+    # flake metadata so deploys cannot silently reuse a stale ref=main cache.
     exec nixos-rebuild switch \
+      --refresh \
       --flake /home/thasso/dotfiles/nix#devbox \
-      --override-input personalAssistant "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=main"
+      --override-input personalAssistant "git+https://git.codecluster.net/thasso/personal-assistant.git?rev=$assistantRev"
   '';
 in
 {
