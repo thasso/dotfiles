@@ -28,12 +28,16 @@ in {
       default = [
         "ubuntu-latest:docker://catthehacker/ubuntu:act-22.04"
         "ubuntu-22.04:docker://catthehacker/ubuntu:act-22.04"
+        # Host execution for Nix jobs (`runs-on: native`): builds land in the
+        # host /nix/store (cached, reusable). Runs as the unprivileged
+        # gitea-runner user; the nix daemon performs the store writes.
+        "native:host"
       ];
       description = ''
         Runner labels mapping job runs-on names to execution backends. Docker
         labels ("<name>:docker://<image>") make the module wire the runner's
-        service into the docker group automatically. Add "native:host" for
-        Nix-native jobs on the host.
+        service into the docker group automatically. "native:host" runs jobs
+        directly on the host with the packages from hostPackages below.
       '';
     };
   };
@@ -53,6 +57,19 @@ in {
         url = cfg.url;
         tokenFile = config.sops.templates."forgejo-runner-token.env".path;
         labels = cfg.labels;
+        # Packages available to `native:host` jobs. nix is what makes
+        # `nix build`/`nix flake check` work on the host runner.
+        hostPackages = with pkgs; [
+          nix
+          bashInteractive
+          coreutils
+          curl
+          gawk
+          gitMinimal
+          gnused
+          nodejs
+          wget
+        ];
       };
     };
   };
