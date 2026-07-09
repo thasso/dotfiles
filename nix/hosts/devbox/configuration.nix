@@ -102,7 +102,7 @@
   # the server and a daily-driver client, so this lets it push/pull (and browse
   # the web UI) over 127.0.0.1 without depending on Tailscale being up. Other
   # tailnet devices still resolve the public DNS record to the Tailscale IP.
-  networking.hosts."127.0.0.1" = [ "git.codecluster.net" ];
+  networking.hosts."127.0.0.1" = [ "git.codecluster.net" "pa.codecluster.net" ];
 
   # Forgejo first-level backup: daily Borg snapshot to the bulk data disk.
   # Unencrypted (local disk), so no secret; keeps the last 7 days.
@@ -117,6 +117,31 @@
     enable = true;
     url = "https://git.codecluster.net";
   };
+
+  # ── Personal assistant ────────────────────────────────────
+  # User-space service (runs as thasso) so it has real $HOME/filesystem access
+  # and inherits logged-in credentials (~/.claude subscription, pi providers).
+  # Reachable tailnet-only at https://pa.codecluster.net via Caddy.
+  #
+  # The shared auth token is injected into the SPA at serve time (not baked into
+  # the build); supply it via a sops secret rendered as ASSISTANT_TOKEN=<value>.
+  sops.secrets.personal_assistant_token = { };
+  sops.templates."personal-assistant-token.env".content =
+    "ASSISTANT_TOKEN=${config.sops.placeholder.personal_assistant_token}";
+
+  services.personal-assistant = {
+    enable = true;
+    allowedOrigins = [ "https://pa.codecluster.net" ];
+    tokenFile = config.sops.templates."personal-assistant-token.env".path;
+    # Agent CLIs/tools on the service PATH (in-process SDKs read ~/.claude + pi
+    # creds; the tmux Claude terminal and pi CLI need the binaries).
+    extraPackages = with pkgs; [ claude-code pi-coding-agent tmux ];
+  };
+
+  # Wire the assistant into Caddy (tailnet-only, cert via DNS-01).
+  services.caddy.virtualHosts."pa.codecluster.net".extraConfig = ''
+    reverse_proxy localhost:${toString config.services.personal-assistant.port}
+  '';
 
   # Remote dev box — must stay reachable, so never auto-suspend/sleep.
   # Mask the sleep targets so nothing (GNOME/GDM idle, logind) can suspend it.

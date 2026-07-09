@@ -35,9 +35,15 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Personal assistant app (server + web UI). No nixpkgs.follows: the package
+    # is built against its own pinned nixpkgs (exactly what its native Nix CI
+    # validates), keeping the npmDepsHash stable.
+    personalAssistant = {
+      url = "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=main";
+    };
   };
 
-  outputs = { self, nixpkgs, claudeCode, codexCli, piMono, nix-darwin, home-manager, nixos-lima, sops-nix, disko, ... }:
+  outputs = { self, nixpkgs, claudeCode, codexCli, piMono, nix-darwin, home-manager, nixos-lima, sops-nix, disko, personalAssistant, ... }:
     let
       overlays = { nixpkgs.overlays = [
         claudeCode.overlays.default
@@ -103,6 +109,7 @@
         modules = [
           overlays
           sops-nix.nixosModules.sops
+          personalAssistant.nixosModules.default
           ./hosts/devbox/configuration.nix
           home-manager.nixosModules.home-manager
           homeManagerConfig
