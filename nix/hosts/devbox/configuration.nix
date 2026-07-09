@@ -15,8 +15,9 @@ let
     export HOME=/root
     # Root reads thasso's checkout; avoid git "dubious ownership" during eval.
     git config --global --add safe.directory /home/thasso/dotfiles || true
+    # The flake lives in the repo's nix/ subdirectory (the git root is one up).
     exec nixos-rebuild switch \
-      --flake /home/thasso/dotfiles#devbox \
+      --flake /home/thasso/dotfiles/nix#devbox \
       --override-input personalAssistant "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=main"
   '';
 in
