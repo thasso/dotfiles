@@ -10,10 +10,13 @@ let
   paDeploy = pkgs.writeShellScriptBin "pa-deploy" ''
     set -euo pipefail
     export PATH=/run/current-system/sw/bin:$PATH
+    # Pin HOME to root's (writable) home so the safe.directory write and nix's
+    # eval cache land somewhere deterministic regardless of who ran sudo.
+    export HOME=/root
     # Root reads thasso's checkout; avoid git "dubious ownership" during eval.
-    git config --global --add safe.directory /home/thasso/git/dotfiles || true
+    git config --global --add safe.directory /home/thasso/dotfiles || true
     exec nixos-rebuild switch \
-      --flake /home/thasso/git/dotfiles#devbox \
+      --flake /home/thasso/dotfiles#devbox \
       --override-input personalAssistant "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=main"
   '';
 in
