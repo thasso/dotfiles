@@ -164,14 +164,30 @@ in
     reverse_proxy localhost:${toString config.services.personal-assistant.port}
   '';
 
-  # CD: let the Forgejo runner's `deploy` job (user `gitea-runner`) run exactly
-  # the pa-deploy rebuild as root, and nothing else. The command is fixed in the
-  # script (exposed at /run/current-system/sw/bin/pa-deploy via systemPackages
-  # below), so the workflow passes no arguments it could abuse.
-  security.sudo.extraRules = [{
-    users = [ "gitea-runner" ];
-    commands = [{ command = "${paDeploy}/bin/pa-deploy"; options = [ "NOPASSWD" ]; }];
-  }];
+  # CD: the Forgejo runner's `deploy` job triggers this rebuild. Runner host jobs
+  # run with NoNewPrivileges, so setuid sudo is blocked; instead the runner asks
+  # systemd (over D-Bus) to start a fixed root oneshot, authorized by a narrow
+  # polkit rule. The command is fixed in the unit, so the runner can only start
+  # it — it gets no other root, and nixos-rebuild is atomic (a failing build
+  # never switches). thasso can still run `sudo pa-deploy` interactively.
+  systemd.services.personal-assistant-deploy = {
+    description = "Rebuild devbox so personal-assistant tracks the latest main";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${paDeploy}/bin/pa-deploy";
+    };
+  };
+
+  security.polkit.enable = true;
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (action.id == "org.freedesktop.systemd1.manage-units" &&
+          action.lookup("unit") == "personal-assistant-deploy.service" &&
+          subject.user == "gitea-runner") {
+        return polkit.Result.YES;
+      }
+    });
+  '';
 
   # Remote dev box — must stay reachable, so never auto-suspend/sleep.
   # Mask the sleep targets so nothing (GNOME/GDM idle, logind) can suspend it.
