@@ -55,8 +55,18 @@ in {
         hash = "sha256-BSTuZx5Em2hAQ2+mGj02IAwgLUV6sE77RRffpbyapHc=";
       };
 
+      # Explicit ACME (Let's Encrypt) issuer with the Hetzner DNS-01 challenge.
+      # propagation_delay is essential here: the zone is served by Hetzner's
+      # legacy multi-nameserver setup, so the challenge TXT record takes a while
+      # to appear on all authoritative servers. Without the delay, Let's Encrypt
+      # validates too early and fails with "No/Incorrect TXT record found".
+      # Using a single explicit issuer also drops the noisy ZeroSSL fallback.
       services.caddy.globalConfig = ''
-        acme_dns hetzner {env.HETZNER_API_TOKEN}
+        cert_issuer acme {
+          dns hetzner {env.HETZNER_API_TOKEN}
+          propagation_delay 120s
+          propagation_timeout 300s
+        }
       '';
 
       # Feed the token to Caddy's unit from sops (never on disk in plaintext).
