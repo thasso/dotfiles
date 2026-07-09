@@ -259,6 +259,7 @@ in
     tree-sitter
   ] ++ lib.optionals (!pkgs.stdenv.isDarwin) [
     clang
+    google-chrome
   ] ++ [
     cmake
     go

@@ -210,6 +210,16 @@ in
   # Power measurement tools (`sudo powertop`, `sensors`) for profiling idle draw.
   environment.systemPackages = with pkgs; [ powertop lm_sensors paDeploy ];
 
+  # Playwright looks for `channel: "chrome"` at the hardcoded Linux path
+  # /opt/google/chrome/chrome, which doesn't exist on NixOS (the Nix Chrome —
+  # installed in home/thasso.nix — lives in the store, wrapped as
+  # google-chrome-stable on PATH). Symlink the expected path to the Nix binary
+  # so Playwright picks it up transparently. `L+` recreates the link on every
+  # activation, so it always tracks the current google-chrome build.
+  systemd.tmpfiles.rules = [
+    "L+ /opt/google/chrome/chrome - - - - ${pkgs.google-chrome}/bin/google-chrome-stable"
+  ];
+
   # ── Extra data disks (added 2026-07-08) ───────────────────
   # bulk: Samsung 860 EVO 2TB SATA SSD (/dev/sda1)
   # fast: Samsung 970 PRO 512GB NVMe   (/dev/nvme0n1p1)
