@@ -7,6 +7,7 @@
     ../../modules/caddy.nix
     ../../modules/forgejo.nix
     ../../modules/forgejo-backup.nix
+    ../../modules/forgejo-runner.nix
   ];
 
   # Bootloader (BIOS/GRUB — bare-metal AMD box, no EFI)
@@ -108,6 +109,13 @@
   services.my-forgejo-backup = {
     enable = true;
     repository = "/mnt/bulk/backups/forgejo";
+  };
+
+  # Forgejo Actions runner (forgejo-runner, Docker backend). Talks to Forgejo
+  # over loopback (git.codecluster.net → 127.0.0.1) with a valid cert.
+  services.my-forgejo-runner = {
+    enable = true;
+    url = "https://git.codecluster.net";
   };
 
   # Remote dev box — must stay reachable, so never auto-suspend/sleep.

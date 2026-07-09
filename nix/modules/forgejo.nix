@@ -55,6 +55,10 @@ in {
         # Personal instance: no open sign-ups. The admin user is created
         # out-of-band via the forgejo CLI after first activation.
         service.DISABLE_REGISTRATION = true;
+
+        # Forgejo Actions (CI). DEFAULT_ACTIONS_URL defaults to "github", so
+        # `uses: actions/checkout@v4` etc. resolve from github.com.
+        actions.ENABLED = true;
       };
     };
   };
