@@ -9,7 +9,7 @@ let
   # assistant keeps serving.
   paDeploy = pkgs.writeShellScriptBin "pa-deploy" ''
     set -euo pipefail
-    export PATH=/run/current-system/sw/bin:$PATH
+    export PATH=${pkgs.git}/bin:${pkgs.gawk}/bin:/run/current-system/sw/bin:$PATH
     # Pin HOME to root's (writable) home so the safe.directory write and nix's
     # eval cache land somewhere deterministic regardless of who ran sudo.
     export HOME=/root
@@ -29,7 +29,7 @@ let
     exec nixos-rebuild switch \
       --refresh \
       --flake /home/thasso/dotfiles/nix#devbox \
-      --override-input personalAssistant "git+https://git.codecluster.net/thasso/personal-assistant.git?rev=$assistantRev"
+      --override-input personalAssistant "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=main&rev=$assistantRev"
   '';
 in
 {
