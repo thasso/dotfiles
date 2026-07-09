@@ -1,5 +1,22 @@
 { config, pkgs, ... }:
 
+let
+  # Continuous-deploy command for the personal assistant. Rebuilds this host
+  # from the local dotfiles checkout, floating ONLY the personalAssistant input
+  # to the latest main (other inputs stay pinned by flake.lock). Run as root via
+  # a scoped NOPASSWD sudo rule by the Forgejo runner's `deploy` job on green
+  # main. nixos-rebuild is atomic: a failing build never switches, so the running
+  # assistant keeps serving.
+  paDeploy = pkgs.writeShellScriptBin "pa-deploy" ''
+    set -euo pipefail
+    export PATH=/run/current-system/sw/bin:$PATH
+    # Root reads thasso's checkout; avoid git "dubious ownership" during eval.
+    git config --global --add safe.directory /home/thasso/git/dotfiles || true
+    exec nixos-rebuild switch \
+      --flake /home/thasso/git/dotfiles#devbox \
+      --override-input personalAssistant "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=main"
+  '';
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -143,6 +160,15 @@
     reverse_proxy localhost:${toString config.services.personal-assistant.port}
   '';
 
+  # CD: let the Forgejo runner's `deploy` job (user `gitea-runner`) run exactly
+  # the pa-deploy rebuild as root, and nothing else. The command is fixed in the
+  # script (exposed at /run/current-system/sw/bin/pa-deploy via systemPackages
+  # below), so the workflow passes no arguments it could abuse.
+  security.sudo.extraRules = [{
+    users = [ "gitea-runner" ];
+    commands = [{ command = "${paDeploy}/bin/pa-deploy"; options = [ "NOPASSWD" ]; }];
+  }];
+
   # Remote dev box — must stay reachable, so never auto-suspend/sleep.
   # Mask the sleep targets so nothing (GNOME/GDM idle, logind) can suspend it.
   systemd.targets.sleep.enable = false;
@@ -151,7 +177,7 @@
   systemd.targets.hybrid-sleep.enable = false;
 
   # Power measurement tools (`sudo powertop`, `sensors`) for profiling idle draw.
-  environment.systemPackages = with pkgs; [ powertop lm_sensors ];
+  environment.systemPackages = with pkgs; [ powertop lm_sensors paDeploy ];
 
   # ── Extra data disks (added 2026-07-08) ───────────────────
   # bulk: Samsung 860 EVO 2TB SATA SSD (/dev/sda1)
