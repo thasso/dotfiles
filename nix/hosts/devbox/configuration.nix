@@ -17,7 +17,7 @@
   # Networking
   networking.hostName = "devbox";
   networking.networkmanager.enable = true;
-  users.users.thasso.extraGroups = [ "networkmanager" "wheel" ];
+  users.users.thasso.extraGroups = [ "networkmanager" "wheel" "docker" ];
 
   # Desktop (GNOME on X11/Wayland via GDM)
   services.xserver.enable = true;
@@ -51,6 +51,19 @@
   # Tailscale VPN
   services.tailscale.enable = true;
   services.tailscale.openFirewall = true;
+
+  # ── Containers (Docker) ───────────────────────────────────
+  # Rootful Docker; thasso is in the `docker` group above so it can drive
+  # containers without sudo. (Note: docker-group access is root-equivalent.)
+  # Data-root stays on the root SSD for now; relocating to /mnt/fast is a
+  # later step (that disk is `nofail`, so it'd need a mount dependency).
+  virtualisation.docker = {
+    enable = true;
+    autoPrune = {
+      enable = true;
+      dates = "weekly";
+    };
+  };
 
   # Secrets (sops-nix). Host key derives the age identity for decryption.
   # Secret declarations live in the modules that consume them (e.g. Caddy).
