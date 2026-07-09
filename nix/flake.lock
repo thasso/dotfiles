@@ -263,6 +263,41 @@
         "type": "github"
       }
     },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1783224372,
+        "narHash": "sha256-8i/87eeoqiGE4yOTjwSA3Eh/ziJRQEmd/unYU+K27sk=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "d407951447dcd00442e97087bf374aad70c04cea",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "personalAssistant": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1783611098,
+        "narHash": "sha256-kJdM59tMqcCxJZX+LJwsJAPEpxl3ONhl4DBFfjJfGkg=",
+        "ref": "main",
+        "rev": "b11a8209e1323addda8ba47fedc3461c78470abf",
+        "revCount": 551,
+        "type": "git",
+        "url": "https://git.codecluster.net/thasso/personal-assistant.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://git.codecluster.net/thasso/personal-assistant.git"
+      }
+    },
     "piMono": {
       "inputs": {
         "bun2nix": "bun2nix",
@@ -294,6 +329,7 @@
         "nix-darwin": "nix-darwin",
         "nixos-lima": "nixos-lima",
         "nixpkgs": "nixpkgs",
+        "personalAssistant": "personalAssistant",
         "piMono": "piMono",
         "sops-nix": "sops-nix"
       }
