@@ -29,6 +29,7 @@ in
     ../../modules/forgejo.nix
     ../../modules/forgejo-backup.nix
     ../../modules/forgejo-runner.nix
+    ../../modules/personal-assistant-backup.nix
   ];
 
   # Bootloader (BIOS/GRUB — bare-metal AMD box, no EFI)
@@ -152,6 +153,7 @@ in
 
   services.personal-assistant = {
     enable = true;
+    dataDir = "/home/thasso/pa-data";
     allowedOrigins = [ "https://pa.codecluster.net" ];
     tokenFile = config.sops.templates."personal-assistant-token.env".path;
     # Agent CLIs/tools on the service PATH (in-process SDKs read ~/.claude + pi
@@ -188,6 +190,15 @@ in
       }
     });
   '';
+
+  # Daily Borg snapshot of the assistant's DATA_DIR (KB, sessions, settings +
+  # integration secrets, SQLite DB) to the bulk disk, mirroring the Forgejo
+  # backup. Consistent DB snapshot via SQLite online-backup; keeps 7 days.
+  services.my-personal-assistant-backup = {
+    enable = true;
+    dataDir = config.services.personal-assistant.dataDir;
+    repository = "/mnt/bulk/backups/personal-assistant";
+  };
 
   # Remote dev box — must stay reachable, so never auto-suspend/sleep.
   # Mask the sleep targets so nothing (GNOME/GDM idle, logind) can suspend it.
