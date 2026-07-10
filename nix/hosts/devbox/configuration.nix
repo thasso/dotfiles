@@ -170,11 +170,29 @@ in
     # Agent CLIs/tools on the service PATH (in-process SDKs read ~/.claude + pi
     # creds; the tmux Claude terminal and pi CLI need the binaries).
     extraPackages = with pkgs; [ claude-code pi-coding-agent tmux ];
+
+    # Per-PR preview deployments at pr-<n>.pa.codecluster.net, seeded from a
+    # consistent clone of the prod dataDir and reusing the shared token above.
+    # The Forgejo runner's pr-deploy/pr-teardown jobs start the pa-pr-deploy@/
+    # pa-pr-teardown@ oneshots (authorized by the polkit rule the module adds).
+    prDeployments = {
+      enable = true;
+      repoUrl = "https://git.codecluster.net/thasso/personal-assistant.git";
+    };
   };
 
   # Wire the assistant into Caddy (tailnet-only, cert via DNS-01).
   services.caddy.virtualHosts."pa.codecluster.net".extraConfig = ''
     reverse_proxy localhost:${toString config.services.personal-assistant.port}
+  '';
+
+  # PR preview routing: import the per-PR site files pa-pr writes/removes. Each
+  # pr-<n>.pa.codecluster.net gets its own cert automatically via the global
+  # DNS-01 issuer. Requires a wildcard DNS record *.pa.codecluster.net → the
+  # devbox tailscale IP (Hetzner DNS, set manually). The import dir is pre-created
+  # by a tmpfiles rule (see below) so the glob is valid before the first deploy.
+  services.caddy.extraConfig = ''
+    import ${config.services.personal-assistant.prDeployments.caddyImportDir}/*.caddy
   '';
 
   # CD: the Forgejo runner's `deploy` job triggers this rebuild. Runner host jobs
@@ -229,6 +247,8 @@ in
   # activation, so it always tracks the current google-chrome build.
   systemd.tmpfiles.rules = [
     "L+ /opt/google/chrome/chrome - - - - ${pkgs.google-chrome}/bin/google-chrome-stable"
+    # Pre-create the PR-preview Caddy import dir (readable by the caddy user).
+    "d ${config.services.personal-assistant.prDeployments.caddyImportDir} 0755 caddy caddy -"
   ];
 
   # ── Extra data disks (added 2026-07-08) ───────────────────
