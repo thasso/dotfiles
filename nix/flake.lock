@@ -36,11 +36,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783642944,
-        "narHash": "sha256-YuaeZs+6565YrJU0xDJ+mZIVn5zmqF9Rth6pMcbnh2E=",
+        "lastModified": 1783733469,
+        "narHash": "sha256-GPPbut5HTEfSwCFf6f7RagCHz2BMHvRQSFkESHOwjB0=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "d120e1bfc6c5e24995178ac8485e98938f2d68d4",
+        "rev": "b8106a2893d7b1c5b116bebbcf17df80ead302b1",
         "type": "github"
       },
       "original": {
@@ -155,11 +155,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783711151,
-        "narHash": "sha256-232L3Nku2nLch/TQHsJEIhiZJKr+VTehnVUs1NZ0SNc=",
+        "lastModified": 1783744526,
+        "narHash": "sha256-yYVxW+uIbCx0Nt870fbErQbz+b2+3Gwpppe+JbIU+Co=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "f938277527aa084929261879d50d9832b9eab6d3",
+        "rev": "2afec152df4e284d264f8489d16004c264aebf4c",
         "type": "github"
       },
       "original": {
@@ -284,11 +284,11 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1783701719,
-        "narHash": "sha256-e2/KxQwiPo6fjX9+/seSvn2LUgjYA0HQc+DWbOOSgEc=",
+        "lastModified": 1783766204,
+        "narHash": "sha256-h9GPmChn0Tyk8nr9GBsTBiuAPjNqVBHYiuTbtoF8feY=",
         "ref": "main",
-        "rev": "4a99c03a516478fc04ee0d31fcd79d214e3000df",
-        "revCount": 574,
+        "rev": "c60a4c9fb9d38372a120918432b2c6aa6f7ba748",
+        "revCount": 580,
         "type": "git",
         "url": "https://git.codecluster.net/thasso/personal-assistant.git"
       },
@@ -307,11 +307,11 @@
         "systems": "systems_3"
       },
       "locked": {
-        "lastModified": 1783670113,
-        "narHash": "sha256-WiwlLnJTQR/93+sJwEcxIf2l3m41M+yNVwnBmzP7PrU=",
+        "lastModified": 1783751297,
+        "narHash": "sha256-S43NbeKp/5f0ibRszmGH57YH/0mdsNFie3WJT3xnZtU=",
         "owner": "lukasl-dev",
         "repo": "pi-mono.nix",
-        "rev": "4487dbbebd9664788f9644a3fe79f8a066e059db",
+        "rev": "7bc33caa6ba571cad3ff8a24da6cf21a65aa0576",
         "type": "github"
       },
       "original": {
