@@ -72,5 +72,11 @@ in {
         ];
       };
     };
+
+    # Let `native:host` jobs read the system journal (the runner user is a
+    # DynamicUser, so grant the group on the service, not the user). The CI
+    # deploy job and the Ops workflow stream unit logs into the job output.
+    systemd.services."gitea-runner-${cfg.name}".serviceConfig.SupplementaryGroups =
+      [ "systemd-journal" ];
   };
 }

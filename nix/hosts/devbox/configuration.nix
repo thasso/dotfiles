@@ -31,6 +31,37 @@ let
       --flake /home/thasso/dotfiles/nix#devbox \
       --override-input personalAssistant "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=main&rev=$assistantRev"
   '';
+
+  # Escape hatch for a stuck stop/drain: agent-spawned stray processes can
+  # survive SIGTERM and hold the service's stop (and any deploy waiting on the
+  # restart) for the full TimeoutStopSec. SIGKILL the whole cgroup, then
+  # restart. Started by the repo's Ops workflow (force-restart) or manually:
+  # `sudo systemctl start personal-assistant-force-restart.service`.
+  paForceRestart = pkgs.writeShellScript "pa-force-restart" ''
+    set -u
+    export PATH=/run/current-system/sw/bin:$PATH
+    echo "SIGKILLing personal-assistant cgroup"
+    systemctl kill --kill-whom=all --signal=SIGKILL personal-assistant.service || true
+    # Let the kill and the unit's own Restart=on-failure logic settle before
+    # issuing the restart, otherwise the fresh instance can catch the SIGKILL.
+    sleep 2
+    systemctl reset-failed personal-assistant.service 2>/dev/null || true
+    echo "Restarting personal-assistant"
+    systemctl restart personal-assistant.service
+    # Exit code reflects the real outcome: wait for a stable active state
+    # (RestartSec=5 means a raced first start may need one more cycle).
+    for _ in $(seq 1 30); do
+      state=$(systemctl is-active personal-assistant.service) || true
+      if [ "$state" = "active" ]; then
+        echo "personal-assistant is active"
+        exit 0
+      fi
+      sleep 2
+    done
+    echo "personal-assistant did not reach active state: $state" >&2
+    systemctl status --no-pager -l personal-assistant.service || true
+    exit 1
+  '';
 in
 {
   imports = [
@@ -209,13 +240,24 @@ in
     };
   };
 
+  systemd.services.personal-assistant-force-restart = {
+    description = "Force-restart personal-assistant (SIGKILL stuck cgroup, then restart)";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${paForceRestart}";
+    };
+  };
+
   security.polkit.enable = true;
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
       if (action.id == "org.freedesktop.systemd1.manage-units" &&
-          action.lookup("unit") == "personal-assistant-deploy.service" &&
           subject.user == "gitea-runner") {
-        return polkit.Result.YES;
+        var unit = action.lookup("unit");
+        if (unit == "personal-assistant-deploy.service" ||
+            unit == "personal-assistant-force-restart.service") {
+          return polkit.Result.YES;
+        }
       }
     });
   '';
