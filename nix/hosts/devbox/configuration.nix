@@ -202,6 +202,14 @@ in
     # creds; the tmux Claude terminal and pi CLI need the binaries).
     extraPackages = with pkgs; [ claude-code pi-coding-agent tmux ];
 
+    # Local CPU-only composer dictation. Models default to the app's own
+    # catalog, so no id/package belongs here (one ~631 MB store path, fetched
+    # once and shared). The recognizer starts on the first dictation and stops
+    # after ~10 min idle, holding ~2 GB while warm — which is why the app module
+    # keeps this out of the env PR previews inherit, and why we don't add it
+    # there either.
+    speech.enable = true;
+
     # Per-PR preview deployments at pr-<n>.pa.codecluster.net, seeded from a
     # consistent clone of the prod dataDir and reusing the shared token above.
     # The Forgejo runner's pr-deploy/pr-teardown jobs start the pa-pr-deploy@/
