@@ -78,6 +78,14 @@
             });
           };
         })
+        # worktrunk has Darwin sandbox/process-table-sensitive tests that can
+        # fail even though the package builds successfully.
+        (final: prev: {
+          worktrunk = prev.worktrunk.overrideAttrs (_old:
+            prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
+              doCheck = false;
+            });
+        })
         # herdr vendors libghostty-vt, whose zig build shells out to
         # xcrun/xcode-select (SDK detection) and Apple's libtool (fat archive),
         # and needs the macOS SDK headers — none of which the nixpkgs build
