@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Claude Code personal wrapper script
+# Starts Claude with auto mode enabled and a personal config directory
+export CLAUDE_CONFIG_DIR="$HOME/.claude-personal"
+exec claude --permission-mode auto "$@"

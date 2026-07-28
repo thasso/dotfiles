@@ -286,6 +286,7 @@ in
   home.file = {
     "bin/oc".source = ../../bin/oc;
     "bin/cca".source = ../../bin/cca;
+    "bin/ccp".source = ../../bin/ccp;
 
     ".agents/skills" = {
       source = ../../agents/skills;
