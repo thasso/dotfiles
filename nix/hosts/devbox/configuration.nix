@@ -240,8 +240,17 @@ in
   # polkit rule. The command is fixed in the unit, so the runner can only start
   # it — it gets no other root, and nixos-rebuild is atomic (a failing build
   # never switches). thasso can still run `sudo pa-deploy` interactively.
+  # These oneshots DRIVE the switch/restart they would be restarted by, so an
+  # activation must never touch a running instance: when the unit file changes
+  # (any nixpkgs bump moves paDeploy's store path), switch-to-configuration puts
+  # personal-assistant-deploy.service in its stop list and the in-flight deploy
+  # SIGTERMs ITSELF mid-activation, then gets re-started while forgejo/caddy are
+  # still down and fails on `git ls-remote` (502). A oneshot picks up its new
+  # definition on the next start anyway, so skipping it during activation costs
+  # nothing.
   systemd.services.personal-assistant-deploy = {
     description = "Rebuild devbox so personal-assistant tracks the latest main";
+    restartIfChanged = false;
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${paDeploy}/bin/pa-deploy";
@@ -250,11 +259,20 @@ in
 
   systemd.services.personal-assistant-force-restart = {
     description = "Force-restart personal-assistant (SIGKILL stuck cgroup, then restart)";
+    restartIfChanged = false;
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${paForceRestart}";
     };
   };
+
+  # The runner hosts the deploy job that triggers activation, so restarting it
+  # during that activation force-kills its own in-flight job
+  # ([runner].shutdown_timeout=0s) and — with forgejo/caddy restarting in the
+  # same batch — the final job status can never be uploaded, leaving the CI run
+  # "running" in Forgejo forever even though the deploy succeeded. Let a runner
+  # version bump take effect on the next natural restart instead.
+  systemd.services.gitea-runner-devbox.restartIfChanged = false;
 
   security.polkit.enable = true;
   security.polkit.extraConfig = ''
