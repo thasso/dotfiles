@@ -117,6 +117,41 @@ in
   services.tailscale.enable = true;
   services.tailscale.openFirewall = true;
 
+  # Exit node: tailnet clients that opt in (`tailscale set --exit-node=devbox`)
+  # send their internet traffic out through devbox's home uplink. Only clients
+  # that select it are affected — advertising is just an offer, and it needs a
+  # one-time approval in the admin console (Machines → devbox → Edit route
+  # settings → Use as exit node).
+  #
+  # "server" enables IPv4 *and* IPv6 forwarding. The v4 sysctl happens to be on
+  # already because Docker sets it, but v6 forwarding is off, which would break
+  # IPv6 egress for exit-node clients. This only touches boot.kernel.sysctl, so
+  # it does not restart tailscaled.
+  services.tailscale.useRoutingFeatures = "server";
+  # Declarative advertisement. extraUpFlags is not an option here: it only
+  # applies when authKeyFile is set, and this node was authenticated
+  # interactively. extraSetFlags instead runs a `tailscale set` oneshot
+  # (tailscaled-set.service) ordered after tailscaled, which is idempotent and
+  # only mutates prefs — the daemon keeps running and existing sessions survive.
+  services.tailscale.extraSetFlags = [ "--advertise-exit-node" ];
+
+  # Tailscale recommends this on subnet routers / exit nodes; without it the
+  # forwarding path is noticeably slower and tailscaled raises a health warning.
+  # Guarded by `|| true` so a driver that lacks the knob can't fail activation.
+  systemd.services.tailscale-gro = {
+    description = "Tune UDP GRO forwarding on the uplink for Tailscale routing";
+    after = [ "network-online.target" "sys-subsystem-net-devices-enp6s0.device" ];
+    wants = [ "network-online.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      ${pkgs.ethtool}/bin/ethtool -K enp6s0 rx-udp-gro-forwarding on rx-gro-list off || true
+    '';
+  };
+
   # ── Containers (Docker) ───────────────────────────────────
   # Rootful Docker; thasso is in the `docker` group above so it can drive
   # containers without sudo. (Note: docker-group access is root-equivalent.)
