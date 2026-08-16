@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 let
   androidSdk = pkgs.androidenv.composeAndroidPackages {
-    platformToolsVersion = "36.0.2"; # 37.0.0 has a broken hash in nixpkgs
+    platformToolsVersion = "37.0.1"; # only version in nixpkgs; 36.x was dropped
     platformVersions = [ "35" ];
     buildToolsVersions = [ "35.0.0" ];
     cmakeVersions = [ "3.22.1" ];
