@@ -40,6 +40,19 @@ in {
         directly on the host with the packages from hostPackages below.
       '';
     };
+    capacity = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 2;
+      description = ''
+        How many jobs this runner executes concurrently (runner.capacity).
+        forgejo-runner defaults to 1, which serializes jobs that a workflow
+        declares as independent: the personal-assistant CI runs its `check`
+        job (docker) and its `nix-build` job (native) back to back, so the
+        ~24s nix build sits on the critical path for no reason. 2 lets them
+        overlap; the box has 24 cores, so the contention is nix build vs. a
+        node test suite rather than anything CPU-starved.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -57,6 +70,10 @@ in {
         url = cfg.url;
         tokenFile = config.sops.templates."forgejo-runner-token.env".path;
         labels = cfg.labels;
+        # Everything left unset here keeps forgejo-runner's own defaults; the
+        # generated config.yaml is the daemon's whole configuration, not an
+        # overlay on top of `generate-config`.
+        settings.runner.capacity = cfg.capacity;
         # Packages available to `native:host` jobs. nix is what makes
         # `nix build`/`nix flake check` work on the host runner.
         hostPackages = with pkgs; [

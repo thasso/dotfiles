@@ -78,6 +78,11 @@ in
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/nvme1n1";
   boot.loader.grub.useOSProber = false;
+  # Every personal-assistant deploy mints a system generation (~8/day, 334 of
+  # them in the first six weeks), and each one becomes a GRUB menu entry that
+  # grub-mkconfig has to re-emit on every switch. Cap the menu; this does not
+  # delete generations, so `nixos-rebuild --rollback` still reaches older ones.
+  boot.loader.grub.configurationLimit = 10;
 
   # Networking
   networking.hostName = "devbox";
@@ -164,6 +169,23 @@ in
       dates = "weekly";
     };
   };
+
+  # ── Nix store hygiene ─────────────────────────────────────
+  # Hardlink byte-identical files across store paths. This box deploys the
+  # personal assistant several times a day and each build is a ~750 MB output,
+  # so without dedup every deploy costs its full size. Measured before turning
+  # this on: the bundled `claude` binary existed as 581 distinct inodes for
+  # 70 GB, 273 of which were identical copies of the same 262 MB file.
+  #
+  # Only applies to paths added after activation; folding what is already in
+  # the store is a one-off `nix store optimise` run by hand.
+  nix.settings.auto-optimise-store = true;
+
+  # Deliberately NO nix.gc here yet: PR previews reference their build only
+  # from a plain env file rather than a GC root, and the pnpmDeps FOD is not
+  # rooted either, so an automatic collection would break live previews and
+  # force CI to refetch the whole npm dependency set. Revisit once the
+  # personal-assistant flake roots both.
 
   # Secrets (sops-nix). Host key derives the age identity for decryption.
   # Secret declarations live in the modules that consume them (e.g. Caddy).
