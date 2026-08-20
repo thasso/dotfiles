@@ -27,12 +27,26 @@ devbox runs, so:
 
 - `make switch` reproduces the deployed release.
 - `make update` re-locks the same tag and cannot drag the assistant forward.
-- Neither restarts the assistant: `personal-assistant.service` is
-  `restartIfChanged = false`, so activation never interrupts a running agent
-  turn (its PATH embeds host-side store paths like `git` and `claude-code`, so
-  it would otherwise churn on every input update). A restart means a release
-  shipped. The flip side: a hand-edited pin takes effect only after
+- Neither restarts the assistant, and neither even changes its unit: the unit's
+  only store paths are the app package and its own drain script, both from the
+  app's flake. `restartIfChanged = false` stays as a belt so anything that does
+  move the unit cannot interrupt an agent turn as a side effect. A restart means
+  a release shipped. The flip side: a hand-edited pin takes effect only after
   `systemctl restart personal-assistant` — or just use `sudo pa-release`.
+- **This host configures no packages for the assistant.** No `extraPackages`, no
+  recognizer, no model. The agents' toolbox is this host's own profiles, which
+  the service PATH ends in; the app declares what it needs in its
+  `config/host-tools.json` and fails its own boot if the host is below a floor.
+  Optional capabilities (dictation, docker, java) are discovered and degrade with
+  a reason. `sherpa-onnx` in `environment.systemPackages` plus
+  `speech.modelDir` is what makes dictation possible — ordinary host config.
+- Nothing here reaches into the app flake for a package. The dictation weights
+  are ours: `nix/pkgs/stt-model-*.nix`, our URL and our hash, wired through the
+  overlay like `gogcli`/`tempomat` and handed to `speech.modelDir`. It is a
+  `fetchzip` on purpose — a fixed-output path depends only on name and hash, so
+  `make update` cannot move it (verified against two unrelated nixpkgs
+  revisions). Never turn it into a `mkDerivation`: that is input-addressed and
+  would churn the assistant's unit on every input update.
 - The app repo's Release workflow moves the pin via
   `personal-assistant-release@<tag>.service` (`pa-release`), which commits the
   bump here and never pushes. So `git log nix/flake.lock` is the deploy history

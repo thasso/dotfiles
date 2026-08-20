@@ -348,17 +348,29 @@ in
     dataDir = "/home/thasso/pa-data";
     allowedOrigins = [ "https://pa.codecluster.net" ];
     tokenFile = config.sops.templates."personal-assistant-token.env".path;
-    # Agent CLIs/tools on the service PATH (in-process SDKs read ~/.claude + pi
-    # creds; the tmux Claude terminal and pi CLI need the binaries).
-    extraPackages = with pkgs; [ claude-code pi-coding-agent tmux ];
 
-    # Local CPU-only composer dictation. Models default to the app's own
-    # catalog, so no id/package belongs here (one ~631 MB store path, fetched
-    # once and shared). The recognizer starts on the first dictation and stops
-    # after ~10 min idle, holding ~2 GB while warm — which is why the app module
-    # keeps this out of the env PR previews inherit, and why we don't add it
-    # there either.
-    speech.enable = true;
+    # No package configuration at all. The agents' toolbox is this host's: the
+    # service PATH is /etc/profiles/per-user/thasso and /run/current-system/sw,
+    # which already carry claude, pi and tmux from home.packages — both hash-free
+    # paths, so a `make update` cannot move the unit and restart the service. The
+    # module has no extraPackages option precisely so that stays true; add a tool
+    # to home.packages or environment.systemPackages instead. The app declares
+    # what it needs in its own config/host-tools.json and checks it at startup.
+    # (claude and pi are not needed as CLIs anyway: the server drives them as
+    # libraries and resolves the Claude binary from its own node_modules.)
+
+    # Local CPU-only composer dictation is an optional HOST capability: the app
+    # ships no recognizer and no weights and only discovers what it is pointed
+    # at, so BOTH halves are this host's. sherpa-onnx is in systemPackages below
+    # and the weights are nix/pkgs/stt-model-*.nix — our package, our URL, our
+    # hash. Nothing here reaches into the app flake. Point this elsewhere, or
+    # leave it empty, and the server just reports `configured: false` with a
+    # reason and disables the mic button.
+    #
+    # A store path, and still churn-free: that package is a fetchzip, i.e. a
+    # fixed-output derivation whose path is a function of its name and output
+    # hash alone. `make update` cannot move it, so it cannot move the unit.
+    speech.modelDir = "${pkgs.stt-model-parakeet-tdt-600m-v2-int8}";
 
     # Per-PR preview deployments at pr-<n>.pa.codecluster.net, seeded from a
     # consistent clone of the prod dataDir and reusing the shared token above.
@@ -370,24 +382,14 @@ in
     };
   };
 
-  # Restarts belong to deploys, not to activations. The pinned release means
-  # `make switch` reproduces production, but the unit still churns on unrelated
-  # system changes: its PATH embeds host-side store paths (git, openssh, bash,
-  # coreutils, the NixOS default path, and claude-code/pi-coding-agent/tmux from
-  # extraPackages above), so any `make update` moved the unit and restarted a
-  # service that drains active agent turns for up to TimeoutStopSec (1h). Pinning
-  # those tools to the app's own nixpkgs would not fix it either: claude-code is
-  # deliberately host-side and moves most often of all.
-  #
-  # So decouple the two. pa-release issues an explicit `systemctl restart` after
-  # its switch, which makes a restart mean "a release shipped" and nothing else.
-  # This is the same shape the module already uses for pa-pr@ previews, which are
-  # restarted only by `pa-pr deploy`.
-  #
-  # The tradeoff: a PATH/env change lands at the next deploy rather than
-  # immediately — which is what you want anyway, rather than swapping an agent's
-  # toolbox mid-turn. If you change the pin by hand (or pull someone else's pin
-  # commit) and `make switch`, restart deliberately or just use `sudo pa-release`.
+  # Restarts belong to deploys, not to activations. The unit is now free of
+  # host store paths, so in principle only a release can change it — but keep
+  # this as the belt: a hand-edited pin, a module change, or anything else that
+  # does move the unit must not interrupt an agent turn as a side effect of an
+  # unrelated `make switch`. pa-release issues an explicit `systemctl restart`
+  # after its switch, so a restart means "a release shipped" and nothing else.
+  # Same shape the app module uses for pa-pr@ previews, restarted only by
+  # `pa-pr deploy`.
   systemd.services.personal-assistant.restartIfChanged = false;
 
   # Wire the assistant into Caddy (tailnet-only, cert via DNS-01).
@@ -504,7 +506,17 @@ in
   systemd.targets.hybrid-sleep.enable = false;
 
   # Power measurement tools (`sudo powertop`, `sensors`) for profiling idle draw.
-  environment.systemPackages = with pkgs; [ powertop lm_sensors paDeploy ];
+  # sherpa-onnx is here rather than in services.personal-assistant because the
+  # assistant treats the recognizer as a host tool it discovers on PATH: the app
+  # ships no recognizer package, so this host is what makes dictation possible.
+  # Updating it is an ordinary host update — it cannot move the assistant's unit.
+  environment.systemPackages = with pkgs; [
+    powertop
+    lm_sensors
+    paDeploy
+    paRelease
+    sherpa-onnx
+  ];
 
   # Playwright looks for `channel: "chrome"` at the hardcoded Linux path
   # /opt/google/chrome/chrome, which doesn't exist on NixOS (the Nix Chrome —
