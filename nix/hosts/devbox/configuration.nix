@@ -1,12 +1,95 @@
 { config, pkgs, ... }:
 
 let
-  # Continuous-deploy command for the personal assistant. Rebuilds this host
-  # from the local dotfiles checkout, floating ONLY the personalAssistant input
-  # to the latest main (other inputs stay pinned by flake.lock). Run as root via
-  # a scoped NOPASSWD sudo rule by the Forgejo runner's `deploy` job on green
-  # main. nixos-rebuild is atomic: a failing build never switches, so the running
-  # assistant keeps serving.
+  dotfiles = "/home/thasso/dotfiles";
+  paRepo = "https://git.codecluster.net/thasso/personal-assistant.git";
+
+  # Release deploy — the ONLY thing that changes which assistant version devbox
+  # runs. Rewrites the personalAssistant pin in the dotfiles checkout to a
+  # published release tag, re-locks it, switches, and commits the bump (never
+  # pushes). Because the pin lands in flake.nix + flake.lock, a later plain
+  # `make switch` reproduces exactly this deployment rather than rolling it back,
+  # and `git log nix/flake.lock` is the deploy history.
+  #
+  # Started by the app repo's Release workflow as
+  # personal-assistant-release@<tag>.service; usable by hand as
+  # `sudo pa-release v1.2.3`.
+  paRelease = pkgs.writeShellScriptBin "pa-release" ''
+    set -euo pipefail
+    export PATH=${pkgs.git}/bin:${pkgs.gnused}/bin:${pkgs.coreutils}/bin:${pkgs.util-linux}/bin:/run/current-system/sw/bin:$PATH
+    # Root's own (writable) HOME for the safe.directory write and nix's eval
+    # cache; repo-touching steps get thasso's HOME via asUser below.
+    export HOME=/root
+    # Root evaluates thasso's checkout; avoid git "dubious ownership".
+    git config --global --add safe.directory ${dotfiles} || true
+
+    tag="''${1:-}"
+    # Anything that reaches sed, a URL or a commit message is validated first:
+    # once for shape, once for charset. The polkit rule constrains the instance
+    # name as well, but this is the check that actually guards the script.
+    case "$tag" in
+      v[0-9]*.[0-9]*.[0-9]*) ;;
+      *) echo "Not a release tag: '$tag' (expected vMAJOR.MINOR.PATCH)" >&2; exit 1 ;;
+    esac
+    case "$tag" in
+      *[!v0-9.]*) echo "Release tag has unexpected characters: '$tag'" >&2; exit 1 ;;
+    esac
+
+    # Every repo operation runs as the owner, so nothing in thasso's checkout
+    # ends up root-owned. Only the switch itself needs root.
+    asUser() {
+      runuser -u thasso -- env HOME=/home/thasso "$@"
+    }
+
+    # Annotated tags need peeling (^{}) to reach the commit; fall back to the
+    # plain ref so a lightweight tag still resolves.
+    refs="$(git ls-remote ${paRepo} "refs/tags/$tag" "refs/tags/$tag^{}")"
+    rev="$(printf '%s\n' "$refs" | sed -n 's|^\([0-9a-f]\{40\}\)[[:space:]].*\^{}$|\1|p' | head -n1)"
+    if [ -z "$rev" ]; then
+      rev="$(printf '%s\n' "$refs" | sed -n 's|^\([0-9a-f]\{40\}\)[[:space:]].*|\1|p' | head -n1)"
+    fi
+    if [ -z "$rev" ]; then
+      echo "No such release tag on the remote: $tag" >&2
+      exit 1
+    fi
+    # The line the Release workflow greps back out of this unit's journal.
+    echo "Deploying personal-assistant $tag ($rev)"
+
+    # The pin lives in files a human edits. Never clobber work in progress.
+    if ! asUser git -C ${dotfiles} diff --quiet -- nix/flake.nix nix/flake.lock ||
+       ! asUser git -C ${dotfiles} diff --cached --quiet -- nix/flake.nix nix/flake.lock; then
+      echo "nix/flake.nix or nix/flake.lock has uncommitted changes; refusing to rewrite the pin." >&2
+      exit 1
+    fi
+
+    asUser sed -i "s|\(personal-assistant\.git?ref=refs/tags/\)v[0-9][0-9.]*|\1$tag|" ${dotfiles}/nix/flake.nix
+    # --refresh so a cached tag→rev mapping cannot ship the wrong commit.
+    asUser nix flake update personalAssistant --refresh --flake ${dotfiles}/nix
+    if ! grep -q "\"rev\": \"$rev\"" ${dotfiles}/nix/flake.lock; then
+      echo "flake.lock does not record $tag ($rev) after re-locking; aborting." >&2
+      asUser git -C ${dotfiles} checkout -- nix/flake.nix nix/flake.lock
+      exit 1
+    fi
+
+    if nixos-rebuild switch --flake ${dotfiles}/nix#devbox; then
+      # Commit only the pin: any other work in the tree stays untouched, and
+      # this never pushes.
+      asUser git -C ${dotfiles} commit -q \
+        -m "Deploy personal-assistant $tag" \
+        -m "personalAssistant pinned to refs/tags/$tag ($rev)." \
+        -- nix/flake.nix nix/flake.lock
+      echo "Deployed $tag and committed the pin (not pushed)."
+    else
+      echo "nixos-rebuild switch failed; restoring the previous pin." >&2
+      asUser git -C ${dotfiles} checkout -- nix/flake.nix nix/flake.lock
+      exit 1
+    fi
+  '';
+
+  # Manual escape hatch: switch onto the CURRENT remote main without touching
+  # the pin, for a hotfix you have not cut a release for. Deliberately leaves
+  # flake.lock alone, so the next plain `make switch` returns to the pinned
+  # release — that asymmetry is the point, not an oversight.
   paDeploy = pkgs.writeShellScriptBin "pa-deploy" ''
     set -euo pipefail
     export PATH=${pkgs.git}/bin:${pkgs.gawk}/bin:/run/current-system/sw/bin:$PATH
@@ -291,20 +374,36 @@ in
     import ${config.services.personal-assistant.prDeployments.caddyImportDir}/*.caddy
   '';
 
-  # CD: the Forgejo runner's `deploy` job triggers this rebuild. Runner host jobs
+  # CD: the app repo's `release` job triggers this rebuild. Runner host jobs
   # run with NoNewPrivileges, so setuid sudo is blocked; instead the runner asks
   # systemd (over D-Bus) to start a fixed root oneshot, authorized by a narrow
   # polkit rule. The command is fixed in the unit, so the runner can only start
   # it — it gets no other root, and nixos-rebuild is atomic (a failing build
-  # never switches). thasso can still run `sudo pa-deploy` interactively.
+  # never switches). thasso can still run `sudo pa-release` / `sudo pa-deploy`
+  # interactively.
   # These oneshots DRIVE the switch/restart they would be restarted by, so an
   # activation must never touch a running instance: when the unit file changes
-  # (any nixpkgs bump moves paDeploy's store path), switch-to-configuration puts
-  # personal-assistant-deploy.service in its stop list and the in-flight deploy
-  # SIGTERMs ITSELF mid-activation, then gets re-started while forgejo/caddy are
-  # still down and fails on `git ls-remote` (502). A oneshot picks up its new
-  # definition on the next start anyway, so skipping it during activation costs
-  # nothing.
+  # (any nixpkgs bump moves the script's store path), switch-to-configuration
+  # puts the unit in its stop list and the in-flight deploy SIGTERMs ITSELF
+  # mid-activation, then gets re-started while forgejo/caddy are still down and
+  # fails on `git ls-remote` (502). A oneshot picks up its new definition on the
+  # next start anyway, so skipping it during activation costs nothing.
+  #
+  # The instance name is the release tag: personal-assistant-release@v1.2.3.
+  # Templated rather than fixed because the tag IS the deploy target now, and
+  # pa-release re-validates %i rather than trusting the polkit pattern.
+  systemd.services."personal-assistant-release@" = {
+    description = "Pin personal-assistant to release %i and switch devbox onto it";
+    restartIfChanged = false;
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${paRelease}/bin/pa-release %i";
+    };
+  };
+
+  # Manual-only hotfix path: ships current main without moving the pin. Kept as
+  # a unit so `systemctl start` semantics (journal, serialization) match the
+  # release path; no polkit rule, so CI cannot reach it.
   systemd.services.personal-assistant-deploy = {
     description = "Rebuild devbox so personal-assistant tracks the latest main";
     restartIfChanged = false;
@@ -331,14 +430,27 @@ in
   # version bump take effect on the next natural restart instead.
   systemd.services.gitea-runner-devbox.restartIfChanged = false;
 
+  # This host authorizes the units this host defines. The assistant module also
+  # ships a polkit rule naming the production oneshots, but it cannot be the
+  # only one: that rule arrives with the PINNED release, so a newly added unit
+  # would be unauthorized until a release carrying its permission is already
+  # deployed — which needs the unit to work. Rules are OR'd, so the two coexist;
+  # this one is what makes the release unit reachable on a fresh switch.
+  #
+  # The boundary is a PATTERN, not a name: only a vMAJOR.MINOR.PATCH instance is
+  # reachable, and pa-release re-validates %i rather than trusting this regex.
+  # personal-assistant-deploy is deliberately absent — shipping unreleased main
+  # is a manual decision. (Until the pinned release carries the module change,
+  # the module's own rule still grants it; harmless, and it lapses on the next
+  # release.)
   security.polkit.enable = true;
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
       if (action.id == "org.freedesktop.systemd1.manage-units" &&
           subject.user == "gitea-runner") {
         var unit = action.lookup("unit");
-        if (unit == "personal-assistant-deploy.service" ||
-            unit == "personal-assistant-force-restart.service") {
+        if (unit == "personal-assistant-force-restart.service" ||
+            /^personal-assistant-release@v[0-9]+\.[0-9]+\.[0-9]+\.service$/.test(unit)) {
           return polkit.Result.YES;
         }
       }

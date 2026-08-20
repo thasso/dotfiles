@@ -19,6 +19,25 @@ make update      # update flake inputs (nixpkgs, home-manager, etc.)
 `make switch` detects the OS and hostname and selects the right flake output
 automatically.
 
+### The personal assistant is pinned, not floating
+
+`nix/flake.nix` pins the `personalAssistant` input to a published release tag
+(`?ref=refs/tags/vX.Y.Z`). That line plus `flake.lock` is the record of what
+devbox runs, so:
+
+- `make switch` reproduces the deployed release. It does not restart the
+  assistant when no release happened in between — the unit is unchanged.
+- `make update` re-locks the same tag and cannot drag the assistant forward.
+  (It does restart the service, because the unit's PATH embeds dotfiles-side
+  store paths like `git` and `claude-code`.)
+- The app repo's Release workflow moves the pin via
+  `personal-assistant-release@<tag>.service` (`pa-release`), which commits the
+  bump here and never pushes. So `git log nix/flake.lock` is the deploy history
+  and rollback is `git revert` + `make switch`.
+- `sudo pa-deploy` is a manual hotfix that ships current `main` *without*
+  touching the pin — the next plain `make switch` therefore returns to the
+  pinned release. CI cannot start it.
+
 ## Nix structure (`nix/`)
 
 ```
