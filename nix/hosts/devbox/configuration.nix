@@ -71,19 +71,29 @@ let
       exit 1
     fi
 
-    if nixos-rebuild switch --flake ${dotfiles}/nix#devbox; then
-      # Commit only the pin: any other work in the tree stays untouched, and
-      # this never pushes.
-      asUser git -C ${dotfiles} commit -q \
-        -m "Deploy personal-assistant $tag" \
-        -m "personalAssistant pinned to refs/tags/$tag ($rev)." \
-        -- nix/flake.nix nix/flake.lock
-      echo "Deployed $tag and committed the pin (not pushed)."
-    else
+    if ! nixos-rebuild switch --flake ${dotfiles}/nix#devbox; then
       echo "nixos-rebuild switch failed; restoring the previous pin." >&2
       asUser git -C ${dotfiles} checkout -- nix/flake.nix nix/flake.lock
       exit 1
     fi
+
+    # Commit only the pin: any other work in the tree stays untouched, and this
+    # never pushes. Committed BEFORE the restart because the switch has already
+    # happened — the system is on $tag whether or not the restart goes well, and
+    # a tree that disagreed with the running system would be the worse state.
+    asUser git -C ${dotfiles} commit -q \
+      -m "Deploy personal-assistant $tag" \
+      -m "personalAssistant pinned to refs/tags/$tag ($rev)." \
+      -- nix/flake.nix nix/flake.lock
+
+    # The switch does NOT restart the service: personal-assistant.service is
+    # restartIfChanged = false (see below), so activation never interrupts a
+    # running agent turn. Deploying is exactly when a restart IS wanted, so ask
+    # for it here. The drain can take up to TimeoutStopSec (1h); the Release
+    # workflow's `systemctl start --wait` timeout covers this whole script.
+    echo "Restarting personal-assistant onto $tag"
+    systemctl restart personal-assistant.service
+    echo "Deployed $tag, committed the pin (not pushed), and restarted the service."
   '';
 
   # Manual escape hatch: switch onto the CURRENT remote main without touching
@@ -359,6 +369,26 @@ in
       repoUrl = "https://git.codecluster.net/thasso/personal-assistant.git";
     };
   };
+
+  # Restarts belong to deploys, not to activations. The pinned release means
+  # `make switch` reproduces production, but the unit still churns on unrelated
+  # system changes: its PATH embeds host-side store paths (git, openssh, bash,
+  # coreutils, the NixOS default path, and claude-code/pi-coding-agent/tmux from
+  # extraPackages above), so any `make update` moved the unit and restarted a
+  # service that drains active agent turns for up to TimeoutStopSec (1h). Pinning
+  # those tools to the app's own nixpkgs would not fix it either: claude-code is
+  # deliberately host-side and moves most often of all.
+  #
+  # So decouple the two. pa-release issues an explicit `systemctl restart` after
+  # its switch, which makes a restart mean "a release shipped" and nothing else.
+  # This is the same shape the module already uses for pa-pr@ previews, which are
+  # restarted only by `pa-pr deploy`.
+  #
+  # The tradeoff: a PATH/env change lands at the next deploy rather than
+  # immediately — which is what you want anyway, rather than swapping an agent's
+  # toolbox mid-turn. If you change the pin by hand (or pull someone else's pin
+  # commit) and `make switch`, restart deliberately or just use `sudo pa-release`.
+  systemd.services.personal-assistant.restartIfChanged = false;
 
   # Wire the assistant into Caddy (tailnet-only, cert via DNS-01).
   services.caddy.virtualHosts."pa.codecluster.net".extraConfig = ''

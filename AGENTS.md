@@ -25,11 +25,14 @@ automatically.
 (`?ref=refs/tags/vX.Y.Z`). That line plus `flake.lock` is the record of what
 devbox runs, so:
 
-- `make switch` reproduces the deployed release. It does not restart the
-  assistant when no release happened in between — the unit is unchanged.
+- `make switch` reproduces the deployed release.
 - `make update` re-locks the same tag and cannot drag the assistant forward.
-  (It does restart the service, because the unit's PATH embeds dotfiles-side
-  store paths like `git` and `claude-code`.)
+- Neither restarts the assistant: `personal-assistant.service` is
+  `restartIfChanged = false`, so activation never interrupts a running agent
+  turn (its PATH embeds host-side store paths like `git` and `claude-code`, so
+  it would otherwise churn on every input update). A restart means a release
+  shipped. The flip side: a hand-edited pin takes effect only after
+  `systemctl restart personal-assistant` — or just use `sudo pa-release`.
 - The app repo's Release workflow moves the pin via
   `personal-assistant-release@<tag>.service` (`pa-release`), which commits the
   bump here and never pushes. So `git log nix/flake.lock` is the deploy history
