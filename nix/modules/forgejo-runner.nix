@@ -42,15 +42,20 @@ in {
     };
     capacity = lib.mkOption {
       type = lib.types.ints.positive;
-      default = 2;
+      default = 4;
       description = ''
         How many jobs this runner executes concurrently (runner.capacity).
         forgejo-runner defaults to 1, which serializes jobs that a workflow
         declares as independent: the personal-assistant CI runs its `check`
         job (docker) and its `nix-build` job (native) back to back, so the
-        ~24s nix build sits on the critical path for no reason. 2 lets them
-        overlap; the box has 24 cores, so the contention is nix build vs. a
-        node test suite rather than anything CPU-starved.
+        ~24s nix build sits on the critical path for no reason.
+
+        The capacity is a single pool shared by every label, so 2 was enough
+        for one workflow's fan-out but not for two at once: a pair of docker
+        jobs could fill both slots and leave a `native:host` job queued behind
+        them. 4 keeps a second workflow (a push landing while a PR builds)
+        from waiting on the first. The box has 24 cores, so the contention is
+        nix build vs. a node test suite rather than anything CPU-starved.
       '';
     };
   };
