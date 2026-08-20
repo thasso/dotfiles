@@ -58,6 +58,21 @@ in {
         nix build vs. a node test suite rather than anything CPU-starved.
       '';
     };
+    cacheProxyPort = lib.mkOption {
+      type = lib.types.port;
+      default = 34567;
+      description = ''
+        Port of the runner's Actions cache proxy, the endpoint jobs reach
+        through ACTIONS_CACHE_URL.
+
+        forgejo-runner defaults this to 0, meaning a fresh random high port on
+        every start. Jobs run in containers, so they cross the host firewall to
+        reach it, and a firewall rule has to name a port — with a random one
+        there is nothing to open, every `actions/cache` step times out after
+        ~20s and restores nothing. Pinning the port is what makes the rule
+        below expressible.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -79,6 +94,15 @@ in {
         # generated config.yaml is the daemon's whole configuration, not an
         # overlay on top of `generate-config`.
         settings.runner.capacity = cfg.capacity;
+        settings.cache.proxy_port = cfg.cacheProxyPort;
+        # Only used to build the ACTIONS_CACHE_URL handed to jobs. docker0's
+        # address is fixed for the lifetime of the host and answers both from
+        # containers on any docker bridge and from `native:host` jobs, unlike
+        # the runner's own guess (an outbound-facing host address that
+        # containers cannot route to). `cache.port` — the cache server the
+        # proxy fronts — stays random on purpose: it is host-local and must not
+        # become reachable.
+        settings.cache.host = "172.17.0.1";
         # Packages available to `native:host` jobs. nix is what makes
         # `nix build`/`nix flake check` work on the host runner.
         hostPackages = with pkgs; [
@@ -94,6 +118,27 @@ in {
         ];
       };
     };
+
+    # Reach the cache proxy from job containers. The nixos-fw chain ends in a
+    # log-refuse, so container traffic to the host is dropped by default.
+    #
+    # The rule is scoped by source range rather than by interface: with
+    # `container.network` unset the runner builds a per-job network, so packets
+    # arrive on a br-<id> interface that only exists while the job does — an
+    # `interfaces."docker0"` rule never matches them. 172.16.0.0/12 is docker's
+    # private pool, which covers those bridges while excluding both the LAN
+    # (192.168.1.0/24) and the tailnet (100.x), so nothing outside this box
+    # gains reach. What makes exposing the proxy to local containers acceptable
+    # at all is that it authenticates: each workflow gets a single-use signed
+    # URL, so a neighbouring container holding no token gets nothing.
+    networking.firewall.extraCommands = ''
+      iptables -I nixos-fw 1 -s 172.16.0.0/12 -p tcp \
+        --dport ${toString cfg.cacheProxyPort} -j nixos-fw-accept
+    '';
+    networking.firewall.extraStopCommands = ''
+      iptables -D nixos-fw -s 172.16.0.0/12 -p tcp \
+        --dport ${toString cfg.cacheProxyPort} -j nixos-fw-accept || true
+    '';
 
     # Let `native:host` jobs read the system journal (the runner user is a
     # DynamicUser, so grant the group on the service, not the user). The CI
