@@ -38,8 +38,18 @@
     # Personal assistant app (server + web UI). No nixpkgs.follows: the package
     # is built against its own pinned nixpkgs (exactly what its native Nix CI
     # validates), keeping the npmDepsHash stable.
+    #
+    # Pinned to a published RELEASE TAG, never to main: this line together with
+    # flake.lock IS the record of which assistant devbox runs, so a plain
+    # `make switch` reproduces production instead of rolling it back. The app's
+    # Release workflow moves the pin (pa-release, via
+    # personal-assistant-release@<tag>.service) and commits the bump here, which
+    # makes the dotfiles history the deploy history — roll back by reverting that
+    # commit and switching. Because the ref names a tag rather than a branch,
+    # `make update` re-locks the same revision and cannot drag the assistant
+    # forward on its own.
     personalAssistant = {
-      url = "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=main";
+      url = "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=refs/tags/v0.23.1";
     };
   };
 
@@ -62,6 +72,13 @@
         })
         (final: prev: { gogcli = final.callPackage ./pkgs/gogcli.nix {}; })
         (final: prev: { tempomat = final.callPackage ./pkgs/tempomat.nix {}; })
+        # Speech-to-text weights for the assistant's dictation. A host package
+        # because the app owns no weights — see the file's own header for why it
+        # is a fetchzip (fixed-output ⇒ its path cannot churn on `make update`).
+        (final: prev: {
+          stt-model-parakeet-tdt-600m-v2-int8 =
+            final.callPackage ./pkgs/stt-model-parakeet-tdt-600m-v2-int8.nix {};
+        })
         # direnv's test suite hangs on Darwin (special chars in test dir names)
         (final: prev: {
           direnv = prev.direnv.overrideAttrs (_old:
