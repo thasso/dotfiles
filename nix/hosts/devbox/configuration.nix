@@ -3,6 +3,12 @@
 let
   dotfiles = "/home/thasso/dotfiles";
   paRepo = "https://git.codecluster.net/thasso/personal-assistant.git";
+  devTunnelCaddyRoute = pkgs.writeText "50-dev-tunnels.caddy" ''
+    @devtunnels header_regexp Host ^dev-[a-z0-9][a-z0-9-]*\.pa\.codecluster\.net(:[0-9]+)?$
+    handle @devtunnels {
+    ${"\t"}reverse_proxy localhost:${toString config.services.personal-assistant.port}
+    }
+  '';
 
   # Release deploy — the ONLY thing that changes which assistant version devbox
   # runs. Rewrites the personalAssistant pin in the dotfiles checkout to a
@@ -392,6 +398,15 @@ in
   # `pa-pr deploy`.
   systemd.services.personal-assistant.restartIfChanged = false;
 
+  # Production alone owns dev-tunnel hostnames. Setting this directly on the
+  # unit keeps it out of the extra environment inherited by PR previews.
+  systemd.services.personal-assistant.environment.ASSISTANT_DEV_TUNNEL_DOMAIN =
+    "pa.codecluster.net";
+
+  # Reload Caddy on activation when the generated route changes. The route is
+  # imported inside pa-pr's existing wildcard site via routes/*.caddy below.
+  systemd.services.caddy.reloadTriggers = [ devTunnelCaddyRoute ];
+
   # Wire the assistant into Caddy (tailnet-only, cert via DNS-01).
   services.caddy.virtualHosts."pa.codecluster.net".extraConfig = ''
     reverse_proxy localhost:${toString config.services.personal-assistant.port}
@@ -528,6 +543,9 @@ in
     "L+ /opt/google/chrome/chrome - - - - ${pkgs.google-chrome}/bin/google-chrome-stable"
     # Pre-create the PR-preview Caddy import dir (readable by the caddy user).
     "d ${config.services.personal-assistant.prDeployments.caddyImportDir} 0755 caddy caddy -"
+    # Add dev tunnels to the wildcard site's imported routes without touching
+    # the pa-pr-managed wildcard or per-preview files.
+    "L+ ${config.services.personal-assistant.prDeployments.caddyImportDir}/routes/50-dev-tunnels.caddy - - - - ${devTunnelCaddyRoute}"
   ];
 
   # ── Extra data disks (added 2026-07-08) ───────────────────
