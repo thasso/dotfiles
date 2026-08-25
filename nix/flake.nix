@@ -49,7 +49,7 @@
     # `make update` re-locks the same revision and cannot drag the assistant
     # forward on its own.
     personalAssistant = {
-      url = "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=refs/tags/v0.24.1";
+      url = "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=refs/tags/v0.25.0";
     };
   };
 
