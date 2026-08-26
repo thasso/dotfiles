@@ -25,6 +25,9 @@ in
   } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
     CC = "clang";
     CXX = "clang++";
+    # Let pkg-config find the .dev outputs installed via home.packages
+    # (Stardust/FFmpeg libraries below).
+    PKG_CONFIG_PATH = "${config.home.profileDirectory}/lib/pkgconfig";
   } // lib.optionalAttrs pkgs.stdenv.isDarwin {
     SSH_AUTH_SOCK = "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
     SOPS_AGE_KEY_CMD = "op read 'op://Private/sops-age-key/private_key'";
@@ -260,8 +263,34 @@ in
   ] ++ lib.optionals (!pkgs.stdenv.isDarwin) [
     clang
     google-chrome
+
+    # Stardust/FFmpeg toolchain: assemblers, autotools and debuggers plus the
+    # .dev outputs (pkg-config files) of the libraries that
+    # scripts/linux/build_ffmpeg_filter.sh expects to discover globally.
+    nasm
+    yasm
+    wget
+    autoconf
+    automake
+    libtool
+    gdb
+    valgrind
+    libass.dev
+    fdk_aac.dev
+    freetype.dev
+    fontconfig.dev
+    fribidi.dev
+    harfbuzz.dev
+    libvpx.dev
+    x264.dev
+    x265.dev
+    numactl.dev
   ] ++ [
     cmake
+    ninja
+    ccache
+    pkg-config
+    shellcheck
     go
     golangci-lint
     gogcli
