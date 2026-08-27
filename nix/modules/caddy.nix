@@ -48,11 +48,14 @@ in {
       }];
 
       # caddy-dns/hetzner v2 targets the Hetzner Cloud DNS API and needs a
-      # Hetzner Cloud API token. The hash covers the plugin's vendored Go deps;
-      # bump it alongside the plugin version (get it from a failing build).
+      # Hetzner Cloud API token. The hash covers the tree xcaddy + `go mod
+      # vendor` produce, which is resolved over the network at build time: it
+      # drifts on its own, with caddy, the plugin and the Go toolchain all
+      # unchanged, and then every rebuild fails until the hash is bumped. Take
+      # the new value from the failing build's "got:" line.
       services.caddy.package = pkgs.caddy.withPlugins {
         plugins = [ "github.com/caddy-dns/hetzner/v2@v2.0.1" ];
-        hash = "sha256-BSTuZx5Em2hAQ2+mGj02IAwgLUV6sE77RRffpbyapHc=";
+        hash = "sha256-pA1+niwdY+KHHXv/aWanY8+EUoeoZlKt2eKDAJUOLqA=";
       };
 
       # Explicit ACME (Let's Encrypt) issuer with the Hetzner DNS-01 challenge.
