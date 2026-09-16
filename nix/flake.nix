@@ -13,7 +13,9 @@
     };
     piMono = {
       url = "github:lukasl-dev/pi-mono.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # pi-mono pins the nixpkgs revision its package expression targets.
+      # Following the host input can break the package when nixpkgs removes
+      # an attribute before pi-mono has adapted (for example typescript-go).
     };
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin";
