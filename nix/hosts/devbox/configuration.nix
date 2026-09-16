@@ -175,8 +175,15 @@ in
 
   # Bootloader (BIOS/GRUB — bare-metal AMD box, no EFI)
   boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/nvme1n1";
+  boot.loader.grub.device = "/dev/disk/by-id/nvme-Samsung_SSD_980_PRO_1TB_S5GXNF0R717108H";
   boot.loader.grub.useOSProber = false;
+  boot.loader.grub.enableCryptodisk = true;
+  boot.initrd.secrets."/root.key" = "/etc/luks-keys/root.key";
+  boot.initrd.luks.devices."cryptroot" = {
+    device = "/dev/disk/by-uuid/b4ee92cf-fda2-47b0-8eaa-a07434267299";
+    keyFile = "/root.key";
+  };
+
   # Every personal-assistant deploy mints a system generation (~8/day, 334 of
   # them in the first six weeks), and each one becomes a GRUB menu entry that
   # grub-mkconfig has to re-emit on every switch. Cap the menu; this does not
@@ -533,6 +540,11 @@ in
     sherpa-onnx
   ];
 
+  environment.etc."crypttab".text = ''
+    fast UUID=8923accb-bfff-4b7d-b0ee-0c73b5ff1de6 /etc/luks-keys/fast.key luks
+    bulk UUID=7dd30a97-80d9-4b21-a9e6-12710339d42d /etc/luks-keys/bulk.key luks
+  '';
+
   # Playwright looks for `channel: "chrome"` at the hardcoded Linux path
   # /opt/google/chrome/chrome, which doesn't exist on NixOS (the Nix Chrome —
   # installed in home/thasso.nix — lives in the store, wrapped as
@@ -553,15 +565,22 @@ in
   # fast: Samsung 970 PRO 512GB NVMe   (/dev/nvme0n1p1)
   # nofail so a missing/failed disk never blocks boot on this headless box.
   fileSystems."/mnt/bulk" = {
-    device = "/dev/disk/by-uuid/e88550a2-189c-44b5-aefb-0f1802b9052d";
+    device = "/dev/mapper/bulk";
     fsType = "ext4";
-    options = [ "nofail" "x-systemd.device-timeout=5s" ];
+    options = [ "nofail" "x-systemd.device-timeout=30s" ];
   };
   fileSystems."/mnt/fast" = {
-    device = "/dev/disk/by-uuid/725eda7b-a820-435e-a389-932cba09bc15";
+    device = "/dev/mapper/fast";
     fsType = "ext4";
-    options = [ "nofail" "x-systemd.device-timeout=5s" ];
+    options = [ "nofail" "x-systemd.device-timeout=30s" ];
   };
+
+  swapDevices = [
+    {
+      device = "/dev/disk/by-id/nvme-Samsung_SSD_980_PRO_1TB_S5GXNF0R717108H-part2";
+      randomEncryption.enable = true;
+    }
+  ];
 
   # ── Idle power reduction ──────────────────────────────────
   # amd_pstate active mode gives power-profiles-daemon a real EPP backend
