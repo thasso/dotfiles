@@ -297,16 +297,16 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1789581430,
-        "narHash": "sha256-w7XwmbpzaOtAlNBJ8LgTZ6HDPY6WLIumUhV0ZSFsM9U=",
-        "ref": "refs/tags/v0.38.0",
-        "rev": "c64f20e174ead267a9e7c20a7d60511da1cd987d",
-        "revCount": 2083,
+        "lastModified": 1789679142,
+        "narHash": "sha256-DH5/ErtFD0vT2lqLW0vwdrR1Wm/JBeQxCCk2szt0EWY=",
+        "ref": "refs/tags/v0.39.0",
+        "rev": "b438cea81631ae1c7422e4b60f27fbd0c19c72c8",
+        "revCount": 2108,
         "type": "git",
         "url": "https://git.codecluster.net/thasso/personal-assistant.git"
       },
       "original": {
-        "ref": "refs/tags/v0.38.0",
+        "ref": "refs/tags/v0.39.0",
         "type": "git",
         "url": "https://git.codecluster.net/thasso/personal-assistant.git"
       }
