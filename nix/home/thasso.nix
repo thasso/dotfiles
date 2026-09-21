@@ -264,6 +264,12 @@ in
     clang
     google-chrome
 
+    # Blender ships its own Python (3.13) with bpy, so `blender --background
+    # --python script.py` works out of the box. Extra Python modules for
+    # scripts go through `blender.withPackages (ps: [ ps.foo ])` — pip into
+    # the bundled interpreter cannot work on a read-only store path.
+    blender
+
     # Stardust/FFmpeg toolchain: assemblers, autotools and debuggers plus the
     # .dev outputs (pkg-config files) of the libraries that
     # scripts/linux/build_ffmpeg_filter.sh expects to discover globally.
