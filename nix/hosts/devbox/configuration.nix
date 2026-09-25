@@ -220,6 +220,17 @@ in
   # Firefox
   programs.firefox.enable = true;
 
+  # Run generic dynamically linked Linux binaries, including uv-managed Python
+  # and common PyPI wheels.
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      stdenv.cc.cc.lib # libstdc++ and libgcc_s for native wheels
+      zlib
+      openssl
+    ];
+  };
+
   # Packages
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.android_sdk.accept_license = true;
