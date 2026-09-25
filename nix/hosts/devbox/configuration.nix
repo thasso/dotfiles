@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   dotfiles = "/home/thasso/dotfiles";
@@ -220,6 +220,17 @@ in
   # Firefox
   programs.firefox.enable = true;
 
+  # Run generic dynamically linked Linux binaries, including uv-managed Python
+  # and common PyPI wheels.
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      stdenv.cc.cc.lib # libstdc++ and libgcc_s for native wheels
+      zlib
+      openssl
+    ];
+  };
+
   # Packages
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.android_sdk.accept_license = true;
@@ -350,11 +361,33 @@ in
   # and inherits logged-in credentials (~/.claude subscription, pi providers).
   # Reachable tailnet-only at https://pa.codecluster.net via Caddy.
   #
-  # The shared auth token is injected into the SPA at serve time (not baked into
-  # the build); supply it via a sops secret rendered as ASSISTANT_TOKEN=<value>.
-  sops.secrets.personal_assistant_token = { };
-  sops.templates."personal-assistant-token.env".content =
-    "ASSISTANT_TOKEN=${config.sops.placeholder.personal_assistant_token}";
+  # Keep the browser token separate because the pinned module also gives its
+  # tokenFile to PR previews. Integration credentials are attached only to the
+  # production unit below and never enter Nix-rendered environment data.
+  sops.secrets = {
+    personal_assistant_token = { };
+    personal_assistant_google_oauth_client_secret = { };
+    personal_assistant_tempo_oauth_client_secret = { };
+    personal_assistant_slack_client_secret = { };
+    personal_assistant_slack_app_token = { };
+  };
+  sops.templates."personal-assistant-token.env" = {
+    owner = "root";
+    group = "root";
+    mode = "0400";
+    content = "ASSISTANT_TOKEN=${config.sops.placeholder.personal_assistant_token}";
+  };
+  sops.templates."personal-assistant-integrations.env" = {
+    owner = "root";
+    group = "root";
+    mode = "0400";
+    content = ''
+      ASSISTANT_GOOGLE_OAUTH_CLIENT_SECRET=${config.sops.placeholder.personal_assistant_google_oauth_client_secret}
+      ASSISTANT_TEMPO_OAUTH_CLIENT_SECRET=${config.sops.placeholder.personal_assistant_tempo_oauth_client_secret}
+      ASSISTANT_SLACK_CLIENT_SECRET=${config.sops.placeholder.personal_assistant_slack_client_secret}
+      ASSISTANT_SLACK_APP_TOKEN=${config.sops.placeholder.personal_assistant_slack_app_token}
+    '';
+  };
 
   services.personal-assistant = {
     enable = true;
@@ -403,7 +436,13 @@ in
   # after its switch, so a restart means "a release shipped" and nothing else.
   # Same shape the app module uses for pa-pr@ previews, restarted only by
   # `pa-pr deploy`.
-  systemd.services.personal-assistant.restartIfChanged = false;
+  systemd.services.personal-assistant = {
+    restartIfChanged = false;
+    serviceConfig.EnvironmentFile = lib.mkForce [
+      config.sops.templates."personal-assistant-token.env".path
+      config.sops.templates."personal-assistant-integrations.env".path
+    ];
+  };
 
   # Production alone owns dev-tunnel hostnames. Setting this directly on the
   # unit keeps it out of the extra environment inherited by PR previews.
