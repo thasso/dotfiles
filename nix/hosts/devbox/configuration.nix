@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, options, pkgs, ... }:
 
 let
   dotfiles = "/home/thasso/dotfiles";
@@ -391,7 +391,11 @@ in
 
   services.personal-assistant = {
     enable = true;
+    # The module no longer defaults the user, the preview domain, or any
+    # deployment value; this host names its own.
+    user = "thasso";
     dataDir = "/home/thasso/pa-data";
+    publicBaseUrl = "https://pa.codecluster.net";
     allowedOrigins = [ "https://pa.codecluster.net" ];
     tokenFile = config.sops.templates."personal-assistant-token.env".path;
 
@@ -424,7 +428,25 @@ in
     # pa-pr-teardown@ oneshots (authorized by the polkit rule the module adds).
     prDeployments = {
       enable = true;
+      domain = "pa.codecluster.net";
       repoUrl = "https://git.codecluster.net/thasso/personal-assistant.git";
+    };
+  }
+  # This deployment's static, nonsecret integration config. The app package now
+  # ships a neutral config/app.json, so these values live here and reach
+  # production and previews as ASSISTANT_CONFIG. Their secrets stay in the sops
+  # env files above. Guarded on the option existing so this can land before the
+  # pin reaches a release that has it; the guard can go once it has.
+  // lib.optionalAttrs (options.services.personal-assistant ? settings) {
+    settings = {
+      google.oauthClientId = "602439754432-ln37ljctk9ckcaf5iptflmfsh5jf997o.apps.googleusercontent.com";
+      jira.host = "castlabs.atlassian.net";
+      tempo.oauthClientId = "VxXpYBRLTMwa37FFz5T0tK8kbDeZYnT87fIc5VtcHUt3n6sukT";
+      slack = {
+        workspaceHost = "castlabs.slack.com";
+        teamId = "T02FDHUPM";
+        clientId = "2523606803.10788939582292";
+      };
     };
   };
 
