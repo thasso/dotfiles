@@ -302,6 +302,7 @@ in
     neovim
     ripgrep
     jq
+    unzip
     gh
     tig
     gnumake
