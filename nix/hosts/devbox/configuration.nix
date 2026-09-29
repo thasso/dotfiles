@@ -470,6 +470,13 @@ in
   # unit keeps it out of the extra environment inherited by PR previews.
   systemd.services.personal-assistant.environment.ASSISTANT_DEV_TUNNEL_DOMAIN =
     "pa.codecluster.net";
+  # Cap glibc per-thread arena bloat in the Node server (see personal-assistant
+  # worktree-performance investigation).
+  systemd.services.personal-assistant.environment.MALLOC_ARENA_MAX = "2";
+  # Agents inherit this environment; uncapped, a workspace `pnpm run test` runs
+  # three vitest suites at cores-1 workers each (~69 here), which peaked the
+  # cgroup at ~20 GB. Vitest 4 reads VITEST_MAX_WORKERS natively.
+  systemd.services.personal-assistant.environment.VITEST_MAX_WORKERS = "4";
 
   # Reload Caddy on activation when the generated route changes. The route is
   # imported inside pa-pr's existing wildcard site via routes/*.caddy below.
