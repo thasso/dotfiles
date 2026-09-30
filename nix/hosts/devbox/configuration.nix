@@ -430,6 +430,37 @@ in
       enable = true;
       domain = "pa.codecluster.net";
       repoUrl = "https://git.codecluster.net/thasso/personal-assistant.git";
+    }
+    # Per preview instance; pa-pr has no concurrency limit. See the budget below.
+    // lib.optionalAttrs (options.services.personal-assistant.prDeployments ? memory) {
+      memory = {
+        max = "4G";
+        swapMax = "1G";
+      };
+    };
+  }
+  # Contain runaway agents (2026-09-30: a 35 GB pytest in this unit caused a
+  # global OOM and systemd stopped the whole service). Best effort, not a
+  # guarantee: see the app's docs/deployment.md. Budget against 47 GiB of RAM:
+  #   production MemoryMax            26 GiB
+  #   one preview at a time            4 GiB  (brought up by hand via
+  #                                            preview.yml; usually none)
+  #   host baseline (forgejo, docker,  2.5 GiB (steady state, systemd-cgtop)
+  #     caddy, tailscale, session)
+  #   kernel, unreclaimable memory     2 GiB
+  #   CI containers and nix builds     8 GiB  (docker peaked 5.5 GB)
+  #   total                          42.5 GiB, ~4.5 GiB slack
+  # A second concurrent preview still fits (46.5 GiB) but uses up the slack.
+  # 26G leaves ~24 GiB for agent work above the server and CLIs (~2 GiB). The
+  # unit carries ~6 GiB without runaways (uncapped vitest peaked ~20 GB before
+  # VITEST_MAX_WORKERS=4). swapMax keeps a runaway from thrashing the 51 GB swap
+  # partition before it is killed. MemoryHigh stays unset: it throttles the
+  # server too and never kills. Guarded until the pin reaches a release with the
+  # option.
+  // lib.optionalAttrs (options.services.personal-assistant ? memory) {
+    memory = {
+      max = "26G";
+      swapMax = "4G";
     };
   }
   # This deployment's static, nonsecret integration config. The app package now
