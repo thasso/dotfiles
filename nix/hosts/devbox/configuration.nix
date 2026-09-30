@@ -228,6 +228,7 @@ in
       stdenv.cc.cc.lib # libstdc++ and libgcc_s for native wheels
       zlib
       openssl
+      cairo # libcairo.so.2 for CairoSVG (SVG-to-PNG export)
     ];
   };
 
@@ -631,12 +632,14 @@ in
   # assistant treats the recognizer as a host tool it discovers on PATH: the app
   # ships no recognizer package, so this host is what makes dictation possible.
   # Updating it is an ordinary host update — it cannot move the assistant's unit.
+  # librsvg provides rsvg-convert, the SVG-to-PNG fallback when CairoSVG is absent.
   environment.systemPackages = with pkgs; [
     powertop
     lm_sensors
     paDeploy
     paRelease
     sherpa-onnx
+    librsvg
   ];
 
   environment.etc."crypttab".text = ''
