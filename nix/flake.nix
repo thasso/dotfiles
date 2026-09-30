@@ -61,17 +61,6 @@
         claudeCode.overlays.default
         codexCli.overlays.default
         piMono.overlays.default
-        # Workaround: upstream pi-mono's tsconfig.base.json targets ES2022
-        # but pi-tui uses regex /v flag (requires ES2024). tsgo rejects this.
-        (final: prev: {
-          pi-coding-agent = prev.pi-coding-agent.overrideAttrs (old: {
-            preBuild = (old.preBuild or "") + ''
-              substituteInPlace tsconfig.base.json \
-                --replace-fail '"target": "ES2022"' '"target": "ES2024"' \
-                --replace-fail '"lib": ["ES2022"]' '"lib": ["ES2024"]'
-            '';
-          });
-        })
         (final: prev: { gogcli = final.callPackage ./pkgs/gogcli.nix {}; })
         (final: prev: { tempomat = final.callPackage ./pkgs/tempomat.nix {}; })
         # Speech-to-text weights for the assistant's dictation. A host package
