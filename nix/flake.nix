@@ -126,16 +126,6 @@
           overlays
           sops-nix.nixosModules.sops
           personalAssistant.nixosModules.default
-          # Run the Bun executable bundle instead of the Node/tsx package
-          # (personal-assistant Task 714). Version-guarded: Bun packages before
-          # 0.49.0 lack the phase-1/2b fixes (memory, env scrub, SQLite shim), so
-          # an older pin keeps the module's Node default. Roll back by deleting
-          # this module, then switch and restart personal-assistant.service.
-          ({ lib, ... }:
-            let bun = personalAssistant.packages.x86_64-linux.personal-assistant-bun;
-            in lib.mkIf (lib.versionAtLeast bun.version "0.49.0") {
-              services.personal-assistant.package = bun;
-            })
           ./hosts/devbox/configuration.nix
           home-manager.nixosModules.home-manager
           homeManagerConfig
