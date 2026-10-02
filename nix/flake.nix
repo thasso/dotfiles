@@ -37,21 +37,23 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Personal assistant app (server + web UI). No nixpkgs.follows: the package
-    # is built against its own pinned nixpkgs (exactly what its native Nix CI
-    # validates), keeping the npmDepsHash stable.
+    # Personal assistant app (Pandeck: server + web UI). No nixpkgs.follows: the
+    # package is built against its own pinned nixpkgs (exactly what its Nix CI
+    # validates), keeping the pnpm dependency hash stable.
     #
     # Pinned to a published RELEASE TAG, never to main: this line together with
     # flake.lock IS the record of which assistant devbox runs, so a plain
-    # `make switch` reproduces production instead of rolling it back. The app's
-    # Release workflow moves the pin (pa-release, via
-    # personal-assistant-release@<tag>.service) and commits the bump here, which
-    # makes the dotfiles history the deploy history — roll back by reverting that
-    # commit and switching. Because the ref names a tag rather than a branch,
-    # `make update` re-locks the same revision and cannot drag the assistant
-    # forward on its own.
+    # `make switch` reproduces production instead of rolling it back. Deploy a
+    # release by hand: move the tag here, `nix flake update personalAssistant`,
+    # `make switch`, then `sudo systemctl restart personal-assistant` (the unit
+    # is restartIfChanged = false) and commit the bump, which keeps the dotfiles
+    # history the deploy history. Roll back by reverting that commit and
+    # switching; a release with a migration also needs the DATA_DIR backup from
+    # before it. Because the ref names a tag rather than a branch, `make update`
+    # re-locks the same revision and cannot drag the assistant forward on its
+    # own. The repository is private for now, so it is fetched over SSH.
     personalAssistant = {
-      url = "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=refs/tags/v0.51.0";
+      url = "git+ssh://git@github.com/thasso/pandeck.git?ref=refs/tags/v0.52.0";
     };
   };
 

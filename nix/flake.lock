@@ -356,18 +356,18 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1790796376,
-        "narHash": "sha256-UFxy9fV6/Drja6mRusrUkdlY5I5sIO4I0DtF7EA4Wdk=",
-        "ref": "refs/tags/v0.51.0",
-        "rev": "66dfb03d0b5dcb2d23dc980d8f82cb99d7a823ce",
-        "revCount": 2391,
+        "lastModified": 1790929819,
+        "narHash": "sha256-R4l5KxJdsK/r5Exo27c/KteBRvLxKTn1GKU8i5IXdr8=",
+        "ref": "refs/tags/v0.52.0",
+        "rev": "c5af72dab8fad4ec72f00268aa77381ec975b7c8",
+        "revCount": 17,
         "type": "git",
-        "url": "https://git.codecluster.net/thasso/personal-assistant.git"
+        "url": "ssh://git@github.com/thasso/pandeck.git"
       },
       "original": {
-        "ref": "refs/tags/v0.51.0",
+        "ref": "refs/tags/v0.52.0",
         "type": "git",
-        "url": "https://git.codecluster.net/thasso/personal-assistant.git"
+        "url": "ssh://git@github.com/thasso/pandeck.git"
       }
     },
     "piMono": {

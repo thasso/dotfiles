@@ -2,140 +2,10 @@
 
 let
   dotfiles = "/home/thasso/dotfiles";
-  paRepo = "https://git.codecluster.net/thasso/personal-assistant.git";
-  devTunnelCaddyRoute = pkgs.writeText "50-dev-tunnels.caddy" ''
-    @devtunnels header_regexp Host ^dev-[a-z0-9][a-z0-9-]*\.pa\.codecluster\.net(:[0-9]+)?$
-    handle @devtunnels {
-    ${"\t"}reverse_proxy localhost:${toString config.services.personal-assistant.port}
-    }
-  '';
-
-  # Release deploy — the ONLY thing that changes which assistant version devbox
-  # runs. Rewrites the personalAssistant pin in the dotfiles checkout to a
-  # published release tag, re-locks it, switches, and commits the bump (never
-  # pushes). Because the pin lands in flake.nix + flake.lock, a later plain
-  # `make switch` reproduces exactly this deployment rather than rolling it back,
-  # and `git log nix/flake.lock` is the deploy history.
-  #
-  # Started by the app repo's Release workflow as
-  # personal-assistant-release@<tag>.service; usable by hand as
-  # `sudo pa-release v1.2.3`.
-  paRelease = pkgs.writeShellScriptBin "pa-release" ''
-    set -euo pipefail
-    export PATH=${pkgs.git}/bin:${pkgs.gnused}/bin:${pkgs.coreutils}/bin:${pkgs.util-linux}/bin:/run/current-system/sw/bin:$PATH
-    # Root's own (writable) HOME for the safe.directory write and nix's eval
-    # cache; repo-touching steps get thasso's HOME via asUser below.
-    export HOME=/root
-    # Root evaluates thasso's checkout; avoid git "dubious ownership".
-    git config --global --add safe.directory ${dotfiles} || true
-
-    tag="''${1:-}"
-    # Anything that reaches sed, a URL or a commit message is validated first:
-    # once for shape, once for charset. The polkit rule constrains the instance
-    # name as well, but this is the check that actually guards the script.
-    case "$tag" in
-      v[0-9]*.[0-9]*.[0-9]*) ;;
-      *) echo "Not a release tag: '$tag' (expected vMAJOR.MINOR.PATCH)" >&2; exit 1 ;;
-    esac
-    case "$tag" in
-      *[!v0-9.]*) echo "Release tag has unexpected characters: '$tag'" >&2; exit 1 ;;
-    esac
-
-    # Every repo operation runs as the owner, so nothing in thasso's checkout
-    # ends up root-owned. Only the switch itself needs root.
-    asUser() {
-      runuser -u thasso -- env HOME=/home/thasso "$@"
-    }
-
-    # Annotated tags need peeling (^{}) to reach the commit; fall back to the
-    # plain ref so a lightweight tag still resolves.
-    refs="$(git ls-remote ${paRepo} "refs/tags/$tag" "refs/tags/$tag^{}")"
-    rev="$(printf '%s\n' "$refs" | sed -n 's|^\([0-9a-f]\{40\}\)[[:space:]].*\^{}$|\1|p' | head -n1)"
-    if [ -z "$rev" ]; then
-      rev="$(printf '%s\n' "$refs" | sed -n 's|^\([0-9a-f]\{40\}\)[[:space:]].*|\1|p' | head -n1)"
-    fi
-    if [ -z "$rev" ]; then
-      echo "No such release tag on the remote: $tag" >&2
-      exit 1
-    fi
-    # The line the Release workflow greps back out of this unit's journal.
-    echo "Deploying personal-assistant $tag ($rev)"
-
-    # The pin lives in files a human edits. Never clobber work in progress.
-    if ! asUser git -C ${dotfiles} diff --quiet -- nix/flake.nix nix/flake.lock ||
-       ! asUser git -C ${dotfiles} diff --cached --quiet -- nix/flake.nix nix/flake.lock; then
-      echo "nix/flake.nix or nix/flake.lock has uncommitted changes; refusing to rewrite the pin." >&2
-      exit 1
-    fi
-
-    asUser sed -i "s|\(personal-assistant\.git?ref=refs/tags/\)v[0-9][0-9.]*|\1$tag|" ${dotfiles}/nix/flake.nix
-    # --refresh so a cached tag→rev mapping cannot ship the wrong commit.
-    asUser nix flake update personalAssistant --refresh --flake ${dotfiles}/nix
-    if ! grep -q "\"rev\": \"$rev\"" ${dotfiles}/nix/flake.lock; then
-      echo "flake.lock does not record $tag ($rev) after re-locking; aborting." >&2
-      asUser git -C ${dotfiles} checkout -- nix/flake.nix nix/flake.lock
-      exit 1
-    fi
-
-    if ! nixos-rebuild switch --flake ${dotfiles}/nix#devbox; then
-      echo "nixos-rebuild switch failed; restoring the previous pin." >&2
-      asUser git -C ${dotfiles} checkout -- nix/flake.nix nix/flake.lock
-      exit 1
-    fi
-
-    # Commit only the pin: any other work in the tree stays untouched, and this
-    # never pushes. Committed BEFORE the restart because the switch has already
-    # happened — the system is on $tag whether or not the restart goes well, and
-    # a tree that disagreed with the running system would be the worse state.
-    asUser git -C ${dotfiles} commit -q \
-      -m "Deploy personal-assistant $tag" \
-      -m "personalAssistant pinned to refs/tags/$tag ($rev)." \
-      -- nix/flake.nix nix/flake.lock
-
-    # The switch does NOT restart the service: personal-assistant.service is
-    # restartIfChanged = false (see below), so activation never interrupts a
-    # running agent turn. Deploying is exactly when a restart IS wanted, so ask
-    # for it here. The drain can take up to TimeoutStopSec (1h); the Release
-    # workflow's `systemctl start --wait` timeout covers this whole script.
-    echo "Restarting personal-assistant onto $tag"
-    systemctl restart personal-assistant.service
-    echo "Deployed $tag, committed the pin (not pushed), and restarted the service."
-  '';
-
-  # Manual escape hatch: switch onto the CURRENT remote main without touching
-  # the pin, for a hotfix you have not cut a release for. Deliberately leaves
-  # flake.lock alone, so the next plain `make switch` returns to the pinned
-  # release — that asymmetry is the point, not an oversight.
-  paDeploy = pkgs.writeShellScriptBin "pa-deploy" ''
-    set -euo pipefail
-    export PATH=${pkgs.git}/bin:${pkgs.gawk}/bin:/run/current-system/sw/bin:$PATH
-    # Pin HOME to root's (writable) home so the safe.directory write and nix's
-    # eval cache land somewhere deterministic regardless of who ran sudo.
-    export HOME=/root
-    # Root reads thasso's checkout; avoid git "dubious ownership" during eval.
-    ${pkgs.git}/bin/git config --global --add safe.directory /home/thasso/dotfiles || true
-
-    assistantRev="$(${pkgs.git}/bin/git ls-remote https://git.codecluster.net/thasso/personal-assistant.git refs/heads/main | ${pkgs.gawk}/bin/awk '{print $1}')"
-    if [ -z "$assistantRev" ]; then
-      echo "Could not resolve latest personal-assistant main revision" >&2
-      exit 1
-    fi
-    echo "Deploying personalAssistant rev $assistantRev"
-
-    # The flake lives in the repo's nix/ subdirectory (the git root is one up).
-    # Pin the floating app input to the exact remote main rev and refresh Nix's
-    # flake metadata so deploys cannot silently reuse a stale ref=main cache.
-    exec nixos-rebuild switch \
-      --refresh \
-      --flake /home/thasso/dotfiles/nix#devbox \
-      --override-input personalAssistant "git+https://git.codecluster.net/thasso/personal-assistant.git?ref=main&rev=$assistantRev"
-  '';
-
   # Escape hatch for a stuck stop/drain: agent-spawned stray processes can
   # survive SIGTERM and hold the service's stop (and any deploy waiting on the
   # restart) for the full TimeoutStopSec. SIGKILL the whole cgroup, then
-  # restart. Started by the repo's Ops workflow (force-restart) or manually:
-  # `sudo systemctl start personal-assistant-force-restart.service`.
+  # restart: `sudo systemctl start personal-assistant-force-restart.service`.
   paForceRestart = pkgs.writeShellScript "pa-force-restart" ''
     set -u
     export PATH=/run/current-system/sw/bin:$PATH
@@ -362,9 +232,8 @@ in
   # and inherits logged-in credentials (~/.claude subscription, pi providers).
   # Reachable tailnet-only at https://pa.codecluster.net via Caddy.
   #
-  # Keep the browser token separate because the pinned module also gives its
-  # tokenFile to PR previews. Integration credentials are attached only to the
-  # production unit below and never enter Nix-rendered environment data.
+  # Integration credentials are attached to the unit below as their own
+  # environment file and never enter Nix-rendered environment data.
   sops.secrets = {
     personal_assistant_token = { };
     personal_assistant_google_oauth_client_secret = { };
@@ -423,35 +292,16 @@ in
     # hash alone. `make update` cannot move it, so it cannot move the unit.
     speech.modelDir = "${pkgs.stt-model-parakeet-tdt-600m-v2-int8}";
 
-    # Per-PR preview deployments at pr-<n>.pa.codecluster.net, seeded from a
-    # consistent clone of the prod dataDir and reusing the shared token above.
-    # The Forgejo runner's pr-deploy/pr-teardown jobs start the pa-pr-deploy@/
-    # pa-pr-teardown@ oneshots (authorized by the polkit rule the module adds).
-    prDeployments = {
-      enable = true;
-      domain = "pa.codecluster.net";
-      repoUrl = "https://git.codecluster.net/thasso/personal-assistant.git";
-    }
-    # Per preview instance; pa-pr has no concurrency limit. See the budget below.
-    // lib.optionalAttrs (options.services.personal-assistant.prDeployments ? memory) {
-      memory = {
-        max = "4G";
-        swapMax = "1G";
-      };
-    };
   }
   # Contain runaway agents (2026-09-30: a 35 GB pytest in this unit caused a
   # global OOM and systemd stopped the whole service). Best effort, not a
   # guarantee: see the app's docs/deployment.md. Budget against 47 GiB of RAM:
   #   production MemoryMax            26 GiB
-  #   one preview at a time            4 GiB  (brought up by hand via
-  #                                            preview.yml; usually none)
   #   host baseline (forgejo, docker,  2.5 GiB (steady state, systemd-cgtop)
   #     caddy, tailscale, session)
   #   kernel, unreclaimable memory     2 GiB
   #   CI containers and nix builds     8 GiB  (docker peaked 5.5 GB)
-  #   total                          42.5 GiB, ~4.5 GiB slack
-  # A second concurrent preview still fits (46.5 GiB) but uses up the slack.
+  #   total                          38.5 GiB, ~8.5 GiB slack
   # 26G leaves ~24 GiB for agent work above the server and CLIs (~2 GiB). The
   # unit carries ~6 GiB without runaways (uncapped vitest peaked ~20 GB before
   # VITEST_MAX_WORKERS=4). swapMax keeps a runaway from thrashing the 51 GB swap
@@ -486,10 +336,9 @@ in
   # host store paths, so in principle only a release can change it — but keep
   # this as the belt: a hand-edited pin, a module change, or anything else that
   # does move the unit must not interrupt an agent turn as a side effect of an
-  # unrelated `make switch`. pa-release issues an explicit `systemctl restart`
-  # after its switch, so a restart means "a release shipped" and nothing else.
-  # Same shape the app module uses for pa-pr@ previews, restarted only by
-  # `pa-pr deploy`.
+  # unrelated `make switch`. A release deploy restarts the service explicitly
+  # (see the personalAssistant input in flake.nix), so a restart means "a
+  # release shipped" and nothing else.
   systemd.services.personal-assistant = {
     restartIfChanged = false;
     serviceConfig.EnvironmentFile = lib.mkForce [
@@ -498,8 +347,7 @@ in
     ];
   };
 
-  # Production alone owns dev-tunnel hostnames. Setting this directly on the
-  # unit keeps it out of the extra environment inherited by PR previews.
+  # Dev tunnels are served at dev-<name>.pa.codecluster.net (Caddy route below).
   systemd.services.personal-assistant.environment.ASSISTANT_DEV_TUNNEL_DOMAIN =
     "pa.codecluster.net";
   # Cap glibc per-thread arena bloat in the Node server (see personal-assistant
@@ -510,62 +358,23 @@ in
   # cgroup at ~20 GB. Vitest 4 reads VITEST_MAX_WORKERS natively.
   systemd.services.personal-assistant.environment.VITEST_MAX_WORKERS = "4";
 
-  # Reload Caddy on activation when the generated route changes. The route is
-  # imported inside pa-pr's existing wildcard site via routes/*.caddy below.
-  systemd.services.caddy.reloadTriggers = [ devTunnelCaddyRoute ];
-
   # Wire the assistant into Caddy (tailnet-only, cert via DNS-01).
   services.caddy.virtualHosts."pa.codecluster.net".extraConfig = ''
     reverse_proxy localhost:${toString config.services.personal-assistant.port}
   '';
 
-  # PR preview routing: import the per-PR site files pa-pr writes/removes. Each
-  # pr-<n>.pa.codecluster.net gets its own cert automatically via the global
-  # DNS-01 issuer. Requires a wildcard DNS record *.pa.codecluster.net → the
-  # devbox tailscale IP (Hetzner DNS, set manually). The import dir is pre-created
-  # by a tmpfiles rule (see below) so the glob is valid before the first deploy.
-  services.caddy.extraConfig = ''
-    import ${config.services.personal-assistant.prDeployments.caddyImportDir}/*.caddy
+  # Dev tunnels: dev-<name>.pa.codecluster.net reaches the assistant, which
+  # routes by Host. Wildcard DNS *.pa.codecluster.net → the devbox tailscale IP
+  # (Hetzner DNS, set manually); the cert comes from the global DNS-01 issuer.
+  services.caddy.virtualHosts."*.pa.codecluster.net".logFormat = ''
+    output file ${config.services.caddy.logDir}/access-wildcard.pa.codecluster.net.log
   '';
-
-  # CD: the app repo's `release` job triggers this rebuild. Runner host jobs
-  # run with NoNewPrivileges, so setuid sudo is blocked; instead the runner asks
-  # systemd (over D-Bus) to start a fixed root oneshot, authorized by a narrow
-  # polkit rule. The command is fixed in the unit, so the runner can only start
-  # it — it gets no other root, and nixos-rebuild is atomic (a failing build
-  # never switches). thasso can still run `sudo pa-release` / `sudo pa-deploy`
-  # interactively.
-  # These oneshots DRIVE the switch/restart they would be restarted by, so an
-  # activation must never touch a running instance: when the unit file changes
-  # (any nixpkgs bump moves the script's store path), switch-to-configuration
-  # puts the unit in its stop list and the in-flight deploy SIGTERMs ITSELF
-  # mid-activation, then gets re-started while forgejo/caddy are still down and
-  # fails on `git ls-remote` (502). A oneshot picks up its new definition on the
-  # next start anyway, so skipping it during activation costs nothing.
-  #
-  # The instance name is the release tag: personal-assistant-release@v1.2.3.
-  # Templated rather than fixed because the tag IS the deploy target now, and
-  # pa-release re-validates %i rather than trusting the polkit pattern.
-  systemd.services."personal-assistant-release@" = {
-    description = "Pin personal-assistant to release %i and switch devbox onto it";
-    restartIfChanged = false;
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${paRelease}/bin/pa-release %i";
-    };
-  };
-
-  # Manual-only hotfix path: ships current main without moving the pin. Kept as
-  # a unit so `systemctl start` semantics (journal, serialization) match the
-  # release path; no polkit rule, so CI cannot reach it.
-  systemd.services.personal-assistant-deploy = {
-    description = "Rebuild devbox so personal-assistant tracks the latest main";
-    restartIfChanged = false;
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${paDeploy}/bin/pa-deploy";
-    };
-  };
+  services.caddy.virtualHosts."*.pa.codecluster.net".extraConfig = ''
+    @devtunnels header_regexp Host ^dev-[a-z0-9][a-z0-9-]*\.pa\.codecluster\.net(:[0-9]+)?$
+    handle @devtunnels {
+      reverse_proxy localhost:${toString config.services.personal-assistant.port}
+    }
+  '';
 
   systemd.services.personal-assistant-force-restart = {
     description = "Force-restart personal-assistant (SIGKILL stuck cgroup, then restart)";
@@ -575,41 +384,6 @@ in
       ExecStart = "${paForceRestart}";
     };
   };
-
-  # The runner hosts the deploy job that triggers activation, so restarting it
-  # during that activation force-kills its own in-flight job
-  # ([runner].shutdown_timeout=0s) and — with forgejo/caddy restarting in the
-  # same batch — the final job status can never be uploaded, leaving the CI run
-  # "running" in Forgejo forever even though the deploy succeeded. Let a runner
-  # version bump take effect on the next natural restart instead.
-  systemd.services.gitea-runner-devbox.restartIfChanged = false;
-
-  # This host authorizes the units this host defines. The assistant module also
-  # ships a polkit rule naming the production oneshots, but it cannot be the
-  # only one: that rule arrives with the PINNED release, so a newly added unit
-  # would be unauthorized until a release carrying its permission is already
-  # deployed — which needs the unit to work. Rules are OR'd, so the two coexist;
-  # this one is what makes the release unit reachable on a fresh switch.
-  #
-  # The boundary is a PATTERN, not a name: only a vMAJOR.MINOR.PATCH instance is
-  # reachable, and pa-release re-validates %i rather than trusting this regex.
-  # personal-assistant-deploy is deliberately absent — shipping unreleased main
-  # is a manual decision. (Until the pinned release carries the module change,
-  # the module's own rule still grants it; harmless, and it lapses on the next
-  # release.)
-  security.polkit.enable = true;
-  security.polkit.extraConfig = ''
-    polkit.addRule(function(action, subject) {
-      if (action.id == "org.freedesktop.systemd1.manage-units" &&
-          subject.user == "gitea-runner") {
-        var unit = action.lookup("unit");
-        if (unit == "personal-assistant-force-restart.service" ||
-            /^personal-assistant-release@v[0-9]+\.[0-9]+\.[0-9]+\.service$/.test(unit)) {
-          return polkit.Result.YES;
-        }
-      }
-    });
-  '';
 
   # Daily Borg snapshot of the assistant's DATA_DIR (KB, sessions, settings +
   # integration secrets, SQLite DB) to the bulk disk, mirroring the Forgejo
@@ -636,8 +410,6 @@ in
   environment.systemPackages = with pkgs; [
     powertop
     lm_sensors
-    paDeploy
-    paRelease
     sherpa-onnx
     librsvg
   ];
@@ -655,11 +427,6 @@ in
   # activation, so it always tracks the current google-chrome build.
   systemd.tmpfiles.rules = [
     "L+ /opt/google/chrome/chrome - - - - ${pkgs.google-chrome}/bin/google-chrome-stable"
-    # Pre-create the PR-preview Caddy import dir (readable by the caddy user).
-    "d ${config.services.personal-assistant.prDeployments.caddyImportDir} 0755 caddy caddy -"
-    # Add dev tunnels to the wildcard site's imported routes without touching
-    # the pa-pr-managed wildcard or per-preview files.
-    "L+ ${config.services.personal-assistant.prDeployments.caddyImportDir}/routes/50-dev-tunnels.caddy - - - - ${devTunnelCaddyRoute}"
   ];
 
   # ── Extra data disks (added 2026-07-08) ───────────────────
