@@ -41,6 +41,7 @@ in
     ../../modules/forgejo-backup.nix
     ../../modules/forgejo-runner.nix
     ../../modules/personal-assistant-backup.nix
+    ../../modules/pandeck-deploy.nix
   ];
 
   # Bootloader (BIOS/GRUB — bare-metal AMD box, no EFI)
@@ -257,6 +258,13 @@ in
       ASSISTANT_SLACK_CLIENT_SECRET=${config.sops.placeholder.personal_assistant_slack_client_secret}
       ASSISTANT_SLACK_APP_TOKEN=${config.sops.placeholder.personal_assistant_slack_app_token}
     '';
+  };
+
+  # `make pandeck` for main and release tags, startable by agents (which cannot
+  # sudo) via polkit.
+  services.my-pandeck-deploy = {
+    enable = true;
+    user = "thasso";
   };
 
   services.personal-assistant = {

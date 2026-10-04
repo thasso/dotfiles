@@ -1,0 +1,222 @@
+#!/usr/bin/env bash
+# Deploy Pandeck to devbox by moving the `personalAssistant` flake pin.
+#
+#   pandeck-deploy [REF]     REF: a release tag (v0.53.0), a branch (main, the
+#                            default), or a commit sha on a pushed branch
+#   pandeck-deploy --status  what is pinned vs. the latest release and main
+#
+# A release tag is pinned as `?ref=refs/tags/<tag>`, exactly as before. Anything
+# else is pinned as `?ref=<branch>&rev=<sha>`: an exact commit, so `make update`
+# cannot drag it forward. Either way flake.nix + flake.lock stay the record of
+# what devbox runs, and each deploy is one local commit (never pushed).
+#
+# Order: pin → lock → switch → commit → queue the restart. A failed switch
+# restores the pin. The restart is queued, not waited for: the unit drains
+# running agent turns before stopping, and the agent that ran this may be one of
+# them, so it has to be able to finish.
+#
+# How it switches depends on the target:
+#   - a commit on main or a release tag goes through pandeck-deploy@<sha>.service
+#     (nix/modules/pandeck-deploy.nix), which needs no sudo, so agents can run
+#     it. That helper rebuilds the dotfiles source the running system was built
+#     from; other edits in this checkout still need `make switch`.
+#   - anything else switches this checkout with sudo, which agent sessions
+#     cannot do.
+#
+# Migrations are the one way a deploy can damage the data directory, so two
+# cases refuse unless ALLOW_MIGRATIONS=1:
+#   - the target is not on main and changes migrations main does not have (the
+#     branch may still rewrite them, but the data has already run them);
+#   - the target lacks migrations the pinned commit has (a downgrade past them;
+#     rolling back needs the DATA_DIR backup from before they ran).
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+NIX_DIR="$REPO_DIR/nix"
+FLAKE_NIX="$NIX_DIR/flake.nix"
+FLAKE_LOCK="$NIX_DIR/flake.lock"
+
+REMOTE="https://github.com/thasso/pandeck.git"
+URL_BASE="git+https://github.com/thasso/pandeck.git"
+MIGRATIONS=(app/server/src/db/migrations app/server/src/db/migrations.lock.json)
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/pandeck-deploy.git"
+HOST="devbox"
+UNIT="personal-assistant"
+
+log() { echo "==> $*"; }
+warn() { echo "WARNING: $*" >&2; }
+err() { echo "ERROR: $*" >&2; exit 1; }
+
+# A bare mirror of the app repo, refreshed on every run: it resolves branches,
+# short shas and tags, and answers the ancestry and migration questions.
+fetch() {
+  if [ ! -d "$CACHE" ]; then
+    git init -q --bare "$CACHE"
+  fi
+  git -C "$CACHE" fetch -q --prune --prune-tags "$REMOTE" \
+    '+refs/heads/*:refs/remotes/origin/*' '+refs/tags/*:refs/tags/*'
+}
+
+g() { git -C "$CACHE" "$@"; }
+
+pinned_rev() {
+  jq -r '.nodes[.nodes.root.inputs.personalAssistant].locked.rev' "$FLAKE_LOCK"
+}
+
+pinned_url() {
+  grep -o "\"${URL_BASE}[^\"]*\"" "$FLAKE_NIX" | tr -d '"'
+}
+
+describe() {
+  g log -1 --format='%h %s' "$1" 2>/dev/null || echo "${1:0:9} (not in $REMOTE)"
+}
+
+latest_tag() {
+  g tag -l 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1
+}
+
+status() {
+  fetch
+  local rev main tag
+  rev="$(pinned_rev)"
+  main="$(g rev-parse refs/remotes/origin/main)"
+  tag="$(latest_tag)"
+  echo "pinned:   $(pinned_url)"
+  echo "          $(describe "$rev")"
+  echo "release:  ${tag:-none} $(if [ -n "$tag" ]; then describe "$tag^{commit}"; fi)"
+  echo "main:     $(describe "$main")"
+  if g cat-file -e "$rev^{commit}" 2>/dev/null; then
+    echo "behind main by $(g rev-list --count "$rev..$main") commit(s)"
+  fi
+}
+
+# Paths under MIGRATIONS that differ between two commits, with a status filter,
+# indented for the warning that lists them.
+migration_changes() {
+  g diff --name-only --diff-filter="$3" "$1" "$2" -- "${MIGRATIONS[@]}" | sed 's/^/  /'
+}
+
+deploy() {
+  local ref="$1" rev branch url label reviewed=0
+
+  [ "$(hostname)" = "$HOST" ] || err "Pandeck is deployed on $HOST only (this is $(hostname))"
+  [ "$(git -C "$REPO_DIR" branch --show-current)" = "master" ] ||
+    err "deploys are recorded on master; switch $REPO_DIR to master first"
+  git -C "$REPO_DIR" diff --quiet HEAD -- "$FLAKE_NIX" "$FLAKE_LOCK" ||
+    err "nix/flake.nix or nix/flake.lock has uncommitted changes"
+  [ "$(grep -c "\"${URL_BASE}[^\"]*\"" "$FLAKE_NIX")" = 1 ] ||
+    err "expected exactly one $URL_BASE url in $FLAKE_NIX"
+
+  log "Fetching $REMOTE"
+  fetch
+
+  if [[ "$ref" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && g rev-parse -q --verify "refs/tags/$ref" >/dev/null; then
+    rev="$(g rev-parse "refs/tags/$ref^{commit}")"
+    url="$URL_BASE?ref=refs/tags/$ref"
+    label="$ref"
+    reviewed=1
+  else
+    if g rev-parse -q --verify "refs/remotes/origin/$ref^{commit}" >/dev/null; then
+      rev="$(g rev-parse "refs/remotes/origin/$ref^{commit}")"
+      branch="$ref"
+    elif rev="$(g rev-parse -q --verify "$ref^{commit}")"; then
+      # Nix fetches a branch and checks the rev against it, so name one that
+      # contains the commit — main whenever it does.
+      if g merge-base --is-ancestor "$rev" refs/remotes/origin/main; then
+        branch="main"
+      else
+        branch="$(g for-each-ref --contains "$rev" --format='%(refname:lstrip=3)' refs/remotes/origin | head -n1)"
+        [ -n "$branch" ] || err "$ref is on no branch of $REMOTE; push it first"
+      fi
+    else
+      err "$ref is not a release tag, branch, or commit of $REMOTE"
+    fi
+    url="$URL_BASE?ref=$branch&rev=$rev"
+    label="$(g rev-parse --short "$rev") ($branch)"
+    if g merge-base --is-ancestor "$rev" refs/remotes/origin/main; then
+      reviewed=1
+    fi
+  fi
+
+  log "Target: $(describe "$rev")"
+
+  local current blocked=0 changes
+  current="$(pinned_rev)"
+  if [ "$current" = "$rev" ] && [ "$(pinned_url)" = "$url" ]; then
+    log "Already pinned to $label; nothing to deploy (restart with: sudo systemctl restart $UNIT)"
+    return
+  fi
+
+  if ! g merge-base --is-ancestor "$rev" refs/remotes/origin/main; then
+    changes="$(migration_changes "$(g merge-base refs/remotes/origin/main "$rev")" "$rev" AMDR)"
+    if [ -n "$changes" ]; then
+      warn "$label is not on main and changes migrations main does not have:"
+      echo "$changes" >&2
+      blocked=1
+    fi
+  fi
+  if g cat-file -e "$current^{commit}" 2>/dev/null; then
+    changes="$(migration_changes "$current" "$rev" D)"
+    if [ -n "$changes" ]; then
+      warn "$label lacks migrations the pinned commit already ran:"
+      echo "$changes" >&2
+      warn "rolling back past them needs the DATA_DIR backup from before they ran"
+      blocked=1
+    fi
+  fi
+  if [ "$blocked" = 1 ] && [ "${ALLOW_MIGRATIONS:-}" != 1 ]; then
+    err "refusing; rerun with ALLOW_MIGRATIONS=1 once DATA_DIR is backed up"
+  fi
+
+  # Until the switch succeeds, any exit (a failed command, err, Ctrl-C) puts
+  # the committed pin back.
+  trap 'warn "restoring the previous pin"
+    git -C "$REPO_DIR" checkout -q HEAD -- "$FLAKE_NIX" "$FLAKE_LOCK"' EXIT
+
+  log "Pinning $url"
+  URL="$url" BASE="$URL_BASE" perl -pi -e \
+    's{"\Q$ENV{BASE}\E[^"]*"}{"$ENV{URL}"}' "$FLAKE_NIX"
+  nix flake update personalAssistant --flake "$NIX_DIR"
+  [ "$(pinned_rev)" = "$rev" ] || err "flake.lock pinned $(pinned_rev), expected $rev"
+
+  if [ "$reviewed" = 1 ]; then
+    log "Switching $HOST through pandeck-deploy@ (no sudo)"
+    helper_switch "$rev"
+  else
+    log "Switching $HOST with sudo ($label is not on main)"
+    sudo nixos-rebuild switch --flake "$NIX_DIR#$HOST"
+  fi
+  trap - EXIT
+
+  git -C "$REPO_DIR" commit -q -m "Deploy Pandeck $label" -m "$url
+$(describe "$rev")" -- "$FLAKE_NIX" "$FLAKE_LOCK"
+  log "Committed: $(git -C "$REPO_DIR" log -1 --format='%h %s') (not pushed)"
+
+  # The helper has queued the restart already.
+  if [ "$reviewed" != 1 ]; then
+    sudo systemctl restart --no-block "$UNIT"
+  fi
+  log "Restart queued: $UNIT drains running agent turns, then starts $label"
+  log "Follow it with: journalctl -fu $UNIT"
+}
+
+# Start the root helper and stream its journal, since `systemctl start` itself
+# prints nothing until the oneshot is done.
+helper_switch() {
+  local unit="pandeck-deploy@$1.service" follower rc=0
+  journalctl -f -n0 -o cat -u "$unit" &
+  follower=$!
+  sleep 0.5
+  systemctl start "$unit" || rc=$?
+  sleep 1
+  kill "$follower" 2>/dev/null || true
+  wait "$follower" 2>/dev/null || true
+  [ "$rc" = 0 ] || err "$unit failed (journalctl -u $unit)"
+}
+
+case "${1:-}" in
+  --status) status ;;
+  -h | --help) sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) deploy "${1:-main}" ;;
+esac

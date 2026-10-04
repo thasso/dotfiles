@@ -21,18 +21,19 @@ automatically.
 
 ### The personal assistant is pinned, not floating
 
-`nix/flake.nix` pins the `personalAssistant` input to a published release tag
-(`?ref=refs/tags/vX.Y.Z`). That line plus `flake.lock` is the record of what
-devbox runs, so:
+`nix/flake.nix` pins the `personalAssistant` input (Pandeck) to a release tag
+(`?ref=refs/tags/vX.Y.Z`) or an exact commit (`?ref=<branch>&rev=<sha>`), never
+to a moving branch. That line plus `flake.lock` is the record of what devbox
+runs, so:
 
-- `make switch` reproduces the deployed release.
-- `make update` re-locks the same tag and cannot drag the assistant forward.
+- `make switch` reproduces the deployed revision.
+- `make update` re-locks the same revision and cannot drag the assistant forward.
 - Neither restarts the assistant, and neither even changes its unit: the unit's
   only store paths are the app package and its own drain script, both from the
   app's flake. `restartIfChanged = false` stays as a belt so anything that does
   move the unit cannot interrupt an agent turn as a side effect. A restart means
-  a release shipped. The flip side: a hand-edited pin takes effect only after
-  `systemctl restart personal-assistant` — or just use `sudo pa-release`.
+  a deploy shipped. The flip side: a moved pin takes effect only after
+  `systemctl restart personal-assistant`, which `make pandeck` does.
 - **This host configures no packages for the assistant.** No `extraPackages`, no
   recognizer, no model. The agents' toolbox is this host's own profiles, which
   the service PATH ends in; the app declares what it needs in its
@@ -47,13 +48,24 @@ devbox runs, so:
   `make update` cannot move it (verified against two unrelated nixpkgs
   revisions). Never turn it into a `mkDerivation`: that is input-addressed and
   would churn the assistant's unit on every input update.
-- The app repo's Release workflow moves the pin via
-  `personal-assistant-release@<tag>.service` (`pa-release`), which commits the
-  bump here and never pushes. So `git log nix/flake.lock` is the deploy history
-  and rollback is `git revert` + `make switch`.
-- `sudo pa-deploy` is a manual hotfix that ships current `main` *without*
-  touching the pin — the next plain `make switch` therefore returns to the
-  pinned release. CI cannot start it.
+- Nothing deploys automatically: the app's GitHub CI never reaches this host.
+  `make pandeck REF=<tag|branch|sha>` (default `main`; `scripts/pandeck-deploy`)
+  moves the pin, switches, commits the bump here (never pushes) and queues the
+  app restart, which drains running agent turns first. `make pandeck-status`
+  compares the pin with the latest release and `main`. So `git log
+  nix/flake.lock` is the deploy history, and rollback is deploying an older ref.
+- Agents can deploy, but only reviewed code. Agent sessions cannot sudo, so a
+  commit on `main` or a release tag switches through the root oneshot
+  `pandeck-deploy@<sha>.service` (`nix/modules/pandeck-deploy.nix`), which a
+  polkit rule lets thasso start. It fetches the public Pandeck repository
+  itself, refuses anything not on `main` or tagged, and rebuilds the dotfiles source the running system
+  was built from with only the pin changed, so checkout edits still need
+  `make switch`. Unmerged branch commits switch this checkout with sudo: human
+  only. Keep it that way: Pandeck's NixOS module is evaluated as root.
+- `make pandeck` refuses a target on an unmerged branch that changes migrations,
+  and a target that lacks migrations the pinned commit already ran, unless
+  `ALLOW_MIGRATIONS=1`: the data directory cannot un-run a migration, so either
+  case needs a `DATA_DIR` backup first.
 
 ## Nix structure (`nix/`)
 

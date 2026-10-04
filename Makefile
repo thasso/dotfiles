@@ -1,7 +1,7 @@
 NIX_DIR := $(CURDIR)/nix
 
 # ── Nix targets ────────────────────────────────────────────
-.PHONY: switch switch-offline update dry-update deploy-all
+.PHONY: switch switch-offline update dry-update deploy-all pandeck pandeck-status
 
 HOSTNAME := $(shell hostname)
 
@@ -30,6 +30,19 @@ dry-update:
 	@mv $(NIX_DIR)/flake.lock.bak $(NIX_DIR)/flake.lock
 	@echo ""
 	@echo "Lock file restored. Run 'make update' to apply."
+
+# ── Pandeck (devbox) ──────────────────────────────────────
+# Moves the personalAssistant pin, switches, commits the bump (never pushes)
+# and queues the app restart. REF: a release tag, a branch (default main) or a
+# commit sha on a pushed branch; main and tags need no sudo, so agents can run
+# it. See scripts/pandeck-deploy.
+#   make pandeck REF=v0.53.0
+#   make pandeck REF=main ALLOW_MIGRATIONS=1
+pandeck:
+	@ALLOW_MIGRATIONS=$(ALLOW_MIGRATIONS) $(CURDIR)/scripts/pandeck-deploy $(REF)
+
+pandeck-status:
+	@$(CURDIR)/scripts/pandeck-deploy --status
 
 # ── Remote deployment ─────────────────────────────────────
 # Pulls latest and rebuilds on remote host (requires repo cloned in ~/dotfiles)
