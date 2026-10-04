@@ -49,10 +49,9 @@
     # (scripts/pandeck-deploy), which pins, switches, commits the bump and
     # queues the unit's restart (restartIfChanged = false), keeping the dotfiles
     # history the deploy history. Roll back by deploying an older ref; a release with a
-    # migration also needs the DATA_DIR backup from before it. The repository is
-    # private for now, so it is fetched over SSH.
+    # migration also needs the DATA_DIR backup from before it.
     personalAssistant = {
-      url = "git+ssh://git@github.com/thasso/pandeck.git?ref=refs/tags/v0.52.0";
+      url = "git+https://github.com/thasso/pandeck.git?ref=refs/tags/v0.52.0";
     };
   };
 

@@ -57,9 +57,8 @@ runs, so:
 - Agents can deploy, but only reviewed code. Agent sessions cannot sudo, so a
   commit on `main` or a release tag switches through the root oneshot
   `pandeck-deploy@<sha>.service` (`nix/modules/pandeck-deploy.nix`), which a
-  polkit rule lets thasso start. It fetches Pandeck with its own read-only
-  deploy key (`pandeck_deploy_key` in `secrets/devbox.yaml`), refuses anything
-  not on `main` or tagged, and rebuilds the dotfiles source the running system
+  polkit rule lets thasso start. It fetches the public Pandeck repository
+  itself, refuses anything not on `main` or tagged, and rebuilds the dotfiles source the running system
   was built from with only the pin changed, so checkout edits still need
   `make switch`. Unmerged branch commits switch this checkout with sudo: human
   only. Keep it that way: Pandeck's NixOS module is evaluated as root.

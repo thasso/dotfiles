@@ -37,8 +37,8 @@ NIX_DIR="$REPO_DIR/nix"
 FLAKE_NIX="$NIX_DIR/flake.nix"
 FLAKE_LOCK="$NIX_DIR/flake.lock"
 
-REMOTE="git@github.com:thasso/pandeck.git"
-URL_BASE="git+ssh://git@github.com/thasso/pandeck.git"
+REMOTE="https://github.com/thasso/pandeck.git"
+URL_BASE="git+https://github.com/thasso/pandeck.git"
 MIGRATIONS=(app/server/src/db/migrations app/server/src/db/migrations.lock.json)
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/pandeck-deploy.git"
 HOST="devbox"

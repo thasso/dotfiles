@@ -4,17 +4,12 @@ let
   unitName = "pandeck-deploy";
   stateDir = "/var/lib/${unitName}";
   mirror = "${stateDir}/pandeck.git";
-  # GitHub's published ed25519 host key, pinned so the root fetch never trusts
-  # on first use.
-  githubKnownHosts = pkgs.writeText "pandeck-deploy-known-hosts" ''
-    github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
-  '';
 
   # Root half of `make pandeck`: switches this host onto Pandeck <rev> and
   # queues the app restart. It deliberately trusts nothing the caller controls
   # beyond the commit id:
-  #   - It fetches Pandeck itself, with its own read-only deploy key, and only
-  #     accepts a commit on main or a release tag's commit. Pandeck's NixOS
+  #   - It fetches Pandeck itself (anonymously; the repository is public) and
+  #     only accepts a commit on main or a release tag's commit. Pandeck's NixOS
   #     module is evaluated as root, so this is what keeps unmerged branch code
   #     from becoming root; branch commits stay a manual `sudo` deploy.
   #   - It rebuilds the dotfiles source the RUNNING system was built from
@@ -25,7 +20,7 @@ let
   # unit's ExecStop drains running turns before the new version starts.
   helper = pkgs.writeShellScript "pandeck-deploy-helper" ''
     set -euo pipefail
-    export PATH=${lib.makeBinPath [ pkgs.git pkgs.openssh pkgs.util-linux pkgs.coreutils ]}:/run/current-system/sw/bin
+    export PATH=${lib.makeBinPath [ pkgs.git pkgs.util-linux pkgs.coreutils ]}:/run/current-system/sw/bin
     export HOME=${stateDir}
 
     rev="''${1:-}"
@@ -37,7 +32,6 @@ let
     exec 9>/run/${unitName}.lock
     flock 9
 
-    export GIT_SSH_COMMAND="ssh -i ${config.sops.secrets.${cfg.deployKeySecret}.path} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=${githubKnownHosts}"
     [ -d ${mirror} ] || git init -q --bare ${mirror}
     git -C ${mirror} fetch -q --prune --prune-tags ${cfg.remote} \
       '+refs/heads/main:refs/heads/main' '+refs/tags/*:refs/tags/*'
@@ -77,13 +71,8 @@ in {
     };
     remote = lib.mkOption {
       type = lib.types.str;
-      default = "git@github.com:thasso/pandeck.git";
-      description = "Pandeck repository the root helper fetches over SSH.";
-    };
-    deployKeySecret = lib.mkOption {
-      type = lib.types.str;
-      default = "pandeck_deploy_key";
-      description = "sops secret holding a read-only GitHub deploy key for `remote`.";
+      default = "https://github.com/thasso/pandeck.git";
+      description = "Public Pandeck repository the root helper fetches.";
     };
     user = lib.mkOption {
       type = lib.types.str;
@@ -98,8 +87,6 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    sops.secrets.${cfg.deployKeySecret} = { };
-
     systemd.services."${unitName}@" = {
       description = "Switch ${config.networking.hostName} onto Pandeck %i";
       # This unit DRIVES the switch it would be restarted by: an activation must

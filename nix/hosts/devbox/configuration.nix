@@ -261,8 +261,7 @@ in
   };
 
   # `make pandeck` for main and release tags, startable by agents (which cannot
-  # sudo) via polkit. Needs `pandeck_deploy_key` in secrets/devbox.yaml: a
-  # read-only GitHub deploy key on thasso/pandeck.
+  # sudo) via polkit.
   services.my-pandeck-deploy = {
     enable = true;
     user = "thasso";
