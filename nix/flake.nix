@@ -41,17 +41,16 @@
     # package is built against its own pinned nixpkgs (exactly what its Nix CI
     # validates), keeping the pnpm dependency hash stable.
     #
-    # Pinned to a published RELEASE TAG, never to main: this line together with
-    # flake.lock IS the record of which assistant devbox runs, so a plain
-    # `make switch` reproduces production instead of rolling it back. Deploy a
-    # release by hand: move the tag here, `nix flake update personalAssistant`,
-    # `make switch`, then `sudo systemctl restart personal-assistant` (the unit
-    # is restartIfChanged = false) and commit the bump, which keeps the dotfiles
-    # history the deploy history. Roll back by reverting that commit and
-    # switching; a release with a migration also needs the DATA_DIR backup from
-    # before it. Because the ref names a tag rather than a branch, `make update`
-    # re-locks the same revision and cannot drag the assistant forward on its
-    # own. The repository is private for now, so it is fetched over SSH.
+    # Pinned to a release tag or an exact commit, never to a moving branch:
+    # this line together with flake.lock IS the record of which assistant
+    # devbox runs, so a plain `make switch` reproduces production instead of
+    # rolling it back, and `make update` re-locks the same revision rather than
+    # dragging the assistant forward. Move it only with `make pandeck REF=...`
+    # (scripts/pandeck-deploy), which pins, switches, commits the bump and
+    # restarts the unit (restartIfChanged = false), keeping the dotfiles history
+    # the deploy history. Roll back by deploying an older ref; a release with a
+    # migration also needs the DATA_DIR backup from before it. The repository is
+    # private for now, so it is fetched over SSH.
     personalAssistant = {
       url = "git+ssh://git@github.com/thasso/pandeck.git?ref=refs/tags/v0.52.0";
     };
