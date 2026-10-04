@@ -10,9 +10,18 @@
 # cannot drag it forward. Either way flake.nix + flake.lock stay the record of
 # what devbox runs, and each deploy is one local commit (never pushed).
 #
-# Order: pin → lock → switch → commit → restart. A failed switch restores the
-# pin. The commit comes before the restart because the restart ends every
-# process in the assistant's cgroup, which may include whoever ran this.
+# Order: pin → lock → switch → commit → queue the restart. A failed switch
+# restores the pin. The restart is queued, not waited for: the unit drains
+# running agent turns before stopping, and the agent that ran this may be one of
+# them, so it has to be able to finish.
+#
+# How it switches depends on the target:
+#   - a commit on main or a release tag goes through pandeck-deploy@<sha>.service
+#     (nix/modules/pandeck-deploy.nix), which needs no sudo, so agents can run
+#     it. That helper rebuilds the dotfiles source the running system was built
+#     from; other edits in this checkout still need `make switch`.
+#   - anything else switches this checkout with sudo, which agent sessions
+#     cannot do.
 #
 # Migrations are the one way a deploy can damage the data directory, so two
 # cases refuse unless ALLOW_MIGRATIONS=1:
@@ -89,7 +98,7 @@ migration_changes() {
 }
 
 deploy() {
-  local ref="$1" rev branch url label
+  local ref="$1" rev branch url label reviewed=0
 
   [ "$(hostname)" = "$HOST" ] || err "Pandeck is deployed on $HOST only (this is $(hostname))"
   [ "$(git -C "$REPO_DIR" branch --show-current)" = "master" ] ||
@@ -106,6 +115,7 @@ deploy() {
     rev="$(g rev-parse "refs/tags/$ref^{commit}")"
     url="$URL_BASE?ref=refs/tags/$ref"
     label="$ref"
+    reviewed=1
   else
     if g rev-parse -q --verify "refs/remotes/origin/$ref^{commit}" >/dev/null; then
       rev="$(g rev-parse "refs/remotes/origin/$ref^{commit}")"
@@ -124,6 +134,9 @@ deploy() {
     fi
     url="$URL_BASE?ref=$branch&rev=$rev"
     label="$(g rev-parse --short "$rev") ($branch)"
+    if g merge-base --is-ancestor "$rev" refs/remotes/origin/main; then
+      reviewed=1
+    fi
   fi
 
   log "Target: $(describe "$rev")"
@@ -167,17 +180,39 @@ deploy() {
   nix flake update personalAssistant --flake "$NIX_DIR"
   [ "$(pinned_rev)" = "$rev" ] || err "flake.lock pinned $(pinned_rev), expected $rev"
 
-  log "Switching $HOST"
-  sudo nixos-rebuild switch --flake "$NIX_DIR#$HOST"
+  if [ "$reviewed" = 1 ]; then
+    log "Switching $HOST through pandeck-deploy@ (no sudo)"
+    helper_switch "$rev"
+  else
+    log "Switching $HOST with sudo ($label is not on main)"
+    sudo nixos-rebuild switch --flake "$NIX_DIR#$HOST"
+  fi
   trap - EXIT
 
   git -C "$REPO_DIR" commit -q -m "Deploy Pandeck $label" -m "$url
 $(describe "$rev")" -- "$FLAKE_NIX" "$FLAKE_LOCK"
   log "Committed: $(git -C "$REPO_DIR" log -1 --format='%h %s') (not pushed)"
 
-  log "Restarting $UNIT"
-  sudo systemctl restart "$UNIT"
-  log "$UNIT is $(systemctl is-active "$UNIT" || true)"
+  # The helper has queued the restart already.
+  if [ "$reviewed" != 1 ]; then
+    sudo systemctl restart --no-block "$UNIT"
+  fi
+  log "Restart queued: $UNIT drains running agent turns, then starts $label"
+  log "Follow it with: journalctl -fu $UNIT"
+}
+
+# Start the root helper and stream its journal, since `systemctl start` itself
+# prints nothing until the oneshot is done.
+helper_switch() {
+  local unit="pandeck-deploy@$1.service" follower rc=0
+  journalctl -f -n0 -o cat -u "$unit" &
+  follower=$!
+  sleep 0.5
+  systemctl start "$unit" || rc=$?
+  sleep 1
+  kill "$follower" 2>/dev/null || true
+  wait "$follower" 2>/dev/null || true
+  [ "$rc" = 0 ] || err "$unit failed (journalctl -u $unit)"
 }
 
 case "${1:-}" in

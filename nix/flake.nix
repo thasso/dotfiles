@@ -47,8 +47,8 @@
     # rolling it back, and `make update` re-locks the same revision rather than
     # dragging the assistant forward. Move it only with `make pandeck REF=...`
     # (scripts/pandeck-deploy), which pins, switches, commits the bump and
-    # restarts the unit (restartIfChanged = false), keeping the dotfiles history
-    # the deploy history. Roll back by deploying an older ref; a release with a
+    # queues the unit's restart (restartIfChanged = false), keeping the dotfiles
+    # history the deploy history. Roll back by deploying an older ref; a release with a
     # migration also needs the DATA_DIR backup from before it. The repository is
     # private for now, so it is fetched over SSH.
     personalAssistant = {
@@ -128,6 +128,9 @@
           sops-nix.nixosModules.sops
           personalAssistant.nixosModules.default
           ./hosts/devbox/configuration.nix
+          # The source this very system is built from, so an agent-started
+          # Pandeck deploy rebuilds it rather than the (writable) checkout.
+          { services.my-pandeck-deploy.flake = "path:${self.sourceInfo.outPath}?dir=nix"; }
           home-manager.nixosModules.home-manager
           homeManagerConfig
         ];

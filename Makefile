@@ -33,8 +33,9 @@ dry-update:
 
 # ── Pandeck (devbox) ──────────────────────────────────────
 # Moves the personalAssistant pin, switches, commits the bump (never pushes)
-# and restarts the app. REF: a release tag, a branch (default main) or a
-# commit sha on a pushed branch. See scripts/pandeck-deploy.
+# and queues the app restart. REF: a release tag, a branch (default main) or a
+# commit sha on a pushed branch; main and tags need no sudo, so agents can run
+# it. See scripts/pandeck-deploy.
 #   make pandeck REF=v0.53.0
 #   make pandeck REF=main ALLOW_MIGRATIONS=1
 pandeck:

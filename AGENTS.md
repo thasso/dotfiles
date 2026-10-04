@@ -50,10 +50,19 @@ runs, so:
   would churn the assistant's unit on every input update.
 - Nothing deploys automatically: the app's GitHub CI never reaches this host.
   `make pandeck REF=<tag|branch|sha>` (default `main`; `scripts/pandeck-deploy`)
-  moves the pin, switches, commits the bump here (never pushes) and restarts the
-  app; `make pandeck-status` compares the pin with the latest release and
-  `main`. So `git log nix/flake.lock` is the deploy history, and rollback is
-  deploying an older ref.
+  moves the pin, switches, commits the bump here (never pushes) and queues the
+  app restart, which drains running agent turns first. `make pandeck-status`
+  compares the pin with the latest release and `main`. So `git log
+  nix/flake.lock` is the deploy history, and rollback is deploying an older ref.
+- Agents can deploy, but only reviewed code. Agent sessions cannot sudo, so a
+  commit on `main` or a release tag switches through the root oneshot
+  `pandeck-deploy@<sha>.service` (`nix/modules/pandeck-deploy.nix`), which a
+  polkit rule lets thasso start. It fetches Pandeck with its own read-only
+  deploy key (`pandeck_deploy_key` in `secrets/devbox.yaml`), refuses anything
+  not on `main` or tagged, and rebuilds the dotfiles source the running system
+  was built from with only the pin changed, so checkout edits still need
+  `make switch`. Unmerged branch commits switch this checkout with sudo: human
+  only. Keep it that way: Pandeck's NixOS module is evaluated as root.
 - `make pandeck` refuses a target on an unmerged branch that changes migrations,
   and a target that lacks migrations the pinned commit already ran, unless
   `ALLOW_MIGRATIONS=1`: the data directory cannot un-run a migration, so either
