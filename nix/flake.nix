@@ -51,7 +51,7 @@
     # history the deploy history. Roll back by deploying an older ref; a release with a
     # migration also needs the DATA_DIR backup from before it.
     personalAssistant = {
-      url = "git+https://github.com/thasso/pandeck.git?ref=refs/tags/v0.52.0";
+      url = "git+https://github.com/thasso/pandeck.git?ref=refs/tags/v0.53.0";
     };
   };
 
