@@ -356,16 +356,16 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1791360379,
-        "narHash": "sha256-WBgi5mG6oDlkeIiLLI7ZZ1MJqNkCmcckeY+i0eaAtFk=",
-        "ref": "refs/tags/v0.53.0",
-        "rev": "04c2d4b306c700e745fd0dde95cf9690fcfb5307",
-        "revCount": 68,
+        "lastModified": 1791794779,
+        "narHash": "sha256-Mf1EyGigKRNPQAHOAcOyeh/hnCl4tIMyZQS9VG13es8=",
+        "ref": "refs/tags/v0.54.0",
+        "rev": "cb3a2b6633db84bc8e597d67fcde9abaccbc6bea",
+        "revCount": 80,
         "type": "git",
         "url": "https://github.com/thasso/pandeck.git"
       },
       "original": {
-        "ref": "refs/tags/v0.53.0",
+        "ref": "refs/tags/v0.54.0",
         "type": "git",
         "url": "https://github.com/thasso/pandeck.git"
       }
