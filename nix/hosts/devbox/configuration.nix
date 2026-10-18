@@ -159,6 +159,15 @@ in
     };
   };
 
+  # Run arm64 images (`docker run --platform linux/arm64`) under QEMU user
+  # emulation, e.g. to check an arm64 build locally before a staging deploy.
+  # Static emulators register with the fix-binary (F) flag, so the kernel opens
+  # the interpreter at registration time and it works inside containers where
+  # /nix/store isn't visible; without it arm64 containers fail with
+  # `exec format error`.
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+  boot.binfmt.preferStaticEmulators = true;
+
   # ── Nix store hygiene ─────────────────────────────────────
   # Hardlink byte-identical files across store paths. This box deploys the
   # personal assistant several times a day and each build is a ~750 MB output,
