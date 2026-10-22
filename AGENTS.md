@@ -40,13 +40,16 @@ runs, so:
   `config/host-tools.json` and fails its own boot if the host is below a floor.
   Optional capabilities (dictation, docker, java) are discovered and degrade with
   a reason. `sherpa-onnx` in `environment.systemPackages` plus
-  `speech.modelDir` is what makes dictation possible — ordinary host config.
-- Nothing here reaches into the app flake for a package. The dictation weights
-  are ours: `nix/pkgs/stt-model-*.nix`, our URL and our hash, wired through the
-  overlay like `gogcli`/`tempomat` and handed to `speech.modelDir`. It is a
-  `fetchzip` on purpose — a fixed-output path depends only on name and hash, so
-  `make update` cannot move it (verified against two unrelated nixpkgs
-  revisions). Never turn it into a `mkDerivation`: that is input-addressed and
+  `speech.modelDir` is what makes dictation possible; voice conversation adds
+  `speech.streamingModelDir`, `speech.ttsModelDir` and `speech.ttsPython` (the
+  `pandeck-tts-python` wrapper, also in `environment.systemPackages`) —
+  ordinary host config.
+- Nothing here reaches into the app flake for a package. The speech weights are
+  ours: `nix/pkgs/stt-model-*.nix` and `nix/pkgs/tts-model-*.nix`, our URL and
+  our hash, wired through the overlay like `gogcli`/`tempomat` and handed to the
+  `speech.*` options. Each is a `fetchzip` on purpose — a fixed-output path
+  depends only on name and hash, so `make update` cannot move it (verified
+  against two unrelated nixpkgs revisions). Never turn it into a `mkDerivation`: that is input-addressed and
   would churn the assistant's unit on every input update.
 - Nothing deploys automatically: the app's GitHub CI never reaches this host.
   `make pandeck REF=<tag|branch|sha>` (default `main`; `scripts/pandeck-deploy`)

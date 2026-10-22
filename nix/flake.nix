@@ -3,6 +3,12 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # The assistant's speech runtime only: sherpa-onnx >= 1.13.5 (1.13.3 drops
+    # subwords with streaming Nemotron, k2-fsa/sherpa-onnx#3785) and the Kokoro
+    # sidecar's Python bindings. Pinned to an exact nixos-unstable commit
+    # because moving `nixpkgs` past it currently fails evaluation (the
+    # forgejo-runner module). Drop this input once `nixpkgs` reaches 1.13.5+.
+    nixpkgsSpeech.url = "github:NixOS/nixpkgs/02c087f3fe673c9e317f206a627cb6b910336dbe";
     claudeCode = {
       url = "github:sadjow/claude-code-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -51,11 +57,11 @@
     # history the deploy history. Roll back by deploying an older ref; a release with a
     # migration also needs the DATA_DIR backup from before it.
     personalAssistant = {
-      url = "git+https://github.com/thasso/pandeck.git?ref=refs/tags/v0.61.0";
+      url = "git+https://github.com/thasso/pandeck.git?ref=refs/tags/v0.62.0";
     };
   };
 
-  outputs = { self, nixpkgs, claudeCode, codexCli, piMono, nix-darwin, home-manager, nixos-lima, sops-nix, disko, personalAssistant, ... }:
+  outputs = { self, nixpkgs, nixpkgsSpeech, claudeCode, codexCli, piMono, nix-darwin, home-manager, nixos-lima, sops-nix, disko, personalAssistant, ... }:
     let
       overlays = { nixpkgs.overlays = [
         claudeCode.overlays.default
@@ -63,13 +69,26 @@
         piMono.overlays.default
         (final: prev: { gogcli = final.callPackage ./pkgs/gogcli.nix {}; })
         (final: prev: { tempomat = final.callPackage ./pkgs/tempomat.nix {}; })
-        # Speech-to-text weights for the assistant's dictation. A host package
-        # because the app owns no weights — see the file's own header for why it
-        # is a fetchzip (fixed-output ⇒ its path cannot churn on `make update`).
+        # Speech weights for the assistant's dictation and voice conversation.
+        # Host packages because the app owns no weights — see the files' own
+        # headers for why they are fetchzips (fixed-output ⇒ their paths cannot
+        # churn on `make update`).
         (final: prev: {
           stt-model-parakeet-tdt-600m-v2-int8 =
             final.callPackage ./pkgs/stt-model-parakeet-tdt-600m-v2-int8.nix {};
+          stt-model-nemotron-streaming-en-560ms-int8 =
+            final.callPackage ./pkgs/stt-model-nemotron-streaming-en-560ms-int8.nix {};
+          tts-model-kokoro-v1-fp32 =
+            final.callPackage ./pkgs/tts-model-kokoro-v1-fp32.nix {};
         })
+        # The speech runtime from nixpkgsSpeech (see that input). The Python env
+        # comes whole from the same revision, so its bindings match its CLI.
+        (final: prev:
+          let speechPkgs = nixpkgsSpeech.legacyPackages.${final.stdenv.hostPlatform.system};
+          in {
+            sherpa-onnx = speechPkgs.sherpa-onnx;
+            sherpa-onnx-python = speechPkgs.python3.withPackages (p: [ p.sherpa-onnx ]);
+          })
         # direnv's test suite hangs on Darwin (special chars in test dir names)
         (final: prev: {
           direnv = prev.direnv.overrideAttrs (_old:
