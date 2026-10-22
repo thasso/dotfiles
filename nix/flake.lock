@@ -319,6 +319,22 @@
         "type": "github"
       }
     },
+    "nixpkgsSpeech": {
+      "locked": {
+        "lastModified": 1792502884,
+        "narHash": "sha256-IoNisKcGbUjdd45qCqywGMCYmZ5EnkxezvLII0FWwNA=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "02c087f3fe673c9e317f206a627cb6b910336dbe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "02c087f3fe673c9e317f206a627cb6b910336dbe",
+        "type": "github"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1783224372,
@@ -402,6 +418,7 @@
         "nix-darwin": "nix-darwin",
         "nixos-lima": "nixos-lima",
         "nixpkgs": "nixpkgs",
+        "nixpkgsSpeech": "nixpkgsSpeech",
         "personalAssistant": "personalAssistant",
         "piMono": "piMono",
         "sops-nix": "sops-nix"

@@ -31,6 +31,12 @@ let
     systemctl status --no-pager -l personal-assistant.service || true
     exit 1
   '';
+  # The Python the assistant runs its Kokoro TTS sidecar with. The env's store
+  # path moves whenever its nixpkgs does, so the unit gets this wrapper's
+  # hash-free /run/current-system/sw path instead (see speech.ttsPython).
+  paTtsPython = pkgs.writeShellScriptBin "pandeck-tts-python" ''
+    exec ${pkgs.sherpa-onnx-python}/bin/python3 "$@"
+  '';
 in
 {
   imports = [
@@ -307,7 +313,22 @@ in
     # A store path, and still churn-free: that package is a fetchzip, i.e. a
     # fixed-output derivation whose path is a function of its name and output
     # hash alone. `make update` cannot move it, so it cannot move the unit.
-    speech.modelDir = "${pkgs.stt-model-parakeet-tdt-600m-v2-int8}";
+    speech = {
+      modelDir = "${pkgs.stt-model-parakeet-tdt-600m-v2-int8}";
+    }
+    # Hands-free voice conversation, same split as dictation: the streaming
+    # recognizer (sherpa-onnx-online-websocket-server, >= 1.13.5) comes from
+    # systemPackages, the Python for the Kokoro sidecar is paTtsPython, and the
+    # weights are our fetchzips in nix/pkgs/. All three paths are churn-free.
+    # The recognizer binds 0.0.0.0 on 46000-46999 with no bind option; the
+    # default-deny firewall (22/80/443 open, plus the forgejo SSH port on
+    # tailscale0) keeps those ports local. Guarded until the pin reaches a
+    # release with these options.
+    // lib.optionalAttrs (options.services.personal-assistant.speech ? ttsModelDir) {
+      streamingModelDir = "${pkgs.stt-model-nemotron-streaming-en-560ms-int8}";
+      ttsModelDir = "${pkgs.tts-model-kokoro-v1-fp32}";
+      ttsPython = "/run/current-system/sw/bin/pandeck-tts-python";
+    };
 
   }
   # Contain runaway agents (2026-09-30: a 35 GB pytest in this unit caused a
@@ -421,13 +442,16 @@ in
   # Power measurement tools (`sudo powertop`, `sensors`) for profiling idle draw.
   # sherpa-onnx is here rather than in services.personal-assistant because the
   # assistant treats the recognizer as a host tool it discovers on PATH: the app
-  # ships no recognizer package, so this host is what makes dictation possible.
-  # Updating it is an ordinary host update — it cannot move the assistant's unit.
+  # ships no recognizer package, so this host is what makes dictation and voice
+  # conversation possible. paTtsPython is the Kokoro sidecar's Python, on this
+  # profile for the same reason. Updating either is an ordinary host update — it
+  # cannot move the assistant's unit.
   # librsvg provides rsvg-convert, the SVG-to-PNG fallback when CairoSVG is absent.
   environment.systemPackages = with pkgs; [
     powertop
     lm_sensors
     sherpa-onnx
+    paTtsPython
     librsvg
   ];
 
